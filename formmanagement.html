@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularverwaltung - Notfallschule Rhein Ruhr</title>
+
+    <!-- Verlinkung zur CSS-Datei -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase-Konfigurationsdatei -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Formularverwaltungs-Script -->
+    <script src="js/formmanagement.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Formularverwaltung</h2>
+
+        <!-- Button zum Erstellen eines neuen Formulars -->
+        <button class="button" onclick="window.location.href='form-builder.html'">Neues Formular erstellen</button>
+
+        <!-- Liste aller erstellten Formulare -->
+        <div id="formList" class="form-list">
+            <!-- Hier werden die gespeicherten Formulare dynamisch geladen -->
+        </div>
+
+        <!-- Logout-Button -->
+        <button class="button" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Benachrichtigungscontainer -->
+    <div id="notification" class="notification"></div>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formular-Builder</title>
+    <link rel="stylesheet" href="css/form-builder.css">
+</head>
+
+<body>
+    <div class="form-builder-container">
+        <!-- Linke Seite: Formularelemente -->
+        <aside class="sidebar">
+            <h3>Formularelemente</h3>
+            <div class="element" draggable="true" data-type="text">📄 Textfeld</div>
+            <div class="element" draggable="true" data-type="textarea">📝 Mehrzeiliger Text</div>
+            <div class="element" draggable="true" data-type="checkbox">☑️ Checkbox</div>
+            <div class="element" draggable="true" data-type="dropdown">⬇️ Dropdown-Menü</div>
+            <div class="element" draggable="true" data-type="date">📅 Datumsauswahl</div>
+            <div class="element" draggable="true" data-type="signature">✍️ Unterschrift</div>
+            <div class="element" draggable="true" data-type="file-upload">📂 Datei-Upload</div>
+            <div class="element" draggable="true" data-type="radiobutton">🔘 Radiobutton</div>
+            <div class="element" draggable="true" data-type="multiple-dropdown">⬇️ Mehrfachauswahl Dropdown</div>
+            <div class="element" draggable="true" data-type="section-divider">—— Trennlinie</div>
+            <div class="element" draggable="true" data-type="slider">🎚️ Schieberegler</div>
+            <div class="element" draggable="true" data-type="color-picker">🎨 Farbauswahl</div>
+            <div class="element" draggable="true" data-type="email">✉️ E-Mail-Feld</div>
+            <div class="element" draggable="true" data-type="phone">📞 Telefonnummer</div>
+            <div class="element" draggable="true" data-type="textarea-large">📄 Großes Textfeld</div>
+            <div class="element" draggable="true" data-type="checkbox-terms">📝 AGB Checkbox</div>
+            <div class="element" draggable="true" data-type="submit-button">📤 Senden-Button</div>
+            <div class="element" draggable="true" data-type="custom-button">🔘 Benutzerdefinierter Button</div>
+            <div class="element" draggable="true" data-type="captcha">🛡️ Captcha</div>
+            <div class="element" draggable="true" data-type="google-maps">🗺️ Google Maps Standort</div>
+            <div class="element" draggable="true" data-type="drag-drop-upload">📂 Drag-and-Drop Datei-Upload</div>
+            <div class="element" draggable="true" data-type="progressive-form">⏩ Progressives Formular</div>
+            <div class="element" draggable="true" data-type="conditional-form">🔄 Formular mit Bedingungslogik</div>
+            <div class="element" draggable="true" data-type="payment-field">💳 Zahlungsfeld</div>
+        </aside>
+
+        <!-- Mittlere Seite: Arbeitsbereich (Dropzone) -->
+        <main class="workspace">
+            <h3>Formular erstellen</h3>
+            <div id="form-workspace" class="dropzone">
+                <!-- Hierhin werden die Elemente gezogen -->
+            </div>
+        </main>
+
+        <!-- Rechte Seite: Eigenschaften der Elemente -->
+        <aside class="properties">
+            <h3>Element-Eigenschaften</h3>
+            <div id="element-properties">
+                <!-- Eigenschaften der gewählten Elemente werden hier dynamisch angezeigt -->
+                <p>Wählen Sie ein Element aus, um die Eigenschaften zu bearbeiten.</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Aktionen (Speichern und Vorschau) -->
+    <div class="actions">
+        <button id="save-form">Formular speichern</button>
+        <button id="preview-form">Vorschau</button>
+    </div>
+
+    <script src="js/form-builder.js"></script>
+</body>
+
+</html>

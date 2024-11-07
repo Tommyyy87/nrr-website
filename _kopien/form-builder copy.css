@@ -1,0 +1,421 @@
+/* Grundlegendes Layout und Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Header-Styling */
+header {
+    background-color: #2b2f3b;
+    /* Dunklerer Hintergrund für modernen Look */
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    justify-content: space-between;
+}
+
+/* Titel-Stil für linksbündige Ausrichtung und kleinere Schrift */
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Header Buttons Stil */
+.header-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.header-buttons button {
+    padding: 0.4rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background-color 0.3s ease;
+    color: #fff;
+    cursor: pointer;
+}
+
+.header-buttons button i {
+    font-size: 1rem;
+    /* Kleine Symbole für moderneren Look */
+}
+
+/* Spezielle Farben für die Buttons */
+.header-buttons .undo-button {
+    background-color: #ffc107;
+}
+
+.header-buttons .undo-button:hover {
+    background-color: #e0a800;
+}
+
+.header-buttons .redo-button {
+    background-color: #17a2b8;
+}
+
+.header-buttons .redo-button:hover {
+    background-color: #138496;
+}
+
+.header-buttons .save-button {
+    background-color: #28a745;
+}
+
+.header-buttons .save-button:hover {
+    background-color: #218838;
+}
+
+.header-buttons .preview-button {
+    background-color: #007bff;
+}
+
+.header-buttons .preview-button:hover {
+    background-color: #0056b3;
+}
+
+.header-buttons .back-button {
+    background-color: #dc3545;
+}
+
+.header-buttons .back-button:hover {
+    background-color: #c82333;
+}
+
+/* Layout für den Formular-Builder */
+main {
+    display: flex;
+    justify-content: space-between;
+    padding: 2.5rem;
+    gap: 1.5rem;
+    width: 100%;
+    height: calc(100vh - 100px);
+    /* Berechnet die Höhe minus Header */
+}
+
+#form-builder {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+/* Baustein-Liste */
+#form-elements {
+    flex-basis: 20%;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+#form-elements h2 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #333;
+    text-align: center;
+}
+
+#form-elements ul {
+    list-style-type: none;
+}
+
+#form-elements li {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: grab;
+    transition: background-color 0.3s, transform 0.2s ease-in-out;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#form-elements li i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+#form-elements li button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#form-elements li:hover {
+    background-color: #e8e8e8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Vorschau-Bereich */
+#form-preview {
+    flex-basis: 35%;
+    background-color: #ffffff11;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 100%;
+    border: 3px dashed #ccc;
+    transition: background-color 0.3s ease;
+    overflow-y: auto;
+}
+
+#form-preview.drag-over {
+    background-color: #f0f8ff;
+}
+
+#form-preview h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Gedroppte Formularelemente in moderner Kartenoptik */
+.form-element {
+    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-element:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.form-element h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.form-element p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.form-element .delete-button {
+    align-self: flex-end;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.form-element .delete-button:hover {
+    background-color: #c82333;
+}
+
+/* Placeholder für das Ziehen */
+.form-element.placeholder {
+    border: 2px dashed #007bff;
+    background-color: #e0f7ff;
+    height: 60px;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.placeholder-target {
+    height: 50px;
+    margin-bottom: 1.5rem;
+    background-color: #e0f7ff;
+    border: 2px dashed #007bff;
+    transition: height 0.2s ease;
+}
+
+.selected-element {
+    border: 2px solid #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Drop-Indikator */
+.drop-indicator {
+    height: 5px;
+    background-color: rgba(0, 123, 255, 0.5);
+    margin: 10px 0;
+    transition: background-color 0.2s;
+}
+
+.form-element label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+/* Eigenschaften-Panel */
+#properties {
+    flex-basis: 25%;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+#properties h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #333;
+    text-align: center;
+}
+
+.properties-section {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.properties-section h3 {
+    font-size: 1.2rem;
+    color: #444;
+    margin-bottom: 1rem;
+}
+
+.property {
+    margin-bottom: 1rem;
+}
+
+.property label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+.property input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+/* Buttons im Eigenschaften-Panel */
+.properties-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.properties-buttons button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.duplicate-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.duplicate-button:hover {
+    background-color: #0056b3;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 1200px) {
+    main {
+        gap: 1.5rem;
+        width: 95vw;
+    }
+
+    #form-elements,
+    #properties {
+        flex-basis: 30%;
+    }
+
+    #form-preview {
+        flex-basis: 40%;
+    }
+}
+
+@media (max-width: 992px) {
+    main {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+
+    #form-elements,
+    #form-preview,
+    #properties {
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    #form-preview {
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    #form-elements,
+    #form-preview,
+    #properties {
+        width: 100%;
+    }
+}

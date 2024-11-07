@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formular-Builder mit Vue 3</title>
+    <link rel="stylesheet" href="css/form-builder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1>Formular-Builder</h1>
+            <div id="actions">
+                <input type="text" v-model="formName" placeholder="Formularname eingeben">
+                <button @click="undo">Rückgängig</button>
+                <button @click="redo">Wiederholen</button>
+            </div>
+        </header>
+
+        <main>
+            <section id="form-builder">
+                <div id="form-elements">
+                    <h2>Bausteine</h2>
+                    <!-- Draggable-Komponente für die Bausteine -->
+                    <Draggable :list="[]" :group="{ name: 'elements', pull: 'clone', put: false }"
+                        @clone="cloneElement">
+                        <div v-for="(element, index) in elements" :key="index" class="element">
+                            <i :class="element.icon"></i> {{ element.label }}
+                        </div>
+                    </Draggable>
+                </div>
+
+                <div id="form-preview">
+                    <h2>Vorschau</h2>
+                    <!-- Draggable-Komponente für Vorschau -->
+                    <Draggable v-model="formElements" :group="{ name: 'elements', pull: false, put: true }" @add="onAdd"
+                        class="form-list">
+                        <div v-for="(item, index) in formElements" :key="index" class="form-element">
+                            <label>{{ item.label }}</label>
+                            <component :is="item.type"></component>
+                            <button @click="removeElement(index)">Löschen</button>
+                        </div>
+                    </Draggable>
+                </div>
+
+                <aside id="properties">
+                    <h2>Eigenschaften</h2>
+                    <div v-if="selectedElement" id="element-properties">
+                        <p>Wähle ein Element aus, um die Eigenschaften anzupassen</p>
+                        <label>Beschriftung:</label>
+                        <input type="text" v-model="selectedElement.label" @input="updateElement">
+                    </div>
+                </aside>
+            </section>
+        </main>
+
+        <footer>
+            <button @click="saveForm">Formular speichern</button>
+            <button @click="previewForm">Formularvorschau</button>
+            <button @click="goBack">Zurück zur Formularverwaltung</button>
+        </footer>
+    </div>
+
+    <!-- Vue und Draggable Module von unpkg laden -->
+    <script type="module">
+        import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.esm-browser.js';
+        import Draggable from 'https://unpkg.com/vue-draggable-next@2.2.1/dist/vue-draggable-next.esm-browser.js';
+        import appConfig from '/js/form-builder.js';
+
+        const app = createApp(appConfig);
+        app.component('Draggable', Draggable);
+        app.mount('#app');
+    </script>
+</body>
+
+</html>

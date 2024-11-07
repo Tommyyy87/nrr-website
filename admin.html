@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Hauptseite</title>
+
+    <!-- Verlinkung zur CSS-Datei -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script> <!-- Initialisierung der Firebase App -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Firebase-Dienste initialisieren
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // Überprüfen, ob der Benutzer angemeldet ist und Admin-Rechte hat
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    try {
+                        const userRef = db.collection('users').doc(user.uid);
+                        const userDoc = await userRef.get();
+
+                        if (userDoc.exists && userDoc.data().isAdmin) {
+                            console.log("Admin-Berechtigung bestätigt.");
+                        } else {
+                            alert("Sie haben keine Berechtigung, diese Seite zu sehen.");
+                            window.location.href = "home.html";
+                        }
+                    } catch (error) {
+                        console.error("Fehler beim Überprüfen der Admin-Rechte:", error);
+                        window.location.href = "home.html";
+                    }
+                } else {
+                    // Nicht eingeloggt, Weiterleitung zur Login-Seite
+                    window.location.href = "index.html";
+                }
+            });
+        });
+
+        // Logout-Funktion
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                alert("Erfolgreich abgemeldet");
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Fehler beim Abmelden:", error.message);
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hier wird das Logo eingefügt -->
+        <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        <h2>Admin - Hauptseite</h2>
+        <p>Wähle eine der folgenden Aktionen aus:</p>
+
+        <!-- Admin-Optionen -->
+        <div class="admin-options">
+            <button class="button" onclick="window.location.href='usercontrol.html'">Benutzerverwaltung</button>
+            <button class="button" onclick="window.location.href='formmanagement.html'">Formularverwaltung</button>
+        </div>
+
+        <!-- Logout-Button -->
+        <button class="button" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Benachrichtigungscontainer -->
+    <div id="notification" class="notification"></div>
+</body>
+
+</html>

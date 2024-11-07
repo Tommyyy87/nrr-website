@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Notfallschule Rhein Ruhr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Verlinkung zur CSS-Datei -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hier wird das Logo eingefügt -->
+        <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        <h2>Login</h2>
+
+        <!-- Eingabefeld für die E-Mail -->
+        <input type="email" id="email" placeholder="E-Mail eingeben" class="input-field">
+
+        <!-- Eingabefeld für das Passwort -->
+        <input type="password" id="password" placeholder="Passwort eingeben" class="input-field">
+
+        <!-- Login-Button -->
+        <button id="loginButton" class="button">Einloggen</button>
+
+        <!-- Link zur Registrierung -->
+        <p>Noch kein Konto? <a href="#" id="registerLink">Registrieren</a></p>
+        <p><a href="#" id="resetPasswordLink">Passwort vergessen?</a></p>
+
+
+        <!-- Registrierungsbereich, wird standardmäßig ausgeblendet -->
+        <div id="registerContainer" style="display: none;">
+            <h2>Registrierung</h2>
+
+            <input type="text" id="registerFirstName" placeholder="Vorname eingeben" class="input-field">
+            <input type="text" id="registerLastName" placeholder="Nachname eingeben" class="input-field">
+            <input type="email" id="registerEmail" placeholder="E-Mail eingeben" class="input-field">
+            <input type="password" id="registerPassword" placeholder="Passwort eingeben" class="input-field">
+
+            <button id="registerButton" class="button">Registrieren</button>
+        </div>
+
+        <!-- Container für Benachrichtigungen -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <!-- Skripte -->
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase-Konfigurationsdatei -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Anwendungsskripte für Login und Registrierung -->
+    <script src="js/auth.js"></script>
+
+    <!-- Interaktive UI-Komponenten -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const registerLink = document.getElementById("registerLink");
+            const registerContainer = document.getElementById("registerContainer");
+            const loginButton = document.getElementById("loginButton");
+            const registerButton = document.getElementById("registerButton");
+
+            // Event-Listener für den Registrierungslink (Anzeigen des Registrierungsformulars)
+            registerLink.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                // Debugging: Aktuellen Display-Wert prüfen
+                console.log("Aktueller display-Wert:", registerContainer.style.display);
+
+                // Feste Zwangsanzeige für den Container (unabhängig von vorherigem Zustand)
+                registerContainer.style.display = "block"; // Erzwinge die Anzeige des Formulars
+                console.log("Registrierungsformular erzwungen sichtbar");
+
+                // Debugging: Neuer Display-Wert prüfen
+                console.log("Neuer display-Wert:", registerContainer.style.display);
+            });
+
+            // Debugging: Überprüfung, ob die Buttons vorhanden sind
+            console.log("Login-Button:", loginButton ? "Gefunden" : "Nicht gefunden");
+            console.log("Registrieren-Button:", registerButton ? "Gefunden" : "Nicht gefunden");
+
+            // Event-Listener für den Login-Button
+            loginButton.addEventListener("click", function () {
+                console.log("Login-Button wurde geklickt");
+            });
+
+            // Event-Listener für den Registrieren-Button
+            registerButton.addEventListener("click", function () {
+                console.log("Registrieren-Button wurde geklickt");
+            });
+        });
+    </script>
+</body>
+
+</html>

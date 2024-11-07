@@ -1,0 +1,308 @@
+/* Grundlegendes Styling für den gesamten Body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+/* Container für Inhalte wie Login, Registrierung und Kursformular */
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    margin: 20px;
+}
+
+/* Filtercontainer */
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Anpassung für Filterelemente für bessere Übersicht */
+.filter-container label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.filter-container select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+/* Benutzerkarten (Card Layout) */
+.user-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Styling für Benutzerdetails */
+.user-item p {
+    margin: 0;
+    font-size: 1em;
+}
+
+/* Überschriften-Styling */
+h1,
+h2 {
+    color: #333;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+/* Eingabefelder-Styling */
+.input-field,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+/* Datei-Upload Styling */
+input[type="file"] {
+    display: block;
+    margin: 10px 0;
+}
+
+/* Buttons */
+.button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+/* Farbige Buttons für spezifische Aktionen */
+.button.approve {
+    background-color: #28a745;
+}
+
+.button.approve:hover {
+    background-color: #218838;
+}
+
+.button.admin {
+    background-color: #007bff;
+}
+
+.button.admin:hover {
+    background-color: #0056b3;
+}
+
+/* Kleine Buttons für Admin- und Benutzeraktionen */
+.button.small {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+/* Buttons für das Löschen */
+.button.delete {
+    background-color: #dc3545;
+}
+
+.button.delete:hover {
+    background-color: #c82333;
+}
+
+/* Fehlernachricht-Styling */
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+/* Link zur Registrierung */
+p {
+    margin-top: 15px;
+}
+
+/* Linkstil */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Canvas für Unterschrift */
+#signaturePad {
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Benachrichtigungen */
+.notification {
+    display: none;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1em;
+    z-index: 1000;
+}
+
+.notification.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.notification.error {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Styling für das Logo */
+.logo {
+    display: block;
+    margin: 0 auto 30px;
+    max-width: 80%;
+    height: auto;
+}
+
+/* Benutzerkarten für Admin- und Benutzeraktionen auf Mobilgeräten */
+@media (max-width: 768px) {
+    .user-item {
+        padding: 15px;
+        font-size: 0.95em;
+    }
+
+    .button.small {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 1.6em;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .filter-container {
+        flex-direction: column;
+    }
+}
+
+/* Responsives Design für kleinere Bildschirme */
+@media (max-width: 600px) {
+    .container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    .input-field,
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+        font-size: 0.9em;
+    }
+
+    .button {
+        font-size: 0.9em;
+    }
+
+    .logo {
+        display: block;
+        margin: 0 auto 30px;
+        max-width: 80%;
+        height: auto;
+    }
+
+    #signaturePad {
+        height: 150px;
+    }
+
+    .filter-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-container select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Platzhalter-Stil für den Drop-Bereich */
+.form-element.placeholder {
+    border: 2px dashed #007bff;
+    background-color: #f0f8ff;
+    height: 60px;
+    /* Definiert die Höhe des Platzhalters */
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease-in-out;
+    /* Weiche Animation bei Platzänderungen */
+}
+
+.dragging-over {
+    margin-top: 10px;
+    transition: margin 0.2s ease;
+}

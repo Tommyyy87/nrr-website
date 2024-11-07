@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Control - Benutzerverwaltung</title>
+
+    <!-- Verlinkung zur CSS-Datei -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Firebase SDKs: Diese müssen vor der firebase-config.js geladen werden -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase-Konfigurationsdatei -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Authentifizierungsdatei für Firebase-Authentifizierung -->
+    <script src="js/auth.js"></script>
+
+    <!-- Benutzersteuerungs-Script -->
+    <script src="js/usercontrol.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>User Control - Benutzerverwaltung</h2>
+
+        <!-- Zeigt den angemeldeten Benutzer an -->
+        <div id="userInfo" class="info-text"></div>
+
+        <!-- Filter für Benutzeranzeige -->
+        <div class="filter-container">
+            <label for="filterApproved">Freigeschaltet:</label>
+            <select id="filterApproved">
+                <option value="all">Alle</option>
+                <option value="approved">Ja</option>
+                <option value="notApproved">Nein</option>
+                <!-- <option value="onlyNotApproved">Nur nicht freigeschaltet</option> -->
+            </select>
+
+            <label for="filterAdmin">Admin:</label>
+            <select id="filterAdmin">
+                <option value="all">Alle</option>
+                <option value="admin">Admin</option>
+                <option value="notAdmin">Kein Admin</option>
+            </select>
+
+            <button class="button small" onclick="applyFilters()">Filter anwenden</button>
+        </div>
+
+        <!-- Benutzerliste -->
+        <div id="usersList" class="user-list"></div>
+
+        <!-- Logout-Button -->
+        <button class="button" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Benachrichtigungscontainer -->
+    <div id="notification" class="notification"></div>
+</body>
+
+</html>

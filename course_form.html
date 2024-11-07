@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kursformular - Notfallschule Rhein Ruhr</title>
+
+    <!-- Einbinden der externen CSS-Datei für das Design -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Favicon und App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/courseForm.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Logo oben einfügen -->
+        <img src="img/logo.png" alt="Notfallschule Rhein Ruhr Logo" class="logo">
+        <h2>Kursformular</h2>
+
+        <!-- Formular für die Kursdaten -->
+        <form id="courseForm">
+            <div class="form-section">
+                <label for="instructorName">Dozent:</label>
+                <p id="instructorName"></p>
+            </div>
+
+            <div class="form-section">
+                <label for="courseDate">Datum:</label>
+                <input type="date" id="courseDate" name="courseDate" required>
+            </div>
+
+            <div class="form-section">
+                <label for="customerName">Kundenname:</label>
+                <input type="text" id="customerName" name="customerName" required>
+
+                <label for="totalParticipants">Gesamtzahl Teilnehmer:</label>
+                <input type="number" id="totalParticipants" name="totalParticipants" required>
+
+                <label for="billingParticipants">Anzahl Teilnehmer über Abrechnungsformular:</label>
+                <input type="number" id="billingParticipants" name="billingParticipants" required>
+
+                <label for="companyParticipants">Anzahl Teilnehmer über Träger/Firma:</label>
+                <input type="number" id="companyParticipants" name="companyParticipants" required>
+            </div>
+
+            <div class="form-section">
+                <h3>Kursunterlagen</h3>
+                <label for="courseDocuments">Dokumente hochladen:</label>
+                <input type="file" id="courseDocuments" name="courseDocuments" multiple>
+                <div id="uploadedDocuments"></div>
+
+                <div class="checkbox-label">
+                    <input type="checkbox" id="dateAndSignature">
+                    <label for="dateAndSignature">Datum und Unterschrift?</label>
+                </div>
+
+                <label for="billingForm">BG Abrechnungsformular hochladen:</label>
+                <input type="file" id="billingForm" name="billingForm">
+                <div id="uploadedBillingForm"></div>
+
+                <div class="checkbox-label">
+                    <input type="checkbox" id="companyStampSignature">
+                    <label for="companyStampSignature">Stempel und Unterschrift Unternehmen?</label>
+                </div>
+                <div class="checkbox-label">
+                    <input type="checkbox" id="ukGutschein">
+                    <label for="ukGutschein">UK NRW Gutschein gültig und Unterschrift TN?</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Desinfektionsnachweis</h3>
+                <label for="equipmentSetNumber">Equipmentsatz Nr.:</label>
+                <select id="equipmentSetNumber" name="equipmentSetNumber" required></select>
+
+                <label for="registrationNumber">Registrierungsnummer:</label>
+                <input type="text" id="registrationNumber" name="registrationNumber" required>
+
+                <label for="disinfectant">Desinfektionsmittel:</label>
+                <div id="disinfectantsList"></div>
+
+                <label for="additionalDisinfection">Weitere Desinfektionsschritte:</label>
+                <div id="additionalDisinfectionList"></div>
+            </div>
+
+            <div class="form-section">
+                <label for="signature">Unterschrift:</label>
+                <canvas id="signaturePad"></canvas>
+                <button type="button" id="clearSignature">Unterschrift löschen</button>
+            </div>
+
+            <button type="button" id="submitButton" class="button">Dateien senden</button>
+        </form>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Der komplette Inhalt wurde nach courseForm.js verschoben
+    </script>
+</body>
+
+</html>

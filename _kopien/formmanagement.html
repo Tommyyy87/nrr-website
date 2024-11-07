@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notfallschule Rhein Ruhr - Formularverwaltung</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"></script>
+    <script src="js/app.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const userRef = db.collection("users").doc(user.uid);
+                    const userDoc = await userRef.get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        if (userData.isMainAdmin) {
+                            document.getElementById("formManagementContainer").style.display = "block";
+                            loadFormSettings();
+                        } else {
+                            alert("Sie haben keine Berechtigung, diese Seite zu sehen.");
+                            window.location.href = "home.html";
+                        }
+                    }
+                } else {
+                    window.location.href = "index.html";
+                }
+            });
+        });
+
+        async function addEquipmentSet() {
+            const equipmentName = document.getElementById("equipmentName").value;
+            if (equipmentName.trim() !== "") {
+                const db = firebase.firestore();
+                const settingsRef = db.collection("formSettings").doc("equipmentsaetze");
+                const settingsDoc = await settingsRef.get();
+                if (settingsDoc.exists) {
+                    const equipmentsaetze = settingsDoc.data().equipmentsaetze || [];
+                    equipmentsaetze.push(equipmentName);
+                    await settingsRef.update({ equipmentsaetze });
+                } else {
+                    await settingsRef.set({ equipmentsaetze: [equipmentName] });
+                }
+                alert("Equipmentsatz hinzugefügt.");
+                document.getElementById("equipmentName").value = "";
+                loadEquipmentSets();
+            } else {
+                alert("Bitte geben Sie einen Namen für den Equipmentsatz ein.");
+            }
+        }
+
+        async function loadEquipmentSets() {
+            const db = firebase.firestore();
+            const settingsRef = db.collection("formSettings").doc("equipmentsaetze");
+            const settingsDoc = await settingsRef.get();
+            const equipmentList = document.getElementById("equipmentList");
+            equipmentList.innerHTML = "";
+            if (settingsDoc.exists) {
+                const equipmentsaetze = settingsDoc.data().equipmentsaetze || [];
+                equipmentsaetze.forEach((equipment) => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = equipment;
+                    equipmentList.appendChild(listItem);
+                });
+            }
+        }
+
+        async function loadFormSettings() {
+            const db = firebase.firestore();
+            const settingsRef = db.collection("formSettings").doc("settings");
+            const settingsDoc = await settingsRef.get();
+            if (settingsDoc.exists) {
+                const settingsData = settingsDoc.data();
+                console.log("Formular Einstellungen:", settingsData);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadEquipmentSets);
+    </script>
+</head>
+
+<body>
+    <div id="formManagementContainer" style="display: none;">
+        <h1>Formularverwaltung</h1>
+        <div class="form-section">
+            <h3>Equipmentsatz hinzufügen</h3>
+            <label for="equipmentName">Name des Equipmentsatzes:</label>
+            <input type="text" id="equipmentName" name="equipmentName">
+            <button onclick="addEquipmentSet()">Hinzufügen</button>
+        </div>
+        <div class="form-section">
+            <h3>Vorhandene Equipmentsätze</h3>
+            <ul id="equipmentList"></ul>
+        </div>
+    </div>
+</body>
+
+</html>
