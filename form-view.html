@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notfallschule Rhein Ruhr - Startseite</title>
+    <title>Formular Ansicht</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Verlinkung zur CSS-Datei -->
@@ -19,21 +19,11 @@
 
 <body>
     <div class="container">
-        <!-- Hier wird das Logo eingefügt -->
-        <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
-
-        <h2>Hallo,</h2>
-        <p>wähle eine Aktion:</p>
-
-        <!-- Bereich für veröffentlichte Formulare -->
-        <div id="publishedForms">
-            <!-- Buttons für die veröffentlichten Formulare werden hier dynamisch hinzugefügt -->
-        </div>
-
-        <!-- <button id="kursformularButton" class="button">NRR Kursformular</button> -->
-        <button id="adminSeiteButton" class="button" style="display: none;">Admin-Seite</button>
-        <button id="logoutButton" class="button">Logout</button>
+        <!-- Hier wird das Formular angezeigt -->
+        <h2 id="formName">Lade Formular...</h2>
+        <form id="dynamicForm" class="form-container"></form>
     </div>
+
     <!-- Benachrichtigungsdiv -->
     <div id="notification" class="notification"></div>
 
@@ -46,7 +36,7 @@
     <script src="js/firebase-config.js"></script>
 
     <!-- Anwendungsskripte -->
-    <script src="js/home.js"></script>
+    <script src="js/form_view.js"></script>
 </body>
 
 </html>

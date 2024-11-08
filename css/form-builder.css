@@ -5,14 +5,34 @@
     box-sizing: border-box;
 }
 
+/* Setzt den HTML- und Body-Bereich auf die volle Höhe und Breite */
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Stellt sicher, dass #app die gesamte Bildschirmfläche einnimmt */
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f4f7fc;
     color: #333;
-    line-height: 1.6;
+    background-color: #f4f7fc;
     min-height: 100vh;
     width: 100vw;
-    overflow-x: hidden;
+    overflow: hidden;
+    /* Kein Scrollen */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header-Styling */
@@ -25,12 +45,18 @@ header {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 header h1 {
     font-size: 1.5rem;
     font-weight: 500;
     margin: 0;
+    color: white;
 }
 
 .header-buttons {
@@ -38,6 +64,7 @@ header h1 {
     gap: 0.5rem;
 }
 
+.header-action-button,
 .header-buttons button {
     padding: 0.4rem 1rem;
     border: none;
@@ -51,11 +78,17 @@ header h1 {
     cursor: pointer;
 }
 
-.header-buttons button i {
-    font-size: 1rem;
+/* Bearbeiten-Button-Style (ähnlich wie andere Header-Buttons) */
+.edit-button {
+    background-color: #007bff;
+    /* Färbung des Bearbeiten-Buttons */
 }
 
-/* Farben der Header-Buttons */
+.edit-button:hover {
+    background-color: #0056b3;
+    /* Hover-Farbe für Bearbeiten-Button */
+}
+
 .header-buttons .undo-button {
     background-color: #fab10c;
 }
@@ -76,52 +109,42 @@ header h1 {
     background-color: #dc3545;
 }
 
-/* Hover-Effekte für Header-Buttons */
-.header-buttons .undo-button:hover {
-    background-color: #b38601;
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
 }
 
-.header-buttons .redo-button:hover {
-    background-color: #138496;
-}
-
-.header-buttons .save-button:hover {
-    background-color: #218838;
-}
-
-.header-buttons .preview-button:hover {
-    background-color: #0056b3;
-}
-
-.header-buttons .back-button:hover {
-    background-color: #c82333;
-}
-
-/* Layout für den Formular-Builder */
+/* Hauptlayout für den Form-Builder */
 main {
     display: flex;
+    flex: 1;
     justify-content: space-between;
-    padding: 0.5rem;
     gap: 1.5rem;
-    width: 100%;
-    height: calc(100vh - 100px);
+    padding-top: 80px;
+    /* Platz für den festen Header */
+    box-sizing: border-box;
+    height: calc(100vh - 80px);
+    /* Berechnung unter Berücksichtigung des Headers */
 }
 
 #form-builder {
     display: flex;
     width: 100%;
     justify-content: space-between;
+    height: 100%;
 }
 
 /* Baustein-Liste */
 #form-elements {
-    flex-basis: 20%;
+    flex-basis: 25%;
     background-color: #ffffff;
     padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    max-height: 100%;
+    height: 100%;
 }
 
 #form-elements h2 {
@@ -133,11 +156,14 @@ main {
 
 #form-elements ul {
     list-style-type: none;
+    padding: 0;
 }
+
 
 #form-elements li {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 12px;
     margin-bottom: 10px;
     background-color: #f9f9f9;
@@ -155,14 +181,19 @@ main {
     color: #27a2bb;
 }
 
-#form-elements li button {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #007bff;
+#form-elements li .element-label {
+    flex-grow: 1;
     font-size: 1rem;
+    color: #333;
+    margin-left: 10px;
+}
+
+/* Tooltip Styling für Klick-Anzeige */
+#form-elements li .help-icon {
+    color: #007bff;
+    font-size: 1.1rem;
     cursor: pointer;
+    position: relative;
 }
 
 #form-elements li:hover {
@@ -171,17 +202,49 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    right: 10px;
+    background-color: #333;
+    color: #fff;
+    padding: 8px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+    /* Standardmäßig ausgeblendet */
+}
+
+.tooltip.show {
+    display: block;
+    /* Wird durch die `show`-Klasse angezeigt */
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#form-elements li:hover .tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* Vorschau-Bereich */
 #form-preview {
-    flex-basis: 35%;
+    flex-grow: 1;
     background-color: #ffffff11;
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    min-height: 100%;
     border: 3px dashed #ccc;
     transition: background-color 0.3s ease;
     overflow-y: auto;
+    height: 100%;
 }
 
 #form-preview.drag-over {
@@ -195,7 +258,7 @@ main {
     text-align: center;
 }
 
-/* Gedroppte Formularelemente in moderner Kartenoptik */
+/* Gedroppte Formularelemente */
 .form-element {
     margin-bottom: 1.5rem;
     padding: 1.2rem;
@@ -216,17 +279,11 @@ main {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.form-element h3 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #007bff;
+.form-element label {
+    display: block;
     margin-bottom: 0.5rem;
-}
-
-.form-element p {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #555;
 }
 
 .form-element .delete-button {
@@ -254,32 +311,17 @@ main {
     transition: all 0.2s ease-in-out;
 }
 
-.placeholder-target {
-    height: 50px;
-    margin-bottom: 1.5rem;
-    background-color: #e0f7ff;
-    border: 2px dashed #007bff;
-    transition: height 0.2s ease;
+/* Anpassungen für das Fragezeichen und Tooltip-Abstand */
+#form-elements li .help-icon:focus .tooltip,
+#form-elements li .help-icon:active .tooltip {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.selected-element {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Drop-Indikator */
-.drop-indicator {
-    height: 5px;
-    background-color: rgba(0, 123, 255, 0.5);
-    margin: 10px 0;
-    transition: background-color 0.2s;
-}
-
-.form-element label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-    color: #555;
+/* Sicherstellen, dass Tooltip nicht aus dem Bildschirm ragt */
+#form-elements li .tooltip {
+    max-width: 200px;
+    word-wrap: break-word;
 }
 
 /* Eigenschaften-Panel */
@@ -290,7 +332,7 @@ main {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    max-height: 100%;
+    height: 100%;
 }
 
 #properties h2 {
@@ -323,48 +365,7 @@ main {
     margin-bottom: 1rem;
 }
 
-/* Buttons Duplizieren und Löschen */
-.properties-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.duplicate-button,
-.delete-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.5rem;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.duplicate-button {
-    background-color: #007bff;
-    color: white;
-}
-
-.duplicate-button:hover {
-    background-color: #0056b3;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.delete-button {
-    background-color: #dc3545;
-    color: white;
-}
-
-.delete-button:hover {
-    background-color: #c82333;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Allgemeine und spezifische Eigenschaften */
+/* Eigenschaften-Einstellungen */
 .property {
     margin-bottom: 1rem;
 }
@@ -394,88 +395,57 @@ main {
     outline: none;
 }
 
-.property input[type="checkbox"] {
-    appearance: none;
-    width: 40px;
-    height: 20px;
-    background-color: #ddd;
-    border-radius: 10px;
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.property input[type="checkbox"]:checked {
-    background-color: #007bff;
-}
-
-.property input[type="checkbox"]::before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background-color: #fff;
-    border-radius: 50%;
-    top: 1px;
-    left: 1px;
-    transition: transform 0.3s ease;
-}
-
-.property input[type="checkbox"]:checked::before {
-    transform: translateX(20px);
-}
-
-/* Image-Selector-Button */
-.property .image-select-button {
+/* Modal-Stile */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
-    border-radius: 6px;
-    background-color: #e9f5ff;
-    color: #007bff;
-    border: 1px dashed #007bff;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.modal h2 {
+    margin-bottom: 15px;
+}
+
+.modal input {
+    width: 80%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.modal button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 4px;
 }
 
-.property .image-select-button:hover {
-    background-color: #d0e9ff;
-    color: #0056b3;
-}
-
-.property .image-select-button i {
-    margin-right: 0.3rem;
-}
-
-/* Ausrichtung-Optionen */
-.property .alignment-options {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.property .alignment-options label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #333;
-}
-
-.property .alignment-options input[type="radio"] {
-    appearance: none;
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.property .alignment-options input[type="radio"]:checked {
+.modal button:first-of-type {
     background-color: #007bff;
-    border-color: #007bff;
+    color: white;
+}
+
+.modal button:last-of-type {
+    background-color: #ddd;
+    color: #333;
 }
 
 /* Responsive Anpassungen */
@@ -522,5 +492,7 @@ main {
     #form-preview,
     #properties {
         width: 100%;
+        height: auto;
+        margin-bottom: 1.5rem;
     }
 }

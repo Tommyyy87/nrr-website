@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const formList = document.getElementById("formList");
 
-    // Überprüft, ob der Benutzer angemeldet ist
+    // Überprüfen, ob der Benutzer angemeldet ist
     auth.onAuthStateChanged(async function (user) {
         if (user) {
             try {
@@ -33,14 +33,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
             formsSnapshot.forEach((doc) => {
                 const formData = doc.data();
+                const formId = doc.id;
                 const formItem = document.createElement("div");
                 formItem.classList.add("form-item");
 
                 formItem.innerHTML = `
-                    <p><strong>Formularname:</strong> ${formData.formName}</p>
+                    <p><strong>Formularname:</strong> ${formData.name}</p>
                     <p><strong>Erstellt am:</strong> ${new Date(formData.createdAt).toLocaleDateString()}</p>
-                    <button class="button small" onclick="editForm('${doc.id}')">📝 Bearbeiten</button>
-                    <button class="button small delete" onclick="deleteForm('${doc.id}')">🗑️ Löschen</button>
+                    <button class="button small" onclick="editForm('${formId}')">📝 Bearbeiten</button>
+                    <button class="button small publish" onclick="togglePublish('${formId}', ${formData.published})">
+                        ${formData.published ? "Unveröffentlichen" : "Veröffentlichen"}
+                    </button>
+                    <button class="button small delete" onclick="deleteForm('${formId}')">🗑️ Löschen</button>
                     <hr>
                 `;
                 formList.appendChild(formItem);
@@ -54,6 +58,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Formular bearbeiten
     window.editForm = function (formId) {
         window.location.href = `form-builder.html?formId=${formId}`;
+    };
+
+    // Formular veröffentlichen oder unveröffentlichen
+    window.togglePublish = async function (formId, currentStatus) {
+        try {
+            await db.collection('forms').doc(formId).update({ published: !currentStatus });
+            showNotification(currentStatus ? "Formular unveröffentlicht." : "Formular veröffentlicht.", 'success');
+            await loadForms();
+        } catch (error) {
+            console.error("Fehler beim Veröffentlichen/Unveröffentlichen des Formulars:", error);
+            showNotification("Fehler beim Veröffentlichen/Unveröffentlichen des Formulars.", 'error');
+        }
     };
 
     // Formular löschen

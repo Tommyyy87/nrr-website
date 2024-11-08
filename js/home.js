@@ -45,6 +45,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (userData.isAdmin || userData.isMainAdmin) {
                     document.getElementById("adminSeiteButton").style.display = "block";
                 }
+
+                // Veröffentliche Formulare laden
+                loadPublishedForms();
+
             } catch (error) {
                 console.error("Fehler beim Abrufen der Benutzerdaten:", error);
                 // Anzeige einer Fehlermeldung
@@ -66,6 +70,28 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {
             notification.style.display = 'none';
         }, 3000);
+    }
+
+    // Funktion zum Laden der veröffentlichten Formulare
+    async function loadPublishedForms() {
+        try {
+            const formsSnapshot = await db.collection('forms').where('published', '==', true).get();
+            const formsContainer = document.getElementById('publishedForms');
+
+            formsSnapshot.forEach((doc) => {
+                const form = doc.data();
+                const formButton = document.createElement('button');
+                formButton.className = 'button';
+                formButton.textContent = form.name;
+                formButton.onclick = () => {
+                    window.location.href = `form-view.html?formId=${doc.id}`;
+                };
+                formsContainer.appendChild(formButton);
+            });
+        } catch (error) {
+            console.error("Fehler beim Laden der veröffentlichten Formulare:", error);
+            showNotification("Fehler beim Laden der veröffentlichten Formulare. Bitte versuchen Sie es erneut.", "error");
+        }
     }
 
     // Event-Handling für die Buttons
