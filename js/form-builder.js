@@ -54,25 +54,49 @@ const App = {
                             </span>
                         </li>
                     </ul>
-
-
                 </div>
+
+
                 <div id="form-preview" class="form-preview" @drop="drop($event)" @dragover.prevent="onDragOver">
                     <h2>Vorschau</h2>
-                    <div v-for="(item, index) in formElements" :key="item.id" class="form-element"
-                         @click="selectElement(item)" 
-                         @dragstart="startReorderDrag(index, $event)" 
-                         draggable="true" 
-                         @dragover.prevent="onDragOver($event, index)" 
-                         @drop="reorderDrop($event, index)">
-                        <label>{{ item.label }}</label>
-                        <component v-if="item.type !== 'section'" :is="item.type"></component>
+                    <div v-for="(item, index) in formElements" :key="item.id" 
+                         class="form-element live-preview"
+                         @click="selectElement(item)"
+                         @dragstart="startReorderDrag(index, $event)"
+                         draggable="true"
+                         @dragover.prevent="onDragOver($event, index)"
+                         @drop="reorderDrop($event, index)"
+                         :style="{
+                            border: selectedElement?.id === item.id ? '2px solid #007bff' : '1px dashed #ccc',
+                            padding: '10px',
+                            marginBottom: '10px'
+                        }">
+
+                        <!-- Render the live preview of each element based on its type -->
+                        <div v-if="item.type === 'text'" 
+                             :style="{
+                                fontSize: getFontSize(item.specificProperties.textSize),
+                                fontWeight: item.specificProperties.format === 'bold' ? 'bold' : 'normal',
+                                fontStyle: item.specificProperties.format === 'italic' ? 'italic' : 'normal',
+                                color: item.specificProperties.textColor
+                             }">
+                            {{ renderTextWithPlaceholders(item.specificProperties.content) }}
+                        </div>
+
                         <img v-if="item.type === 'img'" :src="item.specificProperties.uploadImage" 
+                            :alt="item.label || 'Bild'"
                             :style="{
-                                width: item.specificProperties.width || 'auto',
-                                height: item.specificProperties.proportion ? 'auto' : item.specificProperties.height || 'auto',
-                                textAlign: item.specificProperties.alignment || 'left'
+                                width: item.specificProperties.width || '100%',
+                                height: item.specificProperties.height || 'auto'
+                            }" 
+                            :class="{
+                                'align-left': item.specificProperties.alignment === 'left',
+                                'align-center': item.specificProperties.alignment === 'center',
+                                'align-right': item.specificProperties.alignment === 'right'
                             }" />
+
+                        <label v-if="item.type === 'label'">{{ item.label }}</label>
+
                         <button @click="removeElement(index)" class="delete-button">Löschen</button>
                     </div>
                 </div>
@@ -261,6 +285,11 @@ const App = {
                 this.notificationVisible = false;
             }, 3000);
         },
+
+        getFontSize(size) {
+            return size === 'small' ? '12px' : size === 'large' ? '24px' : '16px';
+        },
+
         handleFileUpload(event) {
             const file = event.target.files[0];
             if (file && ['image/jpeg', 'image/png', 'image/svg+xml'].includes(file.type)) {
@@ -356,6 +385,14 @@ const App = {
             }
             this.selectedElement = element;
         },
+
+        renderTextWithPlaceholders(content) {
+            if (!content) return '';
+            return content.replace(/{{(.*?)}}/g, (match, p1) => {
+                return this.user?.[p1.trim()] || '---';
+            });
+        },
+
         removeElement(index) {
             if (index >= 0 && index < this.formElements.length) {
                 this.formElements.splice(index, 1);
@@ -387,6 +424,17 @@ const App = {
         onDragOver(event) {
             event.preventDefault();
         },
+        mounted() {
+            this.user = {
+                firstName: 'Max',
+                lastName: 'Mustermann',
+                email: 'max@example.com'
+            };
+            this.checkAdminStatus();
+            this.loadFormData();
+            this.$el.focus();
+        },
+
         drop(event) {
             event.preventDefault();
             if (this.draggedElement) {
@@ -401,11 +449,12 @@ const App = {
         },
         duplicateElement() {
             if (this.selectedElement) {
-                const duplicate = JSON.parse(JSON.stringify(this.selectedElement));
-                duplicate.id = Date.now();
+                const duplicate = JSON.parse(JSON.stringify(this.selectedElement)); // Tiefe Kopie erstellen
+                duplicate.id = Date.now(); // Eindeutige ID für das Duplikat setzen
                 const index = this.formElements.indexOf(this.selectedElement);
-                this.formElements.splice(index + 1, 0, duplicate);
+                this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
                 this.isFormSaved = false;
+                this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
             }
         },
 
@@ -494,6 +543,7 @@ const App = {
         this.$el.focus();
     }
 };
+
 
 // Vue-App erstellen und die Komponente mounten
 createApp(App).mount('#app');
