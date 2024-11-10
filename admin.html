@@ -66,8 +66,10 @@
 
 <body>
     <div class="container">
-        <!-- Hier wird das Logo eingefügt -->
-        <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        <!-- Hier wird das Logo mit Link zum Hauptmenü eingefügt -->
+        <a href="home.html">
+            <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        </a>
         <h2>Admin - Hauptseite</h2>
         <p>Wähle eine der folgenden Aktionen aus:</p>
 
@@ -76,7 +78,9 @@
             <button class="button" onclick="window.location.href='usercontrol.html'">Benutzerverwaltung</button>
             <button class="button" onclick="window.location.href='formmanagement.html'">Formularverwaltung</button>
         </div>
-
+        <hr>
+        <!-- Home Button -->
+        <button class="button" onclick="window.location.href='home.html'">Hauptmenü</button>
         <!-- Logout-Button -->
         <button class="button" onclick="logout()">Logout</button>
     </div>

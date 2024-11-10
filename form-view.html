@@ -5,38 +5,87 @@
     <meta charset="UTF-8">
     <title>Formular Ansicht</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Verlinkung zur CSS-Datei -->
     <link rel="stylesheet" href="css/styles.css">
-
-    <!-- Favicon und App Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
     <link rel="manifest" href="icons/site.webmanifest">
     <meta name="theme-color" content="#ffffff">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Hier wird das Formular angezeigt -->
-        <h2 id="formName">Lade Formular...</h2>
-        <form id="dynamicForm" class="form-container"></form>
+
+    <div id="app" class="container">
+        <div>
+            <!-- Logo mit Link zum Hauptmenü -->
+            <a href="home.html">
+                <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+            </a>
+        </div>
+        <h2>{{ formName }}</h2>
+        <form id="dynamicForm" class="form-container">
+            <div v-for="element in formElements" :key="element.id" class="form-group">
+
+
+                <input v-if="element.type === 'text'" type="text" :name="element.id" class="input-field" />
+                <textarea v-if="element.type === 'textarea'" :name="element.id" class="input-field"></textarea>
+                <select v-if="element.type === 'select'" :name="element.id" class="input-field">
+                    <option v-for="option in element.options" :value="option">{{ option }}</option>
+                </select>
+
+                <!-- Bild-Anzeige mit spezifischen Eigenschaften -->
+                <img v-if="element.type === 'img'" :src="element.specificProperties.uploadImage"
+                    :alt="element.label || 'Bild'" :class="{
+                        'align-left': element.specificProperties.alignment === 'left',
+                        'align-center': element.specificProperties.alignment === 'center',
+                        'align-right': element.specificProperties.alignment === 'right'
+                    }" :style="{
+                        width: element.specificProperties.width || 'auto',
+                        height: element.specificProperties.height || 'auto'
+                    }" v-show="element.visible" />
+
+                <!-- Dynamisch gerenderte Datensatzauswahl -->
+                <div v-if="element.type === 'dataset-select'" :style="{
+                        textAlign: element.specificProperties.alignment || 'left',
+                        fontSize: element.specificProperties.fontSize === 'small' ? '12px' : element.specificProperties.fontSize === 'medium' ? '16px' : '20px',
+                        fontFamily: element.specificProperties.fontFamily || 'Arial',
+                        fontWeight: 'bold'
+                    }">
+                    {{ element.specificProperties.title }} {{ userData[element.specificProperties.datasetField] ||
+                    "Daten nicht verfügbar" }}
+                </div>
+
+                <a v-if="element.type === 'document'" :href="element.url" target="_blank" class="document-link">{{
+                    element.label }}</a>
+                <a v-if="element.type === 'hyperlink'" :href="element.href" target="_blank" class="hyperlink">{{
+                    element.text }}</a>
+
+                <input v-if="element.type === 'checkbox'" type="checkbox" :name="element.id" />
+                <input v-if="element.type === 'radio'" type="radio" :name="element.id" :value="element.defaultOption" />
+                <input v-if="element.type === 'datetime-picker'" type="datetime-local" :name="element.id"
+                    class="input-field" />
+                <input v-if="element.type === 'file-upload'" type="file" :name="element.id" class="file-upload" />
+
+                <hr v-if="element.type === 'hr'"
+                    :style="{borderColor: element.lineColor, borderWidth: element.lineWidth, borderStyle: element.lineStyle}" />
+
+                <div v-if="element.type === 'signature'" class="signature-pad">
+                    <label>{{ element.label }}</label>
+                    <canvas :id="element.id" width="300" height="100"></canvas>
+                </div>
+            </div>
+        </form>
+
+        <div v-if="notification.visible" :class="['notification', notification.type]">{{ notification.message }}</div>
     </div>
 
-    <!-- Benachrichtigungsdiv -->
-    <div id="notification" class="notification"></div>
-
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-    <!-- Firebase-Konfigurationsdatei -->
     <script src="js/firebase-config.js"></script>
-
-    <!-- Anwendungsskripte -->
-    <script src="js/form_view.js"></script>
+    <script src="js/form-view.js"></script>
+    <script src="./js/standardauth.js"></script>
 </body>
 
 </html>

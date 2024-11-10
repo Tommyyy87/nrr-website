@@ -14,21 +14,17 @@ const formElements = [
             delete: true,
         },
         specificProperties: {
-            allowUpload: true,
-            maxFileSize: 2, // in MB
-            width: '100%', // Größe anpassbar
-            height: 'auto', // Höhe automatisch oder als Pixelwert festlegen
-            preview: true, // Bildvorschau aktivieren
-            allowUrl: true, // URL-Eingabe für Bild erlauben
-            required: false, // Pflichtfeld-Einstellung
-
-            // Neue Eigenschaften basierend auf dem Screenshot
+            uploadImage: '', // Bilddatei im Base64-Format speichern
+            maxFileSize: 2, // maximale Dateigröße in MB
+            width: '100%', // Standardbreite in Prozent
+            height: 'auto', // Standardhöhe
+            alignment: 'left', // Ausrichtung des Bildes (left, center, right)
             title: '', // Bildtitel
             caption: '', // Bildunterschrift
-            alignment: 'left', // Ausrichtung (left, center, right)
-            allowDetailView: false, // Detailansicht zulassen
-            reportTemplateEnabled: false, // Anzeige in der Berichtsvorlage
-            activationRule: '', // Aktivierungsregel optional
+            preview: true, // Bildvorschau aktivieren
+            allowUrl: false, // URL-Eingabe deaktivieren, da Bild hochgeladen wird
+            visible: true // Sichtbarkeit des Bildes im finalen Formular
+
         },
     },
     {
@@ -125,7 +121,7 @@ const formElements = [
         label: 'Datensatzauswahl',
         type: 'dataset-select',
         icon: 'fas fa-table',
-        description: 'Ermöglicht die Auswahl eines Datensatzes aus einer hinterlegten Tabelle.',
+        description: 'Ermöglicht die Auswahl eines Datensatzfeldes, welches aus dem Datensatz geladen wird. Der Benutzer kann außerdem die Ausrichtung, Textgröße, Schriftart und einen optionalen Titel festlegen.',
         generalProperties: {
             id: 'datensatzauswahl_1',
             label: 'Datensatzauswahl',
@@ -133,9 +129,14 @@ const formElements = [
             delete: true,
         },
         specificProperties: {
-            dataSource: 'Excel-Datei',
-            searchFunction: true,
-            filterOptions: [],
+            dataSource: 'Excel-Datei', // Quelle oder Datenbank für die Datensätze
+            searchFunction: true, // Option für eine Suchfunktion innerhalb des Datensatzes
+            filterOptions: [], // Optionen zum Filtern der angezeigten Daten
+            datasetField: 'firstName', // Standardmäßig ausgewähltes Datensatzfeld (z.B. Vorname)
+            alignment: 'left', // Ausrichtung (z.B. 'left', 'center', 'right')
+            fontSize: 'medium', // Textgröße (z.B. 'small', 'medium', 'large')
+            fontFamily: 'Arial', // Schriftart (z.B. 'Arial', 'Verdana', 'Times New Roman')
+            title: '', // Optionaler Titel, der über dem ausgewählten Datensatzfeld angezeigt werden kann
         },
     },
     {

@@ -1,8 +1,9 @@
-/* Grundlegendes Layout und Reset */
+/* Reset und grundlegende Einstellungen */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Roboto', 'Inter', sans-serif;
 }
 
 /* Setzt den HTML- und Body-Bereich auf die volle Höhe und Breite */
@@ -26,43 +27,52 @@ body {
 body {
     font-family: 'Roboto', sans-serif;
     color: #333;
-    background-color: #f4f7fc;
+    background-color: #f5f5f5;
     min-height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    /* Kein Scrollen */
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* Header-Styling */
+/* Header-Optimierungen */
 header {
     background-color: #2b2f3b;
-    color: #fff;
-    padding: 1rem 2rem;
+    color: white;
+    padding: 0.5rem 1.5rem;
     display: flex;
-    align-items: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
     justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
     z-index: 1000;
+    height: 60px;
+    /* Reduzierte Höhe */
 }
 
 header h1 {
     font-size: 1.5rem;
-    font-weight: 500;
-    margin: 0;
     color: white;
+    margin: 0;
 }
 
-.header-buttons {
+.header-buttons button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    min-width: 80px;
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
+
+.header-buttons button:hover {
+    background: #0056b3;
+}
+
 
 .header-action-button,
 .header-buttons button {
@@ -78,17 +88,24 @@ header h1 {
     cursor: pointer;
 }
 
-/* Bearbeiten-Button-Style (ähnlich wie andere Header-Buttons) */
 .edit-button {
-    background-color: #007bff;
-    /* Färbung des Bearbeiten-Buttons */
+    padding: 0.3rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    background-color: #0056b3;
 }
 
 .edit-button:hover {
-    background-color: #0056b3;
-    /* Hover-Farbe für Bearbeiten-Button */
+    background-color: #0670e0;
 }
 
+/* Buttons im Header-Bereich */
+.header-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Hover-Effekte und Farben der Buttons */
 .header-buttons .undo-button {
     background-color: #fab10c;
 }
@@ -109,24 +126,27 @@ header h1 {
     background-color: #dc3545;
 }
 
+.header-buttons button:hover {
+    opacity: 0.8;
+}
+
+/* Titel und Bearbeiten-Button anpassen */
 .header-title {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     color: white;
+    font-size: 1.25rem;
+    /* Kleinere Schriftgröße für mehr Platz */
 }
 
 /* Hauptlayout für den Form-Builder */
 main {
     display: flex;
     flex: 1;
-    justify-content: space-between;
-    gap: 1.5rem;
     padding-top: 80px;
-    /* Platz für den festen Header */
-    box-sizing: border-box;
-    height: calc(100vh - 80px);
-    /* Berechnung unter Berücksichtigung des Headers */
+    gap: 1rem;
+    overflow: hidden;
 }
 
 #form-builder {
@@ -134,45 +154,50 @@ main {
     width: 100%;
     justify-content: space-between;
     height: 100%;
+    overflow: hidden;
 }
 
 /* Baustein-Liste */
+/* Form Elemente Liste */
 #form-elements {
     flex-basis: 25%;
-    background-color: #ffffff;
+    background: white;
     padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     height: 100%;
+    overflow-y: auto;
 }
 
+
 #form-elements h2 {
+    text-align: center;
     margin-bottom: 1rem;
     font-size: 1.4rem;
     color: #333;
-    text-align: center;
 }
 
 #form-elements ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
 }
 
-
 #form-elements li {
+    background: #dfdfdf;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    cursor: grab;
-    transition: background-color 0.3s, transform 0.2s ease-in-out;
-    position: relative;
+    cursor: pointer;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s ease;
+}
+
+#form-elements li:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
 }
 
 #form-elements li i {
@@ -202,6 +227,14 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
+#form-elements,
+#properties {
+    max-height: calc(100vh - 80px);
+    /* Platz für Header */
+    overflow-y: auto;
+}
+
+
 .tooltip {
     position: absolute;
     bottom: 100%;
@@ -216,14 +249,12 @@ main {
     transition: opacity 0.3s ease, transform 0.3s ease;
     white-space: nowrap;
     pointer-events: none;
-    z-index: 10;
+    z-index: 99998;
     display: none;
-    /* Standardmäßig ausgeblendet */
 }
 
 .tooltip.show {
     display: block;
-    /* Wird durch die `show`-Klasse angezeigt */
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
@@ -235,20 +266,20 @@ main {
 }
 
 /* Vorschau-Bereich */
+/* Form Vorschau */
 #form-preview {
     flex-grow: 1;
-    background-color: #ffffff11;
-    padding: 1.5rem;
-    border-radius: 8px;
+    background: #ffffff11;
+    padding: 1rem;
+    border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 3px dashed #ccc;
-    transition: background-color 0.3s ease;
     overflow-y: auto;
-    height: 100%;
+    transition: background-color 0.3s;
 }
 
 #form-preview.drag-over {
-    background-color: #f0f8ff;
+    background-color: #e8f0fe;
 }
 
 #form-preview h2 {
@@ -259,19 +290,15 @@ main {
 }
 
 /* Gedroppte Formularelemente */
+/* Form Elemente */
 .form-element {
-    margin-bottom: 1.5rem;
-    padding: 1.2rem;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    position: relative;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: grab;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    background: #dfdfdf;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgb(138, 137, 137);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .form-element:hover {
@@ -302,7 +329,6 @@ main {
     background-color: #c82333;
 }
 
-/* Placeholder für das Ziehen */
 .form-element.placeholder {
     border: 2px dashed #007bff;
     background-color: #e0f7ff;
@@ -318,22 +344,23 @@ main {
     transform: translateY(0);
 }
 
-/* Sicherstellen, dass Tooltip nicht aus dem Bildschirm ragt */
 #form-elements li .tooltip {
     max-width: 200px;
     word-wrap: break-word;
 }
 
-/* Eigenschaften-Panel */
+/* Eigenschaften Panel */
 #properties {
     flex-basis: 25%;
-    background-color: #ffffff;
-    padding: 1.5rem;
-    border-radius: 8px;
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
     height: 100%;
 }
+
+
 
 #properties h2 {
     margin-bottom: 2rem;
@@ -344,18 +371,62 @@ main {
 }
 
 /* Name und Icon des Bausteins */
+.form-properties {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.form-properties h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #444;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
 .properties-header {
     display: flex;
     align-items: center;
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #007bff;
+    font-size: 1.2em;
+    color: #0056b3;
+    margin-bottom: 15px;
 }
 
 .properties-header i {
-    margin-right: 0.5rem;
-    font-size: 1.5rem;
+    font-size: 1.5em;
+    margin-right: 8px;
+}
+
+/* Styling für Buttons in den Eigenschaften */
+.properties-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.properties-buttons .duplicate-button,
+.properties-buttons .delete-button {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.duplicate-button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: #fff;
 }
 
 /* Beschreibungstext */
@@ -367,25 +438,25 @@ main {
 
 /* Eigenschaften-Einstellungen */
 .property {
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
 }
 
 .property label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-    color: #555;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 5px;
 }
 
 .property input[type="text"],
 .property select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 6px;
+    padding: 8px;
     border: 1px solid #ddd;
-    font-size: 0.95rem;
-    background-color: #f9fafb;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: #333;
+    margin-top: 5px;
 }
 
 .property input[type="text"]:focus,
@@ -393,6 +464,175 @@ main {
     border-color: #007bff;
     background-color: #ffffff;
     outline: none;
+}
+
+.property input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 10px;
+}
+
+/* Datei-Upload-Bereich mit Bildvorschau */
+.property .uploaded-image-preview {
+    max-width: 100%;
+    max-height: 100px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.property .delete-uploaded-image {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 0.8rem;
+}
+
+.property .delete-uploaded-image:hover {
+    background-color: #c82333;
+}
+
+/* Schieberegler und Input-Field Kombination */
+.property input[type="range"] {
+    width: calc(100% - 60px);
+    margin-right: 10px;
+}
+
+.property .value-display {
+    width: 50px;
+    text-align: center;
+    font-weight: bold;
+    background: #f0f0f0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    font-size: 0.9rem;
+}
+
+/* Proportionen-Checkbox */
+.property .proportion-checkbox {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.property .proportion-checkbox input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.property .visible-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.proportion-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+/* Toggle-Switch Styling */
+/* Toggle-Schalter */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #28a745;
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+/* Beschriftung für den Toggle-Switch */
+.proportion-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #666;
+    margin-top: 10px;
+    gap: 8px;
+}
+
+/* Bildtitel und Bildunterschrift Eingabefelder */
+.property input[type="text"].optional {
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+/* Gruppierung von verwandten Eigenschaften */
+.property-group {
+    background: #f9f9f9;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.property-group .alignment-options {
+    display: flex;
+    gap: 10px;
+}
+
+/* Radio Buttons und Bildgrößen-Skala */
+.property-group label {
+    color: #0056b3;
+}
+
+/* Ausrichtungs-Buttons */
+.alignment-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.alignment-options label {
+    font-weight: normal;
+}
+
+.alignment-options input[type="radio"] {
+    margin-right: 5px;
 }
 
 /* Modal-Stile */

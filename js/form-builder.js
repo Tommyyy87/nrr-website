@@ -4,12 +4,12 @@ import formElements from './form-elements.js';
 const App = {
     template: `
     <div class="form-builder-container" @keyup.delete="deleteSelectedElement($event)" tabindex="0">
-        <!-- Benachrichtigungsbereich, wird basierend auf styles.css angezeigt -->
+        <!-- Benachrichtigungsbereich -->
         <div id="notification" :class="['notification', notificationType, { show: notificationVisible }]">
             {{ notificationMessage }}
         </div>
 
-        <!-- Modal-Popup für die Namenseingabe, erscheint nur beim Speichern, wenn kein Name vorhanden -->
+<!-- Modal-Popup für die Namenseingabe -->
         <div v-if="showNameModal" class="modal-overlay">
             <div class="modal">
                 <h2>Formularname eingeben</h2>
@@ -18,6 +18,7 @@ const App = {
                 <button @click="cancelFormCreation">Abbrechen</button>
             </div>
         </div>
+
 
         <header class="form-builder-header">
             <div class="header-title">
@@ -34,6 +35,7 @@ const App = {
                 <button class="back-button" @click="confirmBack"><i class="fas fa-arrow-left"></i> Zurück</button>
             </div>
         </header>
+
 
         <main>
             <section id="form-builder" class="form-builder-main">
@@ -52,8 +54,10 @@ const App = {
                             </span>
                         </li>
                     </ul>
+
+
                 </div>
-                <div id="form-preview" class="form-preview" @drop="drop($event)" @dragover.prevent="onDragOver($event)">
+                <div id="form-preview" class="form-preview" @drop="drop($event)" @dragover.prevent="onDragOver">
                     <h2>Vorschau</h2>
                     <div v-for="(item, index) in formElements" :key="item.id" class="form-element"
                          @click="selectElement(item)" 
@@ -63,17 +67,26 @@ const App = {
                          @drop="reorderDrop($event, index)">
                         <label>{{ item.label }}</label>
                         <component v-if="item.type !== 'section'" :is="item.type"></component>
+                        <img v-if="item.type === 'img'" :src="item.specificProperties.uploadImage" 
+                            :style="{
+                                width: item.specificProperties.width || 'auto',
+                                height: item.specificProperties.proportion ? 'auto' : item.specificProperties.height || 'auto',
+                                textAlign: item.specificProperties.alignment || 'left'
+                            }" />
                         <button @click="removeElement(index)" class="delete-button">Löschen</button>
                     </div>
                 </div>
+
+
+<!-- Eigenschaftenbereich -->
                 <aside id="properties" class="form-properties">
                     <div v-if="selectedElement">
                         <div class="properties-header">
                             <i :class="selectedElement.icon"></i> {{ selectedElement.label }}
                         </div>
-                        
                         <p class="description">{{ selectedElement.description }}</p>
 
+<!-- Duplizieren und Löschen -->
                         <div class="properties-buttons">
                             <button @click="duplicateElement" class="duplicate-button">
                                 <i class="fas fa-copy"></i> Duplizieren
@@ -83,25 +96,117 @@ const App = {
                             </button>
                         </div>
 
-                        <div class="property" v-if="selectedElement.generalProperties">
-                            <label for="label">Beschriftung:</label>
-                            <input type="text" v-model="selectedElement.generalProperties.label" id="label" />
+<!-- Allgemeine Baustein-ID anzeigen -->
+                        <div class="property">
+                            <label>Baustein ID:</label>
+                            <span>{{ selectedElement.id }}</span>
                         </div>
-                        
-                        <div v-for="(value, key) in selectedElement.specificProperties" :key="key" class="property">
-                            <label :for="key">{{ key }}:</label>
-                            <template v-if="typeof value === 'boolean'">
-                                <input type="checkbox" v-model="selectedElement.specificProperties[key]" :id="key" />
-                            </template>
-                            <template v-else-if="typeof value === 'string'">
-                                <input type="text" v-model="selectedElement.specificProperties[key]" :id="key" />
-                            </template>
-                            <template v-else>
-                                <select v-model="selectedElement.specificProperties[key]" :id="key">
-                                    <option value="option1">Option 1</option>
-                                    <option value="option2">Option 2</option>
+
+
+<!-- AB HIER SPEZIFISCHE EIGENSCHAFTEN!! -->
+
+                        <!-- Spezifische Eigenschaften für den Datensatz-Baustein -->
+                        <div v-if="selectedElement && selectedElement.type === 'dataset-select'">
+                            <div class="property">
+                                <label>Datensatzfeld:</label>
+                                <select v-model="selectedElement.specificProperties.datasetField">
+                                    <option value="firstName">Vorname</option>
+                                    <option value="lastName">Nachname</option>
+                                    <option value="email">E-Mail</option>
                                 </select>
-                            </template>
+                            </div>
+
+                            <div class="property">
+                                <label>Ausrichtung:</label>
+                                <select v-model="selectedElement.specificProperties.alignment">
+                                    <option value="left">Links</option>
+                                    <option value="center">Mitte</option>
+                                    <option value="right">Rechts</option>
+                                </select>
+                            </div>
+
+                            <div class="property">
+                                <label>Textgröße:</label>
+                                <select v-model="selectedElement.specificProperties.fontSize">
+                                    <option value="small">Klein</option>
+                                    <option value="medium">Mittel</option>
+                                    <option value="large">Groß</option>
+                                </select>
+                            </div>
+
+                            <div class="property">
+                                <label>Schriftart:</label>
+                                <select v-model="selectedElement.specificProperties.fontFamily">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Verdana">Verdana</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                </select>
+                            </div>
+
+                            <div class="property">
+                                <label>Optionaler Titel:</label>
+                                <input type="text" v-model="selectedElement.specificProperties.title" placeholder="Titel eingeben"/>
+                            </div>
+                        </div>
+
+                        <!-- Bild-Baustein spezifische Eigenschaften -->
+                        <div v-if="selectedElement && selectedElement.type === 'img'">
+                            <div class="property">
+                                <label>Bild-Upload (max. 2MB):</label>
+                                <input type="file" @change="handleFileUpload" accept=".jpg, .png, .svg" />
+                                <img v-if="selectedElement.specificProperties.uploadImage" 
+                                     :src="selectedElement.specificProperties.uploadImage" 
+                                     class="uploaded-image-preview" />
+                                <div v-if="uploadedImageDimensions">
+                                    Größe: {{ uploadedImageDimensions.width }} x {{ uploadedImageDimensions.height }} px
+                                </div>
+                                <button @click="clearUploadedImage" class="delete-uploaded-image">Bild löschen</button>
+                            </div>
+
+                            <!-- Bildtitel und Bildunterschrift -->
+                            <div class="property">
+                                <label for="title">Bildtitel (optional):</label>
+                                <input type="text" v-model="selectedElement.specificProperties.title" id="title" />
+                            </div>
+                            <div class="property">
+                                <label for="caption">Bildunterschrift (optional):</label>
+                                <input type="text" v-model="selectedElement.specificProperties.caption" id="caption" />
+                            </div>
+
+                            <!-- Ausrichtung -->
+                            <div class="property">
+                                <label>Ausrichtung:</label>
+                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="left" /> Linksbündig
+                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="center" /> Mittig
+                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="right" /> Rechtsbündig
+                            </div>
+
+                            <div class="property-group">
+                                <label>Bildgröße:</label>
+                                
+                                <!-- Breite Slider mit Textfeld -->
+                                <div>
+                                    <label>Breite (0-999%)</label>
+                                    <input type="range" v-model.number="selectedElement.specificProperties.width" min="0" max="999" />
+                                    <input type="number" v-model.number="selectedElement.specificProperties.width" min="0" max="999" /> %
+                                </div>
+
+                                <!-- Toggle für Proportionen -->
+                                <div class="property proportion-checkbox">
+                                    <label class="proportion-label">Proportionen beibehalten</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" v-model="selectedElement.specificProperties.proportionLocked" />
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Höhe Slider, nur anzeigen, wenn Proportionen ausgeschaltet sind -->
+                                <div v-if="!selectedElement.specificProperties.proportionLocked">
+                                    <label>Höhe (0-999%)</label>
+                                    <input type="range" v-model.number="selectedElement.specificProperties.height" min="0" max="999" />
+                                    <input type="number" v-model.number="selectedElement.specificProperties.height" min="0" max="999" /> %
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <p v-else>Kein Element ausgewählt</p>
@@ -117,7 +222,7 @@ const App = {
             formNameInput: '',
             showNameModal: false,
             elements: formElements,
-            formElements: [],
+            formElements: [], // Speichert die Formularelemente mit spezifischen Eigenschaften
             selectedElement: null,
             draggedElement: null,
             draggedIndex: null,
@@ -127,45 +232,83 @@ const App = {
             notificationMessage: '',
             notificationType: '',
             notificationVisible: false,
-            activeTooltipId: null // Neue Daten-Eigenschaft für das aktive Tooltip
+            activeTooltipId: null,
+            proportionLocked: true,
+            uploadedImageDimensions: null,
         };
     },
+
     methods: {
         toggleTooltip(id) {
-            console.log("Tooltip toggled for element ID:", id);
             this.activeTooltipId = this.activeTooltipId === id ? null : id;
         },
         saveFormName() {
-            console.log("Speichern des Formularnamens:", this.formNameInput);
             this.formName = this.formNameInput;
             this.showNameModal = false;
         },
         cancelFormCreation() {
-            console.log("Formularerstellung abgebrochen");
             this.showNameModal = false;
         },
         editFormName() {
-            console.log("Formularname bearbeiten: Aktueller Name:", this.formName);
             this.formNameInput = this.formName;
             this.showNameModal = true;
         },
         showNotification(message, type = 'success') {
-            console.log("Benachrichtigung anzeigen:", message, "vom Typ:", type);
             this.notificationMessage = message;
             this.notificationType = type;
             this.notificationVisible = true;
             setTimeout(() => {
-                console.log("Benachrichtigung ausblenden");
                 this.notificationVisible = false;
             }, 3000);
         },
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file && ['image/jpeg', 'image/png', 'image/svg+xml'].includes(file.type)) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.selectedElement.specificProperties.uploadImage = e.target.result;
+                    this.setUploadedDimensions(file);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                this.showNotification("Ungültiges Dateiformat. Nur JPG, PNG und SVG sind erlaubt.", 'error');
+            }
+        },
+        clearUploadedImage() {
+            this.selectedElement.specificProperties.uploadImage = '';
+            this.uploadedImageDimensions = null;
+        },
+        setUploadedDimensions(file) {
+            const img = new Image();
+            img.onload = () => {
+                this.uploadedImageDimensions = { width: img.width, height: img.height };
+            };
+            img.src = URL.createObjectURL(file);
+        },
+        addImageElement() {
+            this.formElements.push({
+                type: "image",
+                label: "Bild",
+                specificProperties: {
+                    uploadImage: '',
+                    maxFileSize: 2,
+                    title: '',
+                    caption: '',
+                    preview: true,
+                    allowUrl: false,
+                    visible: true,
+                    width: '100%', // Standardbreite
+                    height: 'auto',
+                    proportionLocked: true, // Schalter für Proportionen standardmäßig auf "An"
+                    alignment: "left",
+                }
+            });
+        },
         async saveForm() {
             if (!this.formName || this.formName === 'Neues Formular') {
-                console.log("Formularname fehlt, öffne Modalfenster zur Namenseingabe");
                 this.showNameModal = true;
                 return;
             }
-
             try {
                 const formData = {
                     name: this.formName,
@@ -174,22 +317,16 @@ const App = {
                     published: false,
                     userId: this.user ? this.user.uid : null
                 };
-
-                console.log("Speichere Formular: ", formData);
-
                 if (this.formId) {
                     await db.collection('forms').doc(this.formId).update(formData);
                 } else {
                     const docRef = await db.collection('forms').add(formData);
                     this.formId = docRef.id;
                 }
-
-                console.log("Formular erfolgreich gespeichert, ID:", this.formId);
                 this.showNotification("Formular erfolgreich gespeichert.", "success");
                 this.isFormSaved = true;
             } catch (error) {
-                console.error("Fehler beim Speichern des Formulars:", error);
-                this.showNotification("Fehler beim Speichern des Formulars. Bitte versuchen Sie es erneut.", 'error');
+                this.showNotification("Fehler beim Speichern des Formulars.", 'error');
             }
         },
         confirmBack() {
@@ -202,37 +339,68 @@ const App = {
             }
         },
         goBackToFormManagement() {
-            console.log("Zurück zur Formularverwaltung");
             window.location.href = "formmanagement.html";
         },
         selectElement(element) {
-            console.log("Element ausgewählt:", element);
+            if (!element.specificProperties) {
+                element.specificProperties = {
+                    datasetField: 'firstName', // Standardwert für das Datensatzfeld
+                    alignment: 'left',         // Standardausrichtung
+                    fontSize: 'medium',        // Standard-Textgröße
+                    fontFamily: 'Arial',       // Standardschriftart
+                    title: ''                  // Standardtitel (leer)
+                };
+            }
+            if (typeof element.specificProperties.proportionLocked === 'undefined') {
+                element.specificProperties.proportionLocked = true;
+            }
             this.selectedElement = element;
         },
         removeElement(index) {
-            console.log("Element entfernen, Index:", index);
             if (index >= 0 && index < this.formElements.length) {
                 this.formElements.splice(index, 1);
                 this.isFormSaved = false;
             }
             this.selectedElement = null;
         },
+        getPropertyLabel(key) {
+            const labels = {
+                uploadImage: 'Bild hochladen',
+                maxFileSize: 'Maximale Dateigröße',
+                width: 'Breite',
+                height: 'Höhe',
+                alignment: 'Ausrichtung',
+                title: 'Bildtitel',
+                caption: 'Bildunterschrift',
+                preview: 'Bildvorschau',
+                allowUrl: 'URL erlauben',
+                visible: 'Sichtbar'
+            };
+            return labels[key] || key;
+        },
         startDrag(element, event) {
-            console.log("Drag gestartet für Element:", element);
             this.draggedElement = { ...element };
             this.draggedIndex = -1;
             event.dataTransfer.effectAllowed = 'move';
             event.dataTransfer.setData('text/plain', element.id);
         },
+        onDragOver(event) {
+            event.preventDefault();
+        },
+        drop(event) {
+            event.preventDefault();
+            if (this.draggedElement) {
+                this.addElementToPreview(this.draggedElement);
+                this.resetDragState();
+            }
+        },
         resetDragState() {
-            console.log("Drag-Zustand zurücksetzen");
             this.draggedElement = null;
             this.draggedIndex = null;
             this.placeholderIndex = null;
         },
         duplicateElement() {
             if (this.selectedElement) {
-                console.log("Element duplizieren:", this.selectedElement);
                 const duplicate = JSON.parse(JSON.stringify(this.selectedElement));
                 duplicate.id = Date.now();
                 const index = this.formElements.indexOf(this.selectedElement);
@@ -240,14 +408,26 @@ const App = {
                 this.isFormSaved = false;
             }
         },
+
+        // Funktion zur Vorschau der Elemente, spezifische Eigenschaften werden ebenfalls initialisiert
         addElementToPreview(element) {
-            console.log("Element zur Vorschau hinzufügen:", element);
-            const newElement = { ...element, id: Date.now() };
+            const newElement = {
+                ...element,
+                id: Date.now(),
+                specificProperties: {
+                    ...element.specificProperties,
+                    title: element.specificProperties?.title || "", // Optionaler Titel
+                    datasetField: element.specificProperties?.datasetField || "firstName",
+                    alignment: element.specificProperties?.alignment || "left",
+                    fontSize: element.specificProperties?.fontSize || "medium",
+                    fontFamily: element.specificProperties?.fontFamily || "Arial"
+                }
+            };
             this.formElements.push(newElement);
             this.isFormSaved = false;
         },
+
         deleteSelectedElement(event) {
-            console.log("Ausgewähltes Element löschen");
             const activeElement = document.activeElement;
             const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
             if (!isInputActive && this.selectedElement) {
@@ -262,20 +442,16 @@ const App = {
         async loadFormData() {
             const urlParams = new URLSearchParams(window.location.search);
             this.formId = urlParams.get('formId');
-
             if (this.formId) {
                 try {
-                    console.log("Lade Formulardaten für ID:", this.formId);
                     const doc = await db.collection('forms').doc(this.formId).get();
                     if (doc.exists) {
                         const formData = doc.data();
-                        console.log("Formulardaten geladen:", formData);
                         this.formName = formData.name;
                         this.formElements = formData.elements || [];
                     }
                 } catch (error) {
-                    console.error("Fehler beim Laden des Formulars:", error);
-                    this.showNotification("Fehler beim Laden des Formulars. Bitte versuchen Sie es erneut.", 'error');
+                    this.showNotification("Fehler beim Laden des Formulars.", 'error');
                 }
             }
         },
@@ -283,20 +459,17 @@ const App = {
             try {
                 const user = await auth.currentUser;
                 if (user) {
-                    console.log("Benutzer angemeldet, prüfe Admin-Status");
                     const userDoc = await db.collection('users').doc(user.uid).get();
                     const userData = userDoc.data();
                     if (!userData.isAdmin && !userData.isMainAdmin) {
                         this.showNotification("Sie haben keine Berechtigung, diese Seite zu sehen.", 'error');
                         window.location.href = "home.html";
                     } else {
-                        console.log("Admin-Berechtigung bestätigt");
                         this.user = user;
                     }
                 } else {
                     auth.onAuthStateChanged(async (user) => {
                         if (user) {
-                            console.log("Benutzerstatus geändert, prüfe Admin-Status");
                             const userDoc = await db.collection('users').doc(user.uid).get();
                             const userData = userDoc.data();
                             if (userData.isAdmin || userData.isMainAdmin) {
@@ -311,7 +484,6 @@ const App = {
                     });
                 }
             } catch (error) {
-                console.error("Fehler bei der Admin-Status-Prüfung:", error);
                 window.location.href = "index.html";
             }
         }

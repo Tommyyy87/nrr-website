@@ -26,62 +26,31 @@
 
     <!-- Formularverwaltungs-Script -->
     <script src="js/formmanagement.js" defer></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            // Firebase-Dienste initialisieren
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-
-            // Überprüfen, ob der Benutzer angemeldet ist und Admin-Rechte hat
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    try {
-                        const userRef = db.collection('users').doc(user.uid);
-                        const userDoc = await userRef.get();
-
-                        if (userDoc.exists && userDoc.data().isAdmin) {
-                            console.log("Admin-Berechtigung bestätigt.");
-                        } else {
-                            alert("Sie haben keine Berechtigung, diese Seite zu sehen.");
-                            window.location.href = "home.html";
-                        }
-                    } catch (error) {
-                        console.error("Fehler beim Überprüfen der Admin-Rechte:", error);
-                        window.location.href = "home.html";
-                    }
-                } else {
-                    // Nicht eingeloggt, Weiterleitung zur Login-Seite
-                    window.location.href = "index.html";
-                }
-            });
-        });
-
-        // Logout-Funktion
-        function logout() {
-            firebase.auth().signOut().then(() => {
-                alert("Erfolgreich abgemeldet");
-                window.location.href = "index.html";
-            }).catch((error) => {
-                console.error("Fehler beim Abmelden:", error.message);
-            });
-        }
-    </script>
+    <script src="./js/standardauth.js"></script>
 
 </head>
 
 <body>
+
     <div class="container">
+        <!-- Hier wird das Logo mit Link zum Hauptmenü eingefügt -->
+        <a href="home.html">
+            <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        </a>
+
         <h2>Formularverwaltung</h2>
 
-        <!-- Button zum Erstellen eines neuen Formulars -->
-        <button class="button" onclick="window.location.href='form-builder.html'">Neues Formular erstellen</button>
+        <hr>
 
         <!-- Liste aller erstellten Formulare -->
         <div id="formList" class="form-list">
             <!-- Hier werden die gespeicherten Formulare dynamisch geladen -->
         </div>
 
+        <!-- Button zum Erstellen eines neuen Formulars -->
+        <button class="button" onclick="window.location.href='form-builder.html'">Neues Formular erstellen</button>
+        <!-- Home Button -->
+        <button class="button" onclick="window.location.href='home.html'">Hauptmenü</button>
         <!-- Logout-Button -->
         <button class="button" onclick="logout()">Logout</button>
     </div>

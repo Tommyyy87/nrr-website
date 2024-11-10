@@ -33,6 +33,10 @@
 
 <body>
     <div class="container">
+        <!-- Hier wird das Logo mit Link zum Hauptmenü eingefügt -->
+        <a href="home.html">
+            <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
+        </a>
         <h2>User Control - Benutzerverwaltung</h2>
 
         <!-- Zeigt den angemeldeten Benutzer an -->
@@ -60,7 +64,9 @@
 
         <!-- Benutzerliste -->
         <div id="usersList" class="user-list"></div>
-
+        <hr>
+        <!-- Home Button -->
+        <button class="button" onclick="window.location.href='home.html'">Hauptmenü</button>
         <!-- Logout-Button -->
         <button class="button" onclick="logout()">Logout</button>
     </div>

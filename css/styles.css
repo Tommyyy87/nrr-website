@@ -115,7 +115,8 @@ input[type="file"] {
     cursor: pointer;
     width: 100%;
     font-size: 1em;
-    margin-top: 15px;
+    margin-top: 7px;
+    margin-bottom: 7px;
     transition: background-color 0.3s ease;
 }
 
@@ -310,4 +311,169 @@ a:hover {
 .dragging-over {
     margin-top: 10px;
     transition: margin 0.2s ease;
+}
+
+/* Styling für den FormView */
+/* Zusätzliche Stile für die Formularansicht */
+
+/* Formular Titel */
+.container h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Layout für die generierten Formularelemente */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+/* Individuelle Formulargenerierte Gruppen */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Stile für die dynamisch generierten Eingabefelder */
+.input-field,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.align-left {
+    text-align: left;
+    display: block;
+    margin-left: 0;
+}
+
+.align-center {
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+}
+
+.align-right {
+    text-align: right;
+    display: block;
+    margin-left: auto;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Datepicker und File-Upload Felder */
+input[type="date"],
+input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+}
+
+/* Styling für Radio- und Checkbox-Gruppen */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Trennlinie */
+hr {
+    border: none;
+    border-top: 1px solid #acacac;
+    margin: 15px 0;
+}
+
+/* Dokument- und Hyperlink-Links */
+.document-link,
+.hyperlink {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.document-link:hover,
+.hyperlink:hover {
+    text-decoration: underline;
+}
+
+/* Signaturfeld */
+.signature-pad canvas {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    height: 200px;
+}
+
+/* Notification für die Formularansicht */
+.notification {
+    font-size: 1em;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    .input-field,
+    select,
+    textarea {
+        font-size: 0.9em;
+    }
+
+    .form-group label {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+
+    .input-field,
+    select,
+    textarea {
+        font-size: 0.8em;
+    }
+
+    .form-group label {
+        font-size: 0.9em;
+    }
+
+    h2 {
+        font-size: 1.6em;
+    }
 }
