@@ -28,8 +28,10 @@ const App = {
                 </button>
             </div>
             <div class="header-buttons">
-                <button class="undo-button"><i class="fas fa-undo"></i> Rückgängig</button>
-                <button class="redo-button"><i class="fas fa-redo"></i> Wiederholen</button>
+                <button class="undo-button" @click="undo" :disabled="historyIndex <= 0">
+                    <i class="fas fa-undo"></i> Rückgängig</button>
+                <button class="redo-button" @click="redo" :disabled="historyIndex >= history.length - 1">
+                    <i class="fas fa-redo"></i> Wiederholen</button>
                 <button class="save-button" @click="saveForm"><i class="fas fa-save"></i> Speichern</button>
                 <button class="preview-button"><i class="fas fa-eye"></i> Vorschau</button>
                 <button class="back-button" @click="confirmBack"><i class="fas fa-arrow-left"></i> Zurück</button>
@@ -69,8 +71,13 @@ const App = {
                          :style="{
                             border: selectedElement?.id === item.id ? '2px solid #007bff' : '1px dashed #ccc',
                             padding: '10px',
-                            marginBottom: '10px'
+                            marginBottom: '10px',
+                            display: 'flex',
+                            alignItems: 'center'
                         }">
+
+                        <!-- Icon des Elements anzeigen -->
+                        <i :class="item.icon" style="margin-right: 8px;"></i>
 
                         <!-- Render the live preview of each element based on its type -->
                         <div v-if="item.type === 'text'" 
@@ -96,8 +103,6 @@ const App = {
                             }" />
 
                         <label v-if="item.type === 'label'">{{ item.label }}</label>
-
-                        <button @click="removeElement(index)" class="delete-button">Löschen</button>
                     </div>
                 </div>
 
@@ -115,7 +120,7 @@ const App = {
                             <button @click="duplicateElement" class="duplicate-button">
                                 <i class="fas fa-copy"></i> Duplizieren
                             </button>
-                            <button @click="removeElement(selectedElement.id)" class="delete-button">
+                            <button @click="deleteSelectedElementFromProperties" class="delete-button">
                                 <i class="fas fa-trash"></i> Löschen
                             </button>
                         </div>
@@ -247,6 +252,8 @@ const App = {
             showNameModal: false,
             elements: formElements,
             formElements: [], // Speichert die Formularelemente mit spezifischen Eigenschaften
+            history: [],
+            historyIndex: -1,
             selectedElement: null,
             draggedElement: null,
             draggedIndex: null,
@@ -276,6 +283,7 @@ const App = {
         editFormName() {
             this.formNameInput = this.formName;
             this.showNameModal = true;
+            this.saveToHistory();  // Änderung speichern
         },
         showNotification(message, type = 'success') {
             this.notificationMessage = message;
@@ -314,6 +322,20 @@ const App = {
             };
             img.src = URL.createObjectURL(file);
         },
+
+        deleteSelectedElementFromProperties() {
+            if (this.selectedElement) {
+                const index = this.formElements.indexOf(this.selectedElement);
+                if (index > -1) {
+                    this.formElements.splice(index, 1);
+                    this.isFormSaved = false;
+                    this.saveToHistory();  // Änderung speichern
+                }
+                // Setze das ausgewählte Element auf null, um das Eigenschaftenfeld zu schließen
+                this.selectedElement = null;
+            }
+        },
+
         addImageElement() {
             this.formElements.push({
                 type: "image",
@@ -396,6 +418,7 @@ const App = {
         removeElement(index) {
             if (index >= 0 && index < this.formElements.length) {
                 this.formElements.splice(index, 1);
+                this.saveToHistory();  // Änderung speichern
                 this.isFormSaved = false;
             }
             this.selectedElement = null;
@@ -455,6 +478,7 @@ const App = {
                 this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
                 this.isFormSaved = false;
                 this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
+                this.saveToHistory();  // Änderung speichern
             }
         },
 
@@ -465,7 +489,7 @@ const App = {
                 id: Date.now(),
                 specificProperties: {
                     ...element.specificProperties,
-                    title: element.specificProperties?.title || "", // Optionaler Titel
+                    title: element.specificProperties?.title || "",
                     datasetField: element.specificProperties?.datasetField || "firstName",
                     alignment: element.specificProperties?.alignment || "left",
                     fontSize: element.specificProperties?.fontSize || "medium",
@@ -473,8 +497,32 @@ const App = {
                 }
             };
             this.formElements.push(newElement);
+            this.saveToHistory();  // Änderung speichern
             this.isFormSaved = false;
         },
+
+        saveToHistory() {
+            // Zustände speichern, wenn Änderungen auftreten
+            if (this.historyIndex < this.history.length - 1) {
+                this.history = this.history.slice(0, this.historyIndex + 1);
+            }
+            this.history.push(JSON.parse(JSON.stringify(this.formElements)));
+            this.historyIndex++;
+        },
+
+        undo() {
+            if (this.historyIndex > 0) {
+                this.historyIndex--;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+
 
         deleteSelectedElement(event) {
             const activeElement = document.activeElement;
@@ -484,6 +532,7 @@ const App = {
                 if (index > -1) {
                     this.formElements.splice(index, 1);
                     this.isFormSaved = false;
+                    this.saveToHistory();  // Änderung speichern
                     this.selectedElement = null;
                 }
             }
