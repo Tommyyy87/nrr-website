@@ -3,13 +3,13 @@ import formElements from './form-elements.js';
 
 const App = {
     template: `
-    <div class="form-builder-container" @keyup.delete="deleteSelectedElement($event)" tabindex="0">
+    <div class="form-builder-container" @keyup="handleKeyUp" tabindex="0">
         <!-- Benachrichtigungsbereich -->
         <div id="notification" :class="['notification', notificationType, { show: notificationVisible }]">
             {{ notificationMessage }}
         </div>
 
-<!-- Modal-Popup für die Namenseingabe -->
+        <!-- Modal-Popup für die Namenseingabe -->
         <div v-if="showNameModal" class="modal-overlay">
             <div class="modal">
                 <h2>Formularname eingeben</h2>
@@ -19,7 +19,7 @@ const App = {
             </div>
         </div>
 
-
+        <!-- Header mit Aktionsbuttons -->
         <header class="form-builder-header">
             <div class="header-title">
                 <h1>{{ formName || 'Neues Formular' }}</h1>
@@ -29,23 +29,26 @@ const App = {
             </div>
             <div class="header-buttons">
                 <button class="undo-button" @click="undo" :disabled="historyIndex <= 0">
-                    <i class="fas fa-undo"></i> Rückgängig</button>
+                    <i class="fas fa-undo"></i> Rückgängig
+                </button>
                 <button class="redo-button" @click="redo" :disabled="historyIndex >= history.length - 1">
-                    <i class="fas fa-redo"></i> Wiederholen</button>
+                    <i class="fas fa-redo"></i> Wiederholen
+                </button>
                 <button class="save-button" @click="saveForm"><i class="fas fa-save"></i> Speichern</button>
                 <button class="preview-button"><i class="fas fa-eye"></i> Vorschau</button>
                 <button class="back-button" @click="confirmBack"><i class="fas fa-arrow-left"></i> Zurück</button>
             </div>
         </header>
 
-
         <main>
             <section id="form-builder" class="form-builder-main">
+                <!-- Baustein-Liste -->
                 <div id="form-elements" class="form-elements">
                     <h2>Bausteine</h2>
                     <ul>
                         <li v-for="element in elements" :key="element.id" 
                             @dragstart="startDrag(element, $event)" 
+                            @dragend="resetDragState"
                             draggable="true" 
                             @dblclick="addElementToPreview(element)">
                             <i :class="element.icon"></i>
@@ -58,56 +61,65 @@ const App = {
                     </ul>
                 </div>
 
-
-                <div id="form-preview" class="form-preview" @drop="drop($event)" @dragover.prevent="onDragOver">
+                <!-- Form Vorschau-Bereich -->
+                <div id="form-preview" class="form-preview" 
+                    @dragover.prevent="onDragOverPreview"
+                    @dragleave="onDragLeavePreview"
+                    @drop="onDropPreview">
                     <h2>Vorschau</h2>
-                    <div v-for="(item, index) in formElements" :key="item.id" 
-                         class="form-element live-preview"
-                         @click="selectElement(item)"
-                         @dragstart="startReorderDrag(index, $event)"
-                         draggable="true"
-                         @dragover.prevent="onDragOver($event, index)"
-                         @drop="reorderDrop($event, index)"
-                         :style="{
-                            border: selectedElement?.id === item.id ? '2px solid #007bff' : '1px dashed #ccc',
-                            padding: '10px',
-                            marginBottom: '10px',
-                            display: 'flex',
-                            alignItems: 'center'
-                        }">
 
-                        <!-- Icon des Elements anzeigen -->
-                        <i :class="item.icon" style="margin-right: 8px;"></i>
+                    <div v-for="(item, index) in formElements" :key="item.id"
+                        @dragover.prevent="onDragOver($event, index)"
+                        @dragleave="onDragLeave($event, index)"
+                        @drop="onDrop($event, index)">
+                        <!-- Dynamischer Drop-Indikator für die aktuelle Position -->
+                        <div v-if="dragOverIndex === index" class="drop-indicator"></div>
 
-                        <!-- Render the live preview of each element based on its type -->
-                        <div v-if="item.type === 'text'" 
-                             :style="{
-                                fontSize: getFontSize(item.specificProperties.textSize),
-                                fontWeight: item.specificProperties.format === 'bold' ? 'bold' : 'normal',
-                                fontStyle: item.specificProperties.format === 'italic' ? 'italic' : 'normal',
-                                color: item.specificProperties.textColor
-                             }">
-                            {{ renderTextWithPlaceholders(item.specificProperties.content) }}
-                        </div>
-
-                        <img v-if="item.type === 'img'" :src="item.specificProperties.uploadImage" 
-                            :alt="item.label || 'Bild'"
+                        <!-- Vorschau des Elements -->
+                        <div class="form-element live-preview"
+                            @click="selectElement(item)"
+                            @dragstart="startReorderDrag(index, $event)"
+                            @dragend="resetDragState"
+                            draggable="true"
                             :style="{
-                                width: item.specificProperties.width || '100%',
-                                height: item.specificProperties.height || 'auto'
-                            }" 
-                            :class="{
-                                'align-left': item.specificProperties.alignment === 'left',
-                                'align-center': item.specificProperties.alignment === 'center',
-                                'align-right': item.specificProperties.alignment === 'right'
-                            }" />
+                                border: selectedElement?.id === item.id ? '2px solid #007bff' : '2px solid #ccc',
+                                padding: '15px',
+                                marginBottom: '20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                position: 'relative'
+                            }">
 
-                        <label v-if="item.type === 'label'">{{ item.label }}</label>
+                            <!-- Pfeile zum Verschieben -->
+                            <div class="move-buttons" style="position: absolute; right: 10px;">
+                                <button @click.stop="moveElementUp(index)" :disabled="index === 0">▲</button>
+                                <button @click.stop="moveElementDown(index)" :disabled="index === formElements.length - 1">▼</button>
+                            </div>
+
+                            <!-- Icon des Elements anzeigen -->
+                            <i :class="item.icon" style="margin-right: 8px;"></i>
+
+                            <!-- Inhalt des Elements rendern -->
+                            <!-- Hier kannst du deinen bestehenden Code zur Darstellung der Elemente einfügen -->
+                            <div v-if="item.type === 'text'">
+                                <!-- Beispiel: Textbaustein -->
+                                <p>{{ item.specificProperties.content }}</p>
+                            </div>
+
+                            <div v-if="item.type === 'img'">
+                                <!-- Beispiel: Bildbaustein -->
+                                <img :src="item.specificProperties.uploadImage" alt="Bild" />
+                            </div>
+
+                            <!-- Weitere Elementtypen hier hinzufügen -->
+                        </div>
                     </div>
+
+                    <!-- Platzhalter am Ende, falls der Drop am Schluss der Liste sein soll -->
+                    <div v-if="dragOverIndex === formElements.length" class="drop-indicator"></div>
                 </div>
 
-
-<!-- Eigenschaftenbereich -->
+                <!-- Eigenschaftenbereich -->
                 <aside id="properties" class="form-properties">
                     <div v-if="selectedElement">
                         <div class="properties-header">
@@ -115,7 +127,7 @@ const App = {
                         </div>
                         <p class="description">{{ selectedElement.description }}</p>
 
-<!-- Duplizieren und Löschen -->
+                        <!-- Duplizieren und Löschen -->
                         <div class="properties-buttons">
                             <button @click="duplicateElement" class="duplicate-button">
                                 <i class="fas fa-copy"></i> Duplizieren
@@ -125,118 +137,14 @@ const App = {
                             </button>
                         </div>
 
-<!-- Allgemeine Baustein-ID anzeigen -->
+                        <!-- Allgemeine Baustein-ID anzeigen -->
                         <div class="property">
                             <label>Baustein ID:</label>
                             <span>{{ selectedElement.id }}</span>
                         </div>
 
-
-<!-- AB HIER SPEZIFISCHE EIGENSCHAFTEN!! -->
-
-                        <!-- Spezifische Eigenschaften für den Datensatz-Baustein -->
-                        <div v-if="selectedElement && selectedElement.type === 'dataset-select'">
-                            <div class="property">
-                                <label>Datensatzfeld:</label>
-                                <select v-model="selectedElement.specificProperties.datasetField">
-                                    <option value="firstName">Vorname</option>
-                                    <option value="lastName">Nachname</option>
-                                    <option value="email">E-Mail</option>
-                                </select>
-                            </div>
-
-                            <div class="property">
-                                <label>Ausrichtung:</label>
-                                <select v-model="selectedElement.specificProperties.alignment">
-                                    <option value="left">Links</option>
-                                    <option value="center">Mitte</option>
-                                    <option value="right">Rechts</option>
-                                </select>
-                            </div>
-
-                            <div class="property">
-                                <label>Textgröße:</label>
-                                <select v-model="selectedElement.specificProperties.fontSize">
-                                    <option value="small">Klein</option>
-                                    <option value="medium">Mittel</option>
-                                    <option value="large">Groß</option>
-                                </select>
-                            </div>
-
-                            <div class="property">
-                                <label>Schriftart:</label>
-                                <select v-model="selectedElement.specificProperties.fontFamily">
-                                    <option value="Arial">Arial</option>
-                                    <option value="Verdana">Verdana</option>
-                                    <option value="Times New Roman">Times New Roman</option>
-                                </select>
-                            </div>
-
-                            <div class="property">
-                                <label>Optionaler Titel:</label>
-                                <input type="text" v-model="selectedElement.specificProperties.title" placeholder="Titel eingeben"/>
-                            </div>
-                        </div>
-
-                        <!-- Bild-Baustein spezifische Eigenschaften -->
-                        <div v-if="selectedElement && selectedElement.type === 'img'">
-                            <div class="property">
-                                <label>Bild-Upload (max. 2MB):</label>
-                                <input type="file" @change="handleFileUpload" accept=".jpg, .png, .svg" />
-                                <img v-if="selectedElement.specificProperties.uploadImage" 
-                                     :src="selectedElement.specificProperties.uploadImage" 
-                                     class="uploaded-image-preview" />
-                                <div v-if="uploadedImageDimensions">
-                                    Größe: {{ uploadedImageDimensions.width }} x {{ uploadedImageDimensions.height }} px
-                                </div>
-                                <button @click="clearUploadedImage" class="delete-uploaded-image">Bild löschen</button>
-                            </div>
-
-                            <!-- Bildtitel und Bildunterschrift -->
-                            <div class="property">
-                                <label for="title">Bildtitel (optional):</label>
-                                <input type="text" v-model="selectedElement.specificProperties.title" id="title" />
-                            </div>
-                            <div class="property">
-                                <label for="caption">Bildunterschrift (optional):</label>
-                                <input type="text" v-model="selectedElement.specificProperties.caption" id="caption" />
-                            </div>
-
-                            <!-- Ausrichtung -->
-                            <div class="property">
-                                <label>Ausrichtung:</label>
-                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="left" /> Linksbündig
-                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="center" /> Mittig
-                                <input type="radio" v-model="selectedElement.specificProperties.alignment" value="right" /> Rechtsbündig
-                            </div>
-
-                            <div class="property-group">
-                                <label>Bildgröße:</label>
-                                
-                                <!-- Breite Slider mit Textfeld -->
-                                <div>
-                                    <label>Breite (0-999%)</label>
-                                    <input type="range" v-model.number="selectedElement.specificProperties.width" min="0" max="999" />
-                                    <input type="number" v-model.number="selectedElement.specificProperties.width" min="0" max="999" /> %
-                                </div>
-
-                                <!-- Toggle für Proportionen -->
-                                <div class="property proportion-checkbox">
-                                    <label class="proportion-label">Proportionen beibehalten</label>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" v-model="selectedElement.specificProperties.proportionLocked" />
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-
-                                <!-- Höhe Slider, nur anzeigen, wenn Proportionen ausgeschaltet sind -->
-                                <div v-if="!selectedElement.specificProperties.proportionLocked">
-                                    <label>Höhe (0-999%)</label>
-                                    <input type="range" v-model.number="selectedElement.specificProperties.height" min="0" max="999" />
-                                    <input type="number" v-model.number="selectedElement.specificProperties.height" min="0" max="999" /> %
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Baustein spezifische Eigenschaften je nach Typ -->
+                        <!-- Füge hier deine spezifischen Eigenschaften für die Elemente hinzu -->
                     </div>
                     <p v-else>Kein Element ausgewählt</p>
                 </aside>
@@ -251,13 +159,10 @@ const App = {
             formNameInput: '',
             showNameModal: false,
             elements: formElements,
-            formElements: [], // Speichert die Formularelemente mit spezifischen Eigenschaften
+            formElements: [],
             history: [],
             historyIndex: -1,
             selectedElement: null,
-            draggedElement: null,
-            draggedIndex: null,
-            placeholderIndex: null,
             user: null,
             isFormSaved: true,
             notificationMessage: '',
@@ -266,25 +171,32 @@ const App = {
             activeTooltipId: null,
             proportionLocked: true,
             uploadedImageDimensions: null,
+            dragOverIndex: null,
+            draggedElement: null,
+            draggedIndex: null
         };
     },
-
     methods: {
+        // Umschalten der Tooltip-Anzeige
         toggleTooltip(id) {
             this.activeTooltipId = this.activeTooltipId === id ? null : id;
         },
+        // Speichern des Formularnamens
         saveFormName() {
             this.formName = this.formNameInput;
             this.showNameModal = false;
         },
+        // Abbrechen der Formularerstellung
         cancelFormCreation() {
             this.showNameModal = false;
         },
+        // Bearbeiten des Formularnamens
         editFormName() {
             this.formNameInput = this.formName;
             this.showNameModal = true;
-            this.saveToHistory();  // Änderung speichern
+            this.saveToHistory(); // Änderung speichern
         },
+        // Anzeigen einer Benachrichtigung
         showNotification(message, type = 'success') {
             this.notificationMessage = message;
             this.notificationType = type;
@@ -293,68 +205,250 @@ const App = {
                 this.notificationVisible = false;
             }, 3000);
         },
-
-        getFontSize(size) {
-            return size === 'small' ? '12px' : size === 'large' ? '24px' : '16px';
-        },
-
-        handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file && ['image/jpeg', 'image/png', 'image/svg+xml'].includes(file.type)) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.selectedElement.specificProperties.uploadImage = e.target.result;
-                    this.setUploadedDimensions(file);
+        // Ausgewähltes Element setzen
+        selectElement(element) {
+            if (!element.specificProperties) {
+                element.specificProperties = {
+                    datasetField: 'firstName', // Standardwert für das Datensatzfeld
+                    alignment: 'left',         // Standardausrichtung
+                    fontSize: 'medium',        // Standard-Textgröße
+                    fontFamily: 'Arial',       // Standardschriftart
+                    title: ''                  // Standardtitel (leer)
                 };
-                reader.readAsDataURL(file);
-            } else {
-                this.showNotification("Ungültiges Dateiformat. Nur JPG, PNG und SVG sind erlaubt.", 'error');
+            }
+            if (typeof element.specificProperties.proportionLocked === 'undefined') {
+                element.specificProperties.proportionLocked = true;
+            }
+            this.selectedElement = element;
+        },
+        // Hinzufügen eines Elements zur Vorschau per Doppelklick
+        addElementToPreview(element) {
+            const newElement = {
+                ...element,
+                id: Date.now(),
+                specificProperties: {
+                    ...element.specificProperties,
+                    title: element.specificProperties?.title || "",
+                    datasetField: element.specificProperties?.datasetField || "firstName",
+                    alignment: element.specificProperties?.alignment || "left",
+                    fontSize: element.specificProperties?.fontSize || "medium",
+                    fontFamily: element.specificProperties?.fontFamily || "Arial"
+                }
+            };
+            // Element nach dem ausgewählten Element einfügen oder ans Ende setzen
+            let index = this.formElements.length;
+            if (this.selectedElement) {
+                index = this.formElements.indexOf(this.selectedElement) + 1;
+            }
+            this.formElements.splice(index, 0, newElement);
+            this.saveToHistory(); // Änderung speichern
+            this.isFormSaved = false;
+        },
+        // Hinzufügen eines Elements zur Vorschau per Drag-and-Drop
+        startDrag(element, event) {
+            this.draggedElement = { ...element };
+            event.dataTransfer.effectAllowed = 'copy';
+            event.dataTransfer.setData('application/json', JSON.stringify({ type: 'new', id: element.id }));
+        },
+        // Startet das Dragging eines Elements zur Neupositionierung
+        startReorderDrag(index, event) {
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('application/json', JSON.stringify({ type: 'existing', index }));
+            this.draggedIndex = index;
+        },
+        // Rücksetzen des Dragging-Status
+        resetDragState() {
+            this.draggedElement = null;
+            this.dragOverIndex = null;
+            this.draggedIndex = null;
+        },
+        // DragOver-Ereignis für bestehende Elemente
+        onDragOver(event, index) {
+            event.preventDefault();
+            if (this.dragOverIndex !== index) {
+                this.dragOverIndex = index;
             }
         },
-        clearUploadedImage() {
-            this.selectedElement.specificProperties.uploadImage = '';
-            this.uploadedImageDimensions = null;
+        // DragLeave-Ereignis für bestehende Elemente
+        onDragLeave(event, index) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            if (
+                event.clientX < rect.left ||
+                event.clientX > rect.right ||
+                event.clientY < rect.top ||
+                event.clientY > rect.bottom
+            ) {
+                this.dragOverIndex = null;
+            }
         },
-        setUploadedDimensions(file) {
-            const img = new Image();
-            img.onload = () => {
-                this.uploadedImageDimensions = { width: img.width, height: img.height };
-            };
-            img.src = URL.createObjectURL(file);
+        // Drop-Ereignis für bestehende Elemente
+        onDrop(event, index) {
+            event.preventDefault();
+            const data = JSON.parse(event.dataTransfer.getData('application/json'));
+            if (data.type === 'existing') {
+                // Verschieben eines vorhandenen Elements
+                const draggedIndex = data.index;
+                if (draggedIndex !== index) {
+                    const [element] = this.formElements.splice(draggedIndex, 1);
+                    // Index anpassen, wenn Element nach unten verschoben wird
+                    if (draggedIndex < index) {
+                        index--;
+                    }
+                    this.formElements.splice(index, 0, element);
+                }
+            } else if (data.type === 'new') {
+                // Hinzufügen eines neuen Elements
+                const elementId = data.id;
+                const element = this.elements.find(el => el.id === elementId);
+                if (element) {
+                    const newElement = {
+                        ...element,
+                        id: Date.now(),
+                        specificProperties: { ...element.specificProperties }
+                    };
+                    this.formElements.splice(index, 0, newElement);
+                }
+            }
+            this.dragOverIndex = null;
+            this.resetDragState();
+            this.isFormSaved = false;
+            this.saveToHistory(); // Änderung speichern
         },
-
+        // DragOver-Ereignis für den Vorschau-Bereich
+        onDragOverPreview(event) {
+            event.preventDefault();
+            if (this.dragOverIndex !== this.formElements.length) {
+                this.dragOverIndex = this.formElements.length;
+            }
+        },
+        // DragLeave-Ereignis für den Vorschau-Bereich
+        onDragLeavePreview(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            if (
+                event.clientX < rect.left ||
+                event.clientX > rect.right ||
+                event.clientY < rect.top ||
+                event.clientY > rect.bottom
+            ) {
+                this.dragOverIndex = null;
+            }
+        },
+        // Drop-Ereignis für den Vorschau-Bereich
+        onDropPreview(event) {
+            event.preventDefault();
+            this.onDrop(event, this.formElements.length);
+        },
+        // Tastatureingaben verarbeiten
+        handleKeyUp(event) {
+            const activeElement = document.activeElement;
+            const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
+            if (isInputActive) {
+                return;
+            }
+            if (this.selectedElement) {
+                const index = this.formElements.indexOf(this.selectedElement);
+                if (event.key === '+') {
+                    // Element nach oben verschieben
+                    if (index > 0) {
+                        this.moveElementUp(index);
+                        // Aktualisiere das ausgewählte Element
+                        this.selectedElement = this.formElements[index - 1];
+                    }
+                } else if (event.key === '-') {
+                    // Element nach unten verschieben
+                    if (index < this.formElements.length - 1) {
+                        this.moveElementDown(index);
+                        // Aktualisiere das ausgewählte Element
+                        this.selectedElement = this.formElements[index + 1];
+                    }
+                } else if (event.key === 'Delete') {
+                    // Löschen-Taste, bereits anderweitig behandelt
+                }
+            }
+        },
+        // Element nach oben verschieben
+        moveElementUp(index) {
+            if (index > 0) {
+                const temp = this.formElements[index];
+                this.formElements.splice(index, 1);
+                this.formElements.splice(index - 1, 0, temp);
+                this.isFormSaved = false;
+                this.saveToHistory();
+            }
+        },
+        // Element nach unten verschieben
+        moveElementDown(index) {
+            if (index < this.formElements.length - 1) {
+                const temp = this.formElements[index];
+                this.formElements.splice(index, 1);
+                this.formElements.splice(index + 1, 0, temp);
+                this.isFormSaved = false;
+                this.saveToHistory();
+            }
+        },
+        // Element duplizieren
+        duplicateElement() {
+            if (this.selectedElement) {
+                const duplicate = JSON.parse(JSON.stringify(this.selectedElement)); // Tiefe Kopie erstellen
+                duplicate.id = Date.now(); // Eindeutige ID für das Duplikat setzen
+                const index = this.formElements.indexOf(this.selectedElement);
+                this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
+                this.isFormSaved = false;
+                this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
+                this.saveToHistory(); // Änderung speichern
+            }
+        },
+        // Ausgewähltes Element löschen (aus Eigenschaftenbereich)
         deleteSelectedElementFromProperties() {
             if (this.selectedElement) {
                 const index = this.formElements.indexOf(this.selectedElement);
                 if (index > -1) {
                     this.formElements.splice(index, 1);
                     this.isFormSaved = false;
-                    this.saveToHistory();  // Änderung speichern
+                    this.saveToHistory(); // Änderung speichern
                 }
-                // Setze das ausgewählte Element auf null, um das Eigenschaftenfeld zu schließen
+                // Ausgewähltes Element zurücksetzen
                 this.selectedElement = null;
             }
         },
-
-        addImageElement() {
-            this.formElements.push({
-                type: "image",
-                label: "Bild",
-                specificProperties: {
-                    uploadImage: '',
-                    maxFileSize: 2,
-                    title: '',
-                    caption: '',
-                    preview: true,
-                    allowUrl: false,
-                    visible: true,
-                    width: '100%', // Standardbreite
-                    height: 'auto',
-                    proportionLocked: true, // Schalter für Proportionen standardmäßig auf "An"
-                    alignment: "left",
+        // Ausgewähltes Element löschen (mit Delete-Taste)
+        deleteSelectedElement(event) {
+            const activeElement = document.activeElement;
+            const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
+            if (!isInputActive && this.selectedElement) {
+                const index = this.formElements.indexOf(this.selectedElement);
+                if (index > -1) {
+                    this.formElements.splice(index, 1);
+                    this.isFormSaved = false;
+                    this.saveToHistory(); // Änderung speichern
+                    this.selectedElement = null;
                 }
-            });
+            }
         },
+        // Änderungshistorie speichern
+        saveToHistory() {
+            // Zustände speichern, wenn Änderungen auftreten
+            if (this.historyIndex < this.history.length - 1) {
+                this.history = this.history.slice(0, this.historyIndex + 1);
+            }
+            this.history.push(JSON.parse(JSON.stringify(this.formElements)));
+            this.historyIndex++;
+        },
+        // Rückgängig machen
+        undo() {
+            if (this.historyIndex > 0) {
+                this.historyIndex--;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+        // Wiederholen
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+        // Formular speichern
         async saveForm() {
             if (!this.formName || this.formName === 'Neues Formular') {
                 this.showNameModal = true;
@@ -380,6 +474,7 @@ const App = {
                 this.showNotification("Fehler beim Speichern des Formulars.", 'error');
             }
         },
+        // Zurück zum Formularmanagement mit Bestätigung
         confirmBack() {
             if (!this.isFormSaved) {
                 if (confirm("Sie haben ungespeicherte Änderungen. Möchten Sie wirklich zurückkehren und Änderungen verwerfen?")) {
@@ -389,154 +484,11 @@ const App = {
                 this.goBackToFormManagement();
             }
         },
+        // Navigation zum Formularmanagement
         goBackToFormManagement() {
             window.location.href = "formmanagement.html";
         },
-        selectElement(element) {
-            if (!element.specificProperties) {
-                element.specificProperties = {
-                    datasetField: 'firstName', // Standardwert für das Datensatzfeld
-                    alignment: 'left',         // Standardausrichtung
-                    fontSize: 'medium',        // Standard-Textgröße
-                    fontFamily: 'Arial',       // Standardschriftart
-                    title: ''                  // Standardtitel (leer)
-                };
-            }
-            if (typeof element.specificProperties.proportionLocked === 'undefined') {
-                element.specificProperties.proportionLocked = true;
-            }
-            this.selectedElement = element;
-        },
-
-        renderTextWithPlaceholders(content) {
-            if (!content) return '';
-            return content.replace(/{{(.*?)}}/g, (match, p1) => {
-                return this.user?.[p1.trim()] || '---';
-            });
-        },
-
-        removeElement(index) {
-            if (index >= 0 && index < this.formElements.length) {
-                this.formElements.splice(index, 1);
-                this.saveToHistory();  // Änderung speichern
-                this.isFormSaved = false;
-            }
-            this.selectedElement = null;
-        },
-        getPropertyLabel(key) {
-            const labels = {
-                uploadImage: 'Bild hochladen',
-                maxFileSize: 'Maximale Dateigröße',
-                width: 'Breite',
-                height: 'Höhe',
-                alignment: 'Ausrichtung',
-                title: 'Bildtitel',
-                caption: 'Bildunterschrift',
-                preview: 'Bildvorschau',
-                allowUrl: 'URL erlauben',
-                visible: 'Sichtbar'
-            };
-            return labels[key] || key;
-        },
-        startDrag(element, event) {
-            this.draggedElement = { ...element };
-            this.draggedIndex = -1;
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/plain', element.id);
-        },
-        onDragOver(event) {
-            event.preventDefault();
-        },
-        mounted() {
-            this.user = {
-                firstName: 'Max',
-                lastName: 'Mustermann',
-                email: 'max@example.com'
-            };
-            this.checkAdminStatus();
-            this.loadFormData();
-            this.$el.focus();
-        },
-
-        drop(event) {
-            event.preventDefault();
-            if (this.draggedElement) {
-                this.addElementToPreview(this.draggedElement);
-                this.resetDragState();
-            }
-        },
-        resetDragState() {
-            this.draggedElement = null;
-            this.draggedIndex = null;
-            this.placeholderIndex = null;
-        },
-        duplicateElement() {
-            if (this.selectedElement) {
-                const duplicate = JSON.parse(JSON.stringify(this.selectedElement)); // Tiefe Kopie erstellen
-                duplicate.id = Date.now(); // Eindeutige ID für das Duplikat setzen
-                const index = this.formElements.indexOf(this.selectedElement);
-                this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
-                this.isFormSaved = false;
-                this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
-                this.saveToHistory();  // Änderung speichern
-            }
-        },
-
-        // Funktion zur Vorschau der Elemente, spezifische Eigenschaften werden ebenfalls initialisiert
-        addElementToPreview(element) {
-            const newElement = {
-                ...element,
-                id: Date.now(),
-                specificProperties: {
-                    ...element.specificProperties,
-                    title: element.specificProperties?.title || "",
-                    datasetField: element.specificProperties?.datasetField || "firstName",
-                    alignment: element.specificProperties?.alignment || "left",
-                    fontSize: element.specificProperties?.fontSize || "medium",
-                    fontFamily: element.specificProperties?.fontFamily || "Arial"
-                }
-            };
-            this.formElements.push(newElement);
-            this.saveToHistory();  // Änderung speichern
-            this.isFormSaved = false;
-        },
-
-        saveToHistory() {
-            // Zustände speichern, wenn Änderungen auftreten
-            if (this.historyIndex < this.history.length - 1) {
-                this.history = this.history.slice(0, this.historyIndex + 1);
-            }
-            this.history.push(JSON.parse(JSON.stringify(this.formElements)));
-            this.historyIndex++;
-        },
-
-        undo() {
-            if (this.historyIndex > 0) {
-                this.historyIndex--;
-                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
-            }
-        },
-        redo() {
-            if (this.historyIndex < this.history.length - 1) {
-                this.historyIndex++;
-                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
-            }
-        },
-
-
-        deleteSelectedElement(event) {
-            const activeElement = document.activeElement;
-            const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
-            if (!isInputActive && this.selectedElement) {
-                const index = this.formElements.indexOf(this.selectedElement);
-                if (index > -1) {
-                    this.formElements.splice(index, 1);
-                    this.isFormSaved = false;
-                    this.saveToHistory();  // Änderung speichern
-                    this.selectedElement = null;
-                }
-            }
-        },
+        // Formular-Daten laden
         async loadFormData() {
             const urlParams = new URLSearchParams(window.location.search);
             this.formId = urlParams.get('formId');
@@ -553,6 +505,7 @@ const App = {
                 }
             }
         },
+        // Admin-Status prüfen
         async checkAdminStatus() {
             try {
                 const user = await auth.currentUser;
@@ -592,7 +545,6 @@ const App = {
         this.$el.focus();
     }
 };
-
 
 // Vue-App erstellen und die Komponente mounten
 createApp(App).mount('#app');
