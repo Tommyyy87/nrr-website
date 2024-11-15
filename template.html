@@ -1,0 +1,139 @@
+<!-- template.html -->
+<div class="form-builder-container" @keyup="handleKeyUp" tabindex="0">
+    <!-- Benachrichtigungsbereich -->
+    <div id="notification" :class="['notification', notificationType, { show: notificationVisible }]">
+        {{ notificationMessage }}
+    </div>
+
+    <!-- Modal-Popup für die Namenseingabe -->
+    <div v-if="showNameModal" class="modal-overlay">
+        <div class="modal">
+            <h2>Formularname eingeben</h2>
+            <input v-model="formNameInput" placeholder="Formularname" />
+            <button @click="saveFormName">Speichern</button>
+            <button @click="cancelFormCreation">Abbrechen</button>
+        </div>
+    </div>
+
+    <!-- Header mit Aktionsbuttons -->
+    <header class="form-builder-header">
+        <div class="header-title">
+            <h1>{{ formName || 'Neues Formular' }}</h1>
+            <button @click="editFormName" class="edit-button header-action-button">
+                <i class="fas fa-pen"></i> Bearbeiten
+            </button>
+        </div>
+        <div class="header-buttons">
+            <button class="undo-button" @click="undo" :disabled="historyIndex <= 0">
+                <i class="fas fa-undo"></i> Rückgängig
+            </button>
+            <button class="redo-button" @click="redo" :disabled="historyIndex >= history.length - 1">
+                <i class="fas fa-redo"></i> Wiederholen
+            </button>
+            <button class="save-button" @click="saveForm"><i class="fas fa-save"></i> Speichern</button>
+            <button class="preview-button"><i class="fas fa-eye"></i> Vorschau</button>
+            <button class="back-button" @click="confirmBack"><i class="fas fa-arrow-left"></i> Zurück</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="form-builder" class="form-builder-main">
+            <!-- Baustein-Liste -->
+            <div id="form-elements" class="form-elements">
+                <h2>Bausteine</h2>
+                <ul>
+                    <li v-for="element in elements" :key="element.id" @dragstart="startDrag(element, $event)"
+                        @dragend="resetDragState" draggable="true" @dblclick="addElementToPreview(element)">
+                        <i :class="element.icon"></i>
+                        <span class="element-label">{{ element.label }}</span>
+                        <span class="help-icon" @click="toggleTooltip(element.id)">
+                            ?
+                            <span class="tooltip" v-if="activeTooltipId === element.id">{{ element.description }}</span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Form Vorschau-Bereich -->
+            <div id="form-preview" class="form-preview" @dragover.prevent="onDragOverPreview"
+                @dragleave="onDragLeavePreview" @drop="onDropPreview">
+                <h2>Vorschau</h2>
+
+                <div v-for="(item, index) in formElements" :key="item.id" @dragover.prevent="onDragOver($event, index)"
+                    @dragleave="onDragLeave($event, index)" @drop="onDrop($event, index)">
+                    <!-- Dynamischer Drop-Indikator für die aktuelle Position -->
+                    <div v-if="dragOverIndex === index" class="drop-indicator"></div>
+
+                    <!-- Vorschau des Elements -->
+                    <div class="form-element live-preview" @click="selectElement(item)"
+                        @dragstart="startReorderDrag(index, $event)" @dragend="resetDragState" draggable="true" :style="{
+                            border: selectedElement?.id === item.id ? '2px solid #007bff' : '2px solid #ccc',
+                            padding: '15px',
+                            marginBottom: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            position: 'relative'
+                        }">
+
+                        <!-- Pfeile zum Verschieben -->
+                        <div class="move-buttons" style="position: absolute; right: 10px;">
+                            <button @click.stop="moveElementUp(index)" :disabled="index === 0">▲</button>
+                            <button @click.stop="moveElementDown(index)"
+                                :disabled="index === formElements.length - 1">▼</button>
+                        </div>
+
+                        <!-- Icon des Elements anzeigen -->
+                        <i :class="item.icon" style="margin-right: 8px;"></i>
+
+                        <!-- Inhalt des Elements rendern -->
+                        <!-- Hier kannst du deinen bestehenden Code zur Darstellung der Elemente einfügen -->
+                        <div v-if="item.type === 'text'">
+                            <!-- Beispiel: Textbaustein -->
+                            <p>{{ item.specificProperties.content }}</p>
+                        </div>
+
+                        <div v-if="item.type === 'img'">
+                            <!-- Beispiel: Bildbaustein -->
+                            <img :src="item.specificProperties.uploadImage" alt="Bild" />
+                        </div>
+
+                        <!-- Weitere Elementtypen hier hinzufügen -->
+                    </div>
+                </div>
+
+                <!-- Platzhalter am Ende, falls der Drop am Schluss der Liste sein soll -->
+                <div v-if="dragOverIndex === formElements.length" class="drop-indicator"></div>
+            </div>
+
+            <!-- Eigenschaftenbereich -->
+            <aside id="properties" class="form-properties">
+                <div v-if="selectedElement">
+                    <div class="properties-header">
+                        <i :class="selectedElement.icon"></i> {{ selectedElement.label }}
+                    </div>
+                    <p class="description">{{ selectedElement.description }}</p>
+
+                    <!-- Duplizieren und Löschen -->
+                    <div class="properties-buttons">
+                        <button @click="duplicateElement" class="duplicate-button">
+                            <i class="fas fa-copy"></i> Duplizieren
+                        </button>
+                        <button @click="deleteSelectedElementFromProperties" class="delete-button">
+                            <i class="fas fa-trash"></i> Löschen
+                        </button>
+                    </div>
+
+                    <!-- Allgemeine Baustein-ID anzeigen -->
+                    <div class="property">
+                        <label>Baustein ID:</label>
+                        <span>{{ selectedElement.id }}</span>
+                    </div>
+
+                    <!-- Baustein spezifische Eigenschaften je nach Typ -->
+                    <!-- Füge hier deine spezifischen Eigenschaften für die Elemente hinzu -->
+                </div>
+                <p v-else>Kein Element ausgewählt</p>
+            </aside>
+        </section>
+    </main>
+</div>
