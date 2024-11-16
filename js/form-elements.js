@@ -189,346 +189,346 @@ const formElements = [
             defaultSelection: ['Option 1'],
         },
     },
-    {
-        id: 11,
-        label: 'Code-Scanner',
-        type: 'code-scanner',
-        icon: 'fas fa-barcode',
-        description: 'Ermöglicht das Scannen von Barcodes oder QR-Codes mit der Kamera des Geräts.',
-        generalProperties: {
-            id: 'code_scanner_1',
-            label: 'Code-Scanner',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            scannerType: 'QR-Code', // Optionen: QR-Code, Barcode
-            autoScan: true,
-        },
-    },
-    {
-        id: 12,
-        label: 'Datums- und Zeitauswahl',
-        type: 'datetime-picker',
-        icon: 'fas fa-calendar-alt',
-        description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
-        generalProperties: {
-            id: 'datum_zeit_1',
-            label: 'Datums- und Zeitauswahl',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            format: 'datetime', // Optionen: datum, uhrzeit, beides
-            minDate: '',
-            maxDate: '',
-            defaultValue: '',
-        },
-    },
-    {
-        id: 13,
-        label: 'Dokument anhängen',
-        type: 'file-upload',
-        icon: 'fas fa-paperclip',
-        description: 'Lässt den Nutzer ein Dokument hochladen und an das Formular anhängen.',
-        generalProperties: {
-            id: 'dokument_anhaengen_1',
-            label: 'Dokument anhängen',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            allowedFileTypes: ['PDF', 'Word', 'Excel'],
-            maxFileSize: '4MB',
-        },
-    },
-    {
-        id: 14,
-        label: 'E-Mail Eingabefeld',
-        type: 'email',
-        icon: 'fas fa-envelope',
-        description: 'Ermöglicht dem Nutzer, eine E-Mail-Adresse einzugeben. Die Eingabe wird auf Gültigkeit geprüft.',
-        generalProperties: {
-            id: 'email_1',
-            label: 'E-Mail Eingabe',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            placeholder: 'E-Mail eingeben',
-            validation: true,
-        },
-    },
-    {
-        id: 15,
-        label: 'Foto aufnehmen',
-        type: 'photo',
-        icon: 'fas fa-camera',
-        description: 'Der Nutzer kann ein Foto aufnehmen oder aus der Galerie auswählen.',
-        generalProperties: {
-            id: 'foto_1',
-            label: 'Foto aufnehmen',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            imageSize: 'medium', // Optionen: klein, mittel, groß
-            annotationTools: true,
-        },
-    },
-    {
-        id: 16,
-        label: 'Positionsbestimmung',
-        type: 'location',
-        icon: 'fas fa-map-marker-alt',
-        description: 'Ermöglicht dem Nutzer, seine aktuelle Position zu erfassen.',
-        generalProperties: {
-            id: 'position_1',
-            label: 'Positionsbestimmung',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            accuracy: 'high', // Optionen: hoch, mittel, niedrig
-            captureTimestamp: true,
-        },
-    },
-    {
-        id: 17,
-        label: 'Skizze',
-        type: 'drawing',
-        icon: 'fas fa-pencil-alt',
-        description: 'Ermöglicht es dem Nutzer, eine Skizze direkt auf dem Gerät zu erstellen.',
-        generalProperties: {
-            id: 'skizze_1',
-            label: 'Skizze',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            backgroundImage: false,
-            penColor: '#000000',
-            penSize: 'medium',
-        },
-    },
-    {
-        id: 18,
-        label: 'Texteingabefeld',
-        type: 'textarea',
-        icon: 'fas fa-keyboard',
-        description: 'Lässt den Nutzer Text eingeben, z.B. für Kommentare oder Notizen.',
-        generalProperties: {
-            id: 'textfeld_1',
-            label: 'Texteingabefeld',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            placeholder: 'Text eingeben...',
-            maxCharacters: 500,
-        },
-    },
-    {
-        id: 19,
-        label: 'Tonaufnahme',
-        type: 'audio',
-        icon: 'fas fa-microphone',
-        description: 'Ermöglicht es dem Nutzer, eine Sprachnotiz aufzunehmen.',
-        generalProperties: {
-            id: 'tonaufnahme_1',
-            label: 'Tonaufnahme',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            maxRecordingTime: 60, // in Sekunden
-            quality: 'hoch', // Optionen: niedrig, mittel, hoch
-        },
-    },
-    {
-        id: 20,
-        label: 'Unterschrift',
-        type: 'signature',
-        icon: 'fas fa-pen',
-        description: 'Ermöglicht dem Nutzer, eine Unterschrift direkt auf dem Gerät zu leisten.',
-        generalProperties: {
-            id: 'unterschrift_1',
-            label: 'Unterschrift',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            penColor: '#000000',
-            fieldSize: 'medium', // Optionen: klein, mittel, groß
-        },
-    },
-    {
-        id: 21,
-        label: 'Zahleneingabefeld',
-        type: 'number',
-        icon: 'fas fa-hashtag',
-        description: 'Lässt den Nutzer eine Zahl eingeben. Der Wertebereich kann festgelegt werden.',
-        generalProperties: {
-            id: 'zahleneingabe_1',
-            label: 'Zahleneingabefeld',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            minValue: 0,
-            maxValue: 100,
-            stepSize: 1,
-        },
-    },
-    {
-        id: 22,
-        label: 'Zeitstempel',
-        type: 'timestamp',
-        icon: 'fas fa-clock',
-        description: 'Erfasst den aktuellen Zeitpunkt, z.B. für Protokolle.',
-        generalProperties: {
-            id: 'zeitstempel_1',
-            label: 'Zeitstempel',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            autoCapture: true,
-        },
-    },
-    {
-        id: 23,
-        label: 'Textergebnis',
-        type: 'text-result',
-        icon: 'fas fa-font',
-        description: 'Zeigt berechneten Text an, der nicht bearbeitet werden kann.',
-        generalProperties: {
-            id: 'textergebnis_1',
-            label: 'Textergebnis',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            dataSource: 'Berechnungsformel',
-        },
-    },
-    {
-        id: 24,
-        label: 'Zahlenergebnis',
-        type: 'number-result',
-        icon: 'fas fa-calculator',
-        description: 'Zeigt eine berechnete Zahl an, die nicht bearbeitet werden kann.',
-        generalProperties: {
-            id: 'zahlenergebnis_1',
-            label: 'Zahlenergebnis',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            calculationFormula: 'x + y',
-        },
-    },
-    {
-        id: 25,
-        label: 'Zeitpunktergebnis',
-        type: 'datetime-result',
-        icon: 'fas fa-clock',
-        description: 'Zeigt einen berechneten Zeitpunkt an, der nicht bearbeitet werden kann.',
-        generalProperties: {
-            id: 'zeitpunktergebnis_1',
-            label: 'Zeitpunktergebnis',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            dataSource: 'Berechnungsformel',
-        },
-    },
-    {
-        id: 26,
-        label: 'Zeitraumergebnis',
-        type: 'duration-result',
-        icon: 'fas fa-hourglass-half',
-        description: 'Zeigt einen berechneten Zeitraum an, der nicht bearbeitet werden kann.',
-        generalProperties: {
-            id: 'zeitraumergebnis_1',
-            label: 'Zeitraumergebnis',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            calculationFormula: 'Endzeit - Startzeit',
-        },
-    },
-    {
-        id: 27,
-        label: 'E-Mail versenden',
-        type: 'email-send',
-        icon: 'fas fa-paper-plane',
-        description: 'Ermöglicht das Versenden einer E-Mail beim Absenden des Formulars.',
-        generalProperties: {
-            id: 'email_send_1',
-            label: 'E-Mail versenden',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            recipientAddresses: ['example@example.com'],
-            subject: 'Betreff der E-Mail',
-            message: 'Nachrichtentext',
-        },
-    },
-    {
-        id: 28,
-        label: 'Abschnitt',
-        type: 'section',
-        icon: 'fas fa-folder-open',
-        description: 'Hilft, das Formular in logische Abschnitte zu unterteilen.',
-        generalProperties: {
-            id: 'abschnitt_1',
-            label: 'Abschnitt',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            sectionStyle: 'default', // Optionen: default, custom
-            allowNestedElements: true,
-        },
-    },
-    {
-        id: 29,
-        label: 'Gruppe',
-        type: 'group',
-        icon: 'fas fa-object-group',
-        description: 'Gruppiert mehrere Bausteine, um sie gemeinsam zu verwalten.',
-        generalProperties: {
-            id: 'gruppe_1',
-            label: 'Gruppe',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            activationRules: 'always', // Optionen: always, conditional
-            groupDisplay: 'expanded', // Optionen: expanded, collapsed
-        },
-    },
-    {
-        id: 30,
-        label: 'Wiederholungsgruppe',
-        type: 'repeat-group',
-        icon: 'fas fa-redo',
-        description: 'Ermöglicht das Wiederholen eines bestimmten Formularteils, um mehrere Einträge zu erfassen.',
-        generalProperties: {
-            id: 'wiederholungsgruppe_1',
-            label: 'Wiederholungsgruppe',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            maxRepetitions: 5,
-            allowNewEntries: true,
-        },
-    },
+    // {
+    //     id: 11,
+    //     label: 'Code-Scanner',
+    //     type: 'code-scanner',
+    //     icon: 'fas fa-barcode',
+    //     description: 'Ermöglicht das Scannen von Barcodes oder QR-Codes mit der Kamera des Geräts.',
+    //     generalProperties: {
+    //         id: 'code_scanner_1',
+    //         label: 'Code-Scanner',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         scannerType: 'QR-Code', // Optionen: QR-Code, Barcode
+    //         autoScan: true,
+    //     },
+    // },
+    // {
+    //     id: 12,
+    //     label: 'Datums- und Zeitauswahl',
+    //     type: 'datetime-picker',
+    //     icon: 'fas fa-calendar-alt',
+    //     description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
+    //     generalProperties: {
+    //         id: 'datum_zeit_1',
+    //         label: 'Datums- und Zeitauswahl',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         format: 'datetime', // Optionen: datum, uhrzeit, beides
+    //         minDate: '',
+    //         maxDate: '',
+    //         defaultValue: '',
+    //     },
+    // },
+    // {
+    //     id: 13,
+    //     label: 'Dokument anhängen',
+    //     type: 'file-upload',
+    //     icon: 'fas fa-paperclip',
+    //     description: 'Lässt den Nutzer ein Dokument hochladen und an das Formular anhängen.',
+    //     generalProperties: {
+    //         id: 'dokument_anhaengen_1',
+    //         label: 'Dokument anhängen',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         allowedFileTypes: ['PDF', 'Word', 'Excel'],
+    //         maxFileSize: '4MB',
+    //     },
+    // },
+    // {
+    //     id: 14,
+    //     label: 'E-Mail Eingabefeld',
+    //     type: 'email',
+    //     icon: 'fas fa-envelope',
+    //     description: 'Ermöglicht dem Nutzer, eine E-Mail-Adresse einzugeben. Die Eingabe wird auf Gültigkeit geprüft.',
+    //     generalProperties: {
+    //         id: 'email_1',
+    //         label: 'E-Mail Eingabe',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         placeholder: 'E-Mail eingeben',
+    //         validation: true,
+    //     },
+    // },
+    // {
+    //     id: 15,
+    //     label: 'Foto aufnehmen',
+    //     type: 'photo',
+    //     icon: 'fas fa-camera',
+    //     description: 'Der Nutzer kann ein Foto aufnehmen oder aus der Galerie auswählen.',
+    //     generalProperties: {
+    //         id: 'foto_1',
+    //         label: 'Foto aufnehmen',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         imageSize: 'medium', // Optionen: klein, mittel, groß
+    //         annotationTools: true,
+    //     },
+    // },
+    // {
+    //     id: 16,
+    //     label: 'Positionsbestimmung',
+    //     type: 'location',
+    //     icon: 'fas fa-map-marker-alt',
+    //     description: 'Ermöglicht dem Nutzer, seine aktuelle Position zu erfassen.',
+    //     generalProperties: {
+    //         id: 'position_1',
+    //         label: 'Positionsbestimmung',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         accuracy: 'high', // Optionen: hoch, mittel, niedrig
+    //         captureTimestamp: true,
+    //     },
+    // },
+    // {
+    //     id: 17,
+    //     label: 'Skizze',
+    //     type: 'drawing',
+    //     icon: 'fas fa-pencil-alt',
+    //     description: 'Ermöglicht es dem Nutzer, eine Skizze direkt auf dem Gerät zu erstellen.',
+    //     generalProperties: {
+    //         id: 'skizze_1',
+    //         label: 'Skizze',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         backgroundImage: false,
+    //         penColor: '#000000',
+    //         penSize: 'medium',
+    //     },
+    // },
+    // {
+    //     id: 18,
+    //     label: 'Texteingabefeld',
+    //     type: 'textarea',
+    //     icon: 'fas fa-keyboard',
+    //     description: 'Lässt den Nutzer Text eingeben, z.B. für Kommentare oder Notizen.',
+    //     generalProperties: {
+    //         id: 'textfeld_1',
+    //         label: 'Texteingabefeld',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         placeholder: 'Text eingeben...',
+    //         maxCharacters: 500,
+    //     },
+    // },
+    // {
+    //     id: 19,
+    //     label: 'Tonaufnahme',
+    //     type: 'audio',
+    //     icon: 'fas fa-microphone',
+    //     description: 'Ermöglicht es dem Nutzer, eine Sprachnotiz aufzunehmen.',
+    //     generalProperties: {
+    //         id: 'tonaufnahme_1',
+    //         label: 'Tonaufnahme',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         maxRecordingTime: 60, // in Sekunden
+    //         quality: 'hoch', // Optionen: niedrig, mittel, hoch
+    //     },
+    // },
+    // {
+    //     id: 20,
+    //     label: 'Unterschrift',
+    //     type: 'signature',
+    //     icon: 'fas fa-pen',
+    //     description: 'Ermöglicht dem Nutzer, eine Unterschrift direkt auf dem Gerät zu leisten.',
+    //     generalProperties: {
+    //         id: 'unterschrift_1',
+    //         label: 'Unterschrift',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         penColor: '#000000',
+    //         fieldSize: 'medium', // Optionen: klein, mittel, groß
+    //     },
+    // },
+    // {
+    //     id: 21,
+    //     label: 'Zahleneingabefeld',
+    //     type: 'number',
+    //     icon: 'fas fa-hashtag',
+    //     description: 'Lässt den Nutzer eine Zahl eingeben. Der Wertebereich kann festgelegt werden.',
+    //     generalProperties: {
+    //         id: 'zahleneingabe_1',
+    //         label: 'Zahleneingabefeld',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         stepSize: 1,
+    //     },
+    // },
+    // {
+    //     id: 22,
+    //     label: 'Zeitstempel',
+    //     type: 'timestamp',
+    //     icon: 'fas fa-clock',
+    //     description: 'Erfasst den aktuellen Zeitpunkt, z.B. für Protokolle.',
+    //     generalProperties: {
+    //         id: 'zeitstempel_1',
+    //         label: 'Zeitstempel',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         autoCapture: true,
+    //     },
+    // },
+    // {
+    //     id: 23,
+    //     label: 'Textergebnis',
+    //     type: 'text-result',
+    //     icon: 'fas fa-font',
+    //     description: 'Zeigt berechneten Text an, der nicht bearbeitet werden kann.',
+    //     generalProperties: {
+    //         id: 'textergebnis_1',
+    //         label: 'Textergebnis',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         dataSource: 'Berechnungsformel',
+    //     },
+    // },
+    // {
+    //     id: 24,
+    //     label: 'Zahlenergebnis',
+    //     type: 'number-result',
+    //     icon: 'fas fa-calculator',
+    //     description: 'Zeigt eine berechnete Zahl an, die nicht bearbeitet werden kann.',
+    //     generalProperties: {
+    //         id: 'zahlenergebnis_1',
+    //         label: 'Zahlenergebnis',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         calculationFormula: 'x + y',
+    //     },
+    // },
+    // {
+    //     id: 25,
+    //     label: 'Zeitpunktergebnis',
+    //     type: 'datetime-result',
+    //     icon: 'fas fa-clock',
+    //     description: 'Zeigt einen berechneten Zeitpunkt an, der nicht bearbeitet werden kann.',
+    //     generalProperties: {
+    //         id: 'zeitpunktergebnis_1',
+    //         label: 'Zeitpunktergebnis',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         dataSource: 'Berechnungsformel',
+    //     },
+    // },
+    // {
+    //     id: 26,
+    //     label: 'Zeitraumergebnis',
+    //     type: 'duration-result',
+    //     icon: 'fas fa-hourglass-half',
+    //     description: 'Zeigt einen berechneten Zeitraum an, der nicht bearbeitet werden kann.',
+    //     generalProperties: {
+    //         id: 'zeitraumergebnis_1',
+    //         label: 'Zeitraumergebnis',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         calculationFormula: 'Endzeit - Startzeit',
+    //     },
+    // },
+    // {
+    //     id: 27,
+    //     label: 'E-Mail versenden',
+    //     type: 'email-send',
+    //     icon: 'fas fa-paper-plane',
+    //     description: 'Ermöglicht das Versenden einer E-Mail beim Absenden des Formulars.',
+    //     generalProperties: {
+    //         id: 'email_send_1',
+    //         label: 'E-Mail versenden',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         recipientAddresses: ['example@example.com'],
+    //         subject: 'Betreff der E-Mail',
+    //         message: 'Nachrichtentext',
+    //     },
+    // },
+    // {
+    //     id: 28,
+    //     label: 'Abschnitt',
+    //     type: 'section',
+    //     icon: 'fas fa-folder-open',
+    //     description: 'Hilft, das Formular in logische Abschnitte zu unterteilen.',
+    //     generalProperties: {
+    //         id: 'abschnitt_1',
+    //         label: 'Abschnitt',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         sectionStyle: 'default', // Optionen: default, custom
+    //         allowNestedElements: true,
+    //     },
+    // },
+    // {
+    //     id: 29,
+    //     label: 'Gruppe',
+    //     type: 'group',
+    //     icon: 'fas fa-object-group',
+    //     description: 'Gruppiert mehrere Bausteine, um sie gemeinsam zu verwalten.',
+    //     generalProperties: {
+    //         id: 'gruppe_1',
+    //         label: 'Gruppe',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         activationRules: 'always', // Optionen: always, conditional
+    //         groupDisplay: 'expanded', // Optionen: expanded, collapsed
+    //     },
+    // },
+    // {
+    //     id: 30,
+    //     label: 'Wiederholungsgruppe',
+    //     type: 'repeat-group',
+    //     icon: 'fas fa-redo',
+    //     description: 'Ermöglicht das Wiederholen eines bestimmten Formularteils, um mehrere Einträge zu erfassen.',
+    //     generalProperties: {
+    //         id: 'wiederholungsgruppe_1',
+    //         label: 'Wiederholungsgruppe',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         maxRepetitions: 5,
+    //         allowNewEntries: true,
+    //     },
+    // },
 ];
 
 export default formElements;

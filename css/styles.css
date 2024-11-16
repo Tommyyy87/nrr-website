@@ -22,6 +22,33 @@ body {
     margin: 20px;
 }
 
+/* Globale Scrollbar-Anpassung */
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+    /* Abgerundete Ecken der Spur */
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #dfdfdf;
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #27a2bb #f0f0f0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #2391a7;
+    /* Hover-Farbe */
+}
+
 /* Filtercontainer */
 .filter-container {
     display: flex;

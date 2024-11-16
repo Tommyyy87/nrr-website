@@ -37,10 +37,6 @@ import formElements from './form-elements.js';
             };
         },
         methods: {
-            // Umschalten der Tooltip-Anzeige
-            toggleTooltip(id) {
-                this.activeTooltipId = this.activeTooltipId === id ? null : id;
-            },
             // Speichern des Formularnamens
             saveFormName() {
                 this.formName = this.formNameInput;
@@ -466,8 +462,64 @@ import formElements from './form-elements.js';
             // this.$el.focus();
 
             // Globaler Klick-Event-Listener zum Testen
-            window.addEventListener('click', (event) => {
-                console.log('Globaler Klick registriert:', event.target);
+            // Event-Listener für Hover-Events
+            document.querySelectorAll('.help-icon').forEach((icon) => {
+                const elementId = icon.getAttribute('data-id');
+                const elementData = formElements.find((el) => el.id === parseInt(elementId));
+
+                if (!elementData || !elementData.description) {
+                    console.warn(`Tooltip konnte für Icon mit ID ${elementId} nicht geladen werden.`);
+                    return;
+                }
+
+                let tooltip = icon.querySelector('.tooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('span');
+                    tooltip.className = 'tooltip';
+                    tooltip.innerText = elementData.description;
+                    document.body.appendChild(tooltip); // Tooltip direkt zum Body hinzufügen
+                }
+
+                icon.addEventListener('mouseover', (event) => {
+                    const { top, left, width, height } = icon.getBoundingClientRect();
+                    const tooltipWidth = tooltip.offsetWidth;
+                    const tooltipHeight = tooltip.offsetHeight;
+
+                    // Scrollposition des Dokuments berücksichtigen
+                    const scrollY = window.scrollY || document.documentElement.scrollTop;
+                    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+                    // Tooltip-Position berechnen
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.top = `${top + scrollY - tooltipHeight - 10}px`; // Über dem Icon
+                    tooltip.style.left = `${left + scrollX + width / 2 - tooltipWidth / 2}px`; // Zentrieren
+                    tooltip.style.display = 'block';
+                    tooltip.style.opacity = '1';
+                    tooltip.style.zIndex = '9999';
+
+                    // Sicherstellen, dass der Tooltip im Viewport bleibt
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+
+                    if (top - tooltipHeight < 0) {
+                        tooltip.style.top = `${top + scrollY + height + 10}px`; // Unter dem Icon
+                    }
+
+                    if (left + tooltipWidth > viewportWidth) {
+                        tooltip.style.left = `${viewportWidth - tooltipWidth - 10}px`; // Rechts begrenzen
+                    }
+
+                    if (left < 0) {
+                        tooltip.style.left = `10px`; // Links begrenzen
+                    }
+                });
+
+                icon.addEventListener('mouseout', () => {
+                    tooltip.style.opacity = '0';
+                    setTimeout(() => {
+                        tooltip.style.display = 'none';
+                    }, 300);
+                });
             });
         }
 

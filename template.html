@@ -46,9 +46,10 @@
                         @dragend="resetDragState" draggable="true" @dblclick="addElementToPreview(element)">
                         <i :class="element.icon"></i>
                         <span class="element-label">{{ element.label }}</span>
-                        <span class="help-icon" @click="toggleTooltip(element.id)">
+                        <!-- Tooltip basierend auf description -->
+                        <span class="help-icon" :data-id="element.id">
                             ?
-                            <span class="tooltip" v-if="activeTooltipId === element.id">{{ element.description }}</span>
+                            <span class="tooltip">{{ element.description }}</span>
                         </span>
                     </li>
                 </ul>
@@ -116,8 +117,6 @@
                         <button @click="deleteSelectedElementFromProperties" class="delete-button">
                             <i class="fas fa-trash"></i> Löschen
                         </button>
-                        <label>Baustein ID:</label>
-                        <span>{{ selectedElement.id }}</span>
                         <!-- Sichtbarkeits-Schalter -->
                         <!-- Nachher: Angepasster Code für den visuellen Test ohne Vue-Bindung -->
                     </div>
@@ -128,6 +127,10 @@
                             <i class="fas fa-cogs"></i> Allgemeine Eigenschaften
                             <i :class="isGeneralVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                         </h3>
+                        <div class="property">
+                            <label>Baustein ID:</label>
+                        <span>{{ selectedElement.id }}</span>
+                        </div>
                         <div v-show="isGeneralVisible">
                             <div class="property">
                                 <label for="visibility">Sichtbar:</label>
@@ -135,10 +138,10 @@
                                     v-model="selectedElement.generalProperties.visible" @change="updateVisibility" />
                             </div>
                         </div>
-                    </div>
+                        <!-- </div> -->
 
-                    <!-- Spezifische Eigenschaften -->
-                    <div class="property-group">
+                        <!-- Spezifische Eigenschaften -->
+                        <!-- <div class="property-group"> -->
                         <h3 @click="toggleSection('specific')">
                             <i class="fas fa-sliders-h"></i> Spezifische Eigenschaften
                             <i :class="isSpecificVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>

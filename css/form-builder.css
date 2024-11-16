@@ -144,7 +144,7 @@ header h1 {
 main {
     display: flex;
     flex: 1;
-    padding-top: 80px;
+    padding-top: 5rem;
     gap: 1rem;
     overflow: hidden;
 }
@@ -160,13 +160,23 @@ main {
 /* Baustein-Liste */
 /* Form Elemente Liste */
 #form-elements {
-    flex-basis: 25%;
+    flex-basis: 20%;
+    max-width: 300px;
+    /* Feste Breite in Prozent */
     background: white;
     padding: 1rem;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     height: 100%;
     overflow-y: auto;
+    /* Nur vertikales Scrollen erlauben */
+    overflow-x: hidden;
+    /* Horizontales Scrollen verhindern */
+    box-sizing: border-box;
+    /* Verhindert, dass Padding die Breite erhöht */
+    word-wrap: break-word;
+    /* Lange Texte umbrechen */
+    margin-left: 0.5rem;
 }
 
 
@@ -183,7 +193,7 @@ main {
 }
 
 #form-elements li {
-    background: #dfdfdf;
+    background: #ffffff;
     padding: 12px;
     margin-bottom: 10px;
     border-radius: 8px;
@@ -191,8 +201,9 @@ main {
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     transition: background 0.3s, transform 0.2s ease;
+    border: solid #dfdfdf 1px;
 }
 
 #form-elements li:hover {
@@ -236,40 +247,34 @@ main {
 
 
 .help-icon {
-    color: #007bff;
-    font-size: 0.9rem;
-    cursor: pointer;
     position: relative;
-    margin-left: 8px;
-}
-
-.help-icon:hover .tooltip {
-    display: block;
+    cursor: pointer;
 }
 
 .tooltip {
     position: absolute;
+    /* Tooltip außerhalb des Layoutflusses */
     background-color: #333;
     color: #fff;
-    padding: 5px 10px;
-    font-size: 0.8em;
+    padding: 8px 12px;
+    font-size: 0.85rem;
     border-radius: 4px;
-    top: -5px;
-    left: 105%;
     white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 9000;
-    display: none;
+    /* Kein Zeilenumbruch */
+    max-width: 200px;
+    /* Maximale Breite des Tooltips */
+    overflow: hidden;
+    /* Inhalt, der zu lang ist, wird abgeschnitten */
+    text-overflow: ellipsis;
+    /* Langer Text wird mit "..." angezeigt */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
 }
 
 
-
-.tooltip.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
 
 .tooltip:hover::after {
     content: attr(data-tooltip);
@@ -285,25 +290,36 @@ main {
     left: 50%;
     transform: translateX(-50%);
     opacity: 0.9;
-    z-index: 1000;
+    z-index: 99999;
 }
 
 #form-elements li:hover .tooltip {
     opacity: 1;
     transform: translateY(0);
+    display: block;
 }
 
 /* Vorschau-Bereich */
-/* Form Vorschau */
 #form-preview {
-    flex-grow: 1;
-    background: #ffffff11;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 3px dashed #ccc;
-    overflow-y: auto;
+    flex-basis: 50%;
+    /* Vorschaufeld kleiner machen */
+    max-width: 600px;
+    /* Maximalbreite des Vorschaufelds */
+    min-width: 400px;
+    /* Mindestbreite des Vorschaufelds */
+    margin: auto;
+    /* Zentriert das Vorschaufeld innerhalb des Bereichs */
+    overflow: visible;
+    /* Sicherstellen, dass nichts abgeschnitten wird */
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid #dfdfdf;
+    position: relative;
     transition: background-color 0.3s;
+    height: 100%;
+    color: #27a2bb
 }
 
 #form-preview.drag-over {
@@ -408,21 +424,23 @@ main {
 /* Eigenschaften Panel */
 #properties {
     flex-basis: 25%;
+    max-width: 400px;
     background: white;
     padding: 1rem;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
+    overflow-x: hidden;
     height: 100%;
+    min-height: 100%;
+    margin-right: 1rem;
+    box-sizing: border-box;
 }
 
-
-
 #properties h2 {
-    margin-bottom: 2rem;
-    font-size: 1.6rem;
-    color: #222;
-    font-weight: bold;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #333;
     text-align: center;
 }
 
@@ -449,9 +467,65 @@ main {
 .properties-header {
     display: flex;
     align-items: center;
-    font-size: 1.2em;
-    color: #0056b3;
+    font-size: 1em;
+    color: #666;
     margin-bottom: 15px;
+    justify-content: flex-start;
+    min-height: 1rem;
+    font-weight: bold;
+    /* Einheitliche Mindesthöhe für konsistentes Layout */
+    gap: 2rem;
+    /* Fügt Abstand zwischen Titel und Symbol hinzu */
+    /* display: inline-block; */
+    vertical-align: middle;
+    /* font-size: 1.5em; Einheitliche Symbolgröße */
+}
+
+#properties .property {
+    display: flex;
+    /* flex-direction: column; */
+    background: #ffffff;
+    /* Harmoniert mit dem Bausteinfeld */
+    padding: 12px;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    /* Gleicher Schatten wie im Bausteinfeld */
+    border: solid #dfdfdf 1px;
+    /* Gleicher Rand wie im Bausteinfeld */
+    transition: background 0.3s ease-in-out, transform 0.2s ease;
+    justify-content: space-between;
+}
+
+#properties .property:hover {
+    background: #e8e8e8;
+    /* Gleicher Hover-Effekt wie im Bausteinfeld */
+    transform: translateY(-2px);
+}
+
+#properties input[type="text"],
+#properties select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95em;
+    color: #333;
+    transition: border-color 0.3s ease-in-out;
+    width: 100%;
+    /* Passt die Breite an das Feld an */
+}
+
+#properties input[type="text"]:focus,
+#properties select:focus {
+    border-color: #007bff;
+    /* Harmonische Akzentfarbe */
+    background-color: #f9f9f9;
+}
+
+#properties label {
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 5px;
 }
 
 .properties-header i {
@@ -489,20 +563,31 @@ main {
 .description {
     font-size: 0.9rem;
     color: #666;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    min-height: 2rem;
 }
 
 /* Eigenschaften-Einstellungen */
 .property {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Ändert die Richtung von Spalte zu Reihe */
+    align-items: center;
+    /* Zentriert den Inhalt vertikal */
+    justify-content: flex-start;
+    /* Stellt sicher, dass der Inhalt links bleibt */
+    gap: 1rem;
+    /* Fügt Abstand zwischen Label und Checkbox hinzu */
     margin-bottom: 20px;
 }
 
 .property label {
     font-weight: bold;
     color: #666;
-    margin-bottom: 5px;
+    margin: 0;
+    /* Entfernt den Abstand nach unten */
+    white-space: nowrap;
+    /* Verhindert Zeilenumbruch */
 }
 
 .property input[type="text"],
@@ -561,19 +646,25 @@ input[type="checkbox"] {
 
 /* Schieberegler und Input-Field Kombination */
 .property input[type="range"] {
-    width: calc(100% - 60px);
+    width: calc(100% - 80px);
+    /* Mehr Platz für die Anzeige des Werts */
     margin-right: 10px;
 }
 
 .property .value-display {
-    width: 50px;
+    width: 60px;
+    /* Breitere Anzeige für mehr Platz */
     text-align: center;
     font-weight: bold;
-    background: #f0f0f0;
+    background: #e0f7fa;
+    /* Dezenter Hintergrund zur Hervorhebung */
     border-radius: 5px;
-    border: 1px solid #ddd;
-    padding: 4px;
+    border: 1px solid #007bff;
+    /* Akzentfarbe für mehr Klarheit */
+    padding: 5px;
     font-size: 0.9rem;
+    color: #007bff;
+    /* Gleiche Farbe wie der Rahmen */
 }
 
 /* Proportionen-Checkbox */
@@ -697,17 +788,17 @@ input[type="checkbox"]:checked+.slider:before {
 .property-group {
     background: #ffffff;
     /* Weißer Hintergrund für Kontrast */
-    padding: 1.5rem;
+    /* padding: 1rem; */
     /* Mehr Padding für komfortable Ansicht */
     margin-bottom: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); */
     /* Stärkerer Schatten für mehr Tiefe */
 }
 
 .property-group h3 {
-    font-size: 1.2rem;
-    color: #0056b3;
+    font-size: 1rem;
+    color: #27a2bb;
     /* Akzentfarbe für Gruppentitel */
     margin-bottom: 10px;
     font-weight: bold;
