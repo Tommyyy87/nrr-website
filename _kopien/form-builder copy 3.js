@@ -32,7 +32,7 @@ import formElements from './form-elements.js';
                 draggedElement: null,
                 draggedIndex: null,
                 isGeneralVisible: true, // Hinzugefügt: Standardmäßig sichtbar
-                isSpecificVisible: true,  // Hinzugefügt: Standardmäßig sichtbar
+
 
             };
         },
@@ -247,232 +247,232 @@ import formElements from './form-elements.js';
                 const activeElement = document.activeElement;
                 const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
                 if (isInputActive) {
+                    console.log("Eingabefeld aktiv, Löschen deaktiviert.");
                     return;
                 }
+
                 if (this.selectedElement) {
                     const index = this.formElements.indexOf(this.selectedElement);
                     if (event.key === '+') {
-                        // Element nach oben verschieben
                         if (index > 0) {
                             this.moveElementUp(index);
-                            // Aktualisiere das ausgewählte Element
                             this.selectedElement = this.formElements[index - 1];
                         }
                     } else if (event.key === '-') {
-                        // Element nach unten verschieben
                         if (index < this.formElements.length - 1) {
                             this.moveElementDown(index);
-                            // Aktualisiere das ausgewählte Element
                             this.selectedElement = this.formElements[index + 1];
                         }
                     } else if (event.key === 'Delete') {
+                        console.log("Löschen-Taste gedrückt");
                         this.deleteSelectedElement();
                     }
-                }
-            },
-            // Element nach oben verschieben
-            moveElementUp(index) {
-                if (index > 0) {
-                    const temp = this.formElements[index];
-                    this.formElements.splice(index, 1);
-                    this.formElements.splice(index - 1, 0, temp);
-                    this.isFormSaved = false;
-                    this.saveToHistory();
-                }
-            },
-            // Element nach unten verschieben
-            moveElementDown(index) {
-                if (index < this.formElements.length - 1) {
-                    const temp = this.formElements[index];
-                    this.formElements.splice(index, 1);
-                    this.formElements.splice(index + 1, 0, temp);
-                    this.isFormSaved = false;
-                    this.saveToHistory();
-                }
-            },
-            // Element duplizieren
-            duplicateElement() {
-                if (this.selectedElement) {
-                    const duplicate = JSON.parse(JSON.stringify(this.selectedElement)); // Tiefe Kopie erstellen
-                    duplicate.id = Date.now(); // Eindeutige ID für das Duplikat setzen
-                    const index = this.formElements.indexOf(this.selectedElement);
-                    this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
-                    this.isFormSaved = false;
-                    this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
-                    this.saveToHistory(); // Änderung speichern
-                }
-            },
-            // Ausgewähltes Element löschen (aus Eigenschaftenbereich)
-            deleteSelectedElementFromProperties() {
-                if (this.selectedElement) {
-                    const index = this.formElements.indexOf(this.selectedElement);
-                    if (index > -1) {
-                        this.formElements.splice(index, 1);
-                        this.isFormSaved = false;
-                        this.saveToHistory(); // Änderung speichern
-                    }
-                    // Ausgewähltes Element zurücksetzen
-                    this.selectedElement = null;
-                }
-            },
-
-            // Ausgewähltes Element löschen (mit Delete-Taste)
-            deleteSelectedElement(event) {
-                const activeElement = document.activeElement;
-                const isInputActive = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT' || activeElement.tagName === 'TEXTAREA');
-                if (!isInputActive && this.selectedElement) {
-                    const index = this.formElements.indexOf(this.selectedElement);
-                    if (index > -1) {
-                        this.formElements.splice(index, 1);
-                        this.isFormSaved = false;
-                        this.saveToHistory(); // Änderung speichern
-                        this.selectedElement = null;
-                    }
-                }
-            },
-            // Änderungshistorie speichern
-            saveToHistory() {
-                // Zustände speichern, wenn Änderungen auftreten
-                if (this.historyIndex < this.history.length - 1) {
-                    this.history = this.history.slice(0, this.historyIndex + 1);
-                }
-                this.history.push(JSON.parse(JSON.stringify(this.formElements)));
-                this.historyIndex++;
-            },
-            // Rückgängig machen
-            undo() {
-                if (this.historyIndex > 0) {
-                    this.historyIndex--;
-                    this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
-                }
-            },
-            // Wiederholen
-            redo() {
-                if (this.historyIndex < this.history.length - 1) {
-                    this.historyIndex++;
-                    this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
-                }
-            },
-            // Formular speichern
-            async saveForm() {
-                if (!this.formName || this.formName === 'Neues Formular') {
-                    this.showNameModal = true;
-                    return;
-                }
-                try {
-                    const formData = {
-                        name: this.formName,
-                        elements: this.formElements.map(element => ({
-                            ...element,
-                            generalProperties: {
-                                ...element.generalProperties,
-                                visible: element.generalProperties?.visible ?? true // Allgemeine Sichtbarkeit sicherstellen
-                            },
-                            // specificProperties: {
-                            //     ...element.specificProperties,
-                            //     visible: element.specificProperties?.visible ?? true // Spezifische Sichtbarkeit sicherstellen
-                            // }
-                        })),
-                        createdAt: new Date().toISOString(),
-                        published: false,
-                        userId: this.user ? this.user.uid : null
-                    };
-                    if (this.formId) {
-                        await db.collection('forms').doc(this.formId).update(formData);
-                    } else {
-                        const docRef = await db.collection('forms').add(formData);
-                        this.formId = docRef.id;
-                    }
-                    this.showNotification("Formular erfolgreich gespeichert.", "success");
-                    this.isFormSaved = true;
-                } catch (error) {
-                    this.showNotification("Fehler beim Speichern des Formulars.", 'error');
-                }
-            },
-            // Zurück zum Formularmanagement mit Bestätigung
-            confirmBack() {
-                if (!this.isFormSaved) {
-                    if (confirm("Sie haben ungespeicherte Änderungen. Möchten Sie wirklich zurückkehren und Änderungen verwerfen?")) {
-                        this.goBackToFormManagement();
-                    }
                 } else {
-                    this.goBackToFormManagement();
-                }
-            },
-            // Navigation zum Formularmanagement
-            goBackToFormManagement() {
-                window.location.href = "formmanagement.html";
-            },
-            // Formular-Daten laden
-            async loadFormData() {
-                const urlParams = new URLSearchParams(window.location.search);
-                this.formId = urlParams.get('formId');
-                if (this.formId) {
-                    try {
-                        const doc = await db.collection('forms').doc(this.formId).get();
-                        if (doc.exists) {
-                            const formData = doc.data();
-                            this.formName = formData.name;
-                            this.formElements = formData.elements.map(element => ({
-                                ...element,
-                                generalProperties: {
-                                    ...element.generalProperties,
-                                    visible: element.specificProperties?.visible ?? true // Sicherstellen, dass visible vorhanden ist
-                                }
-                            }));
-                        }
-                    } catch (error) {
-                        this.showNotification("Fehler beim Laden des Formulars.", 'error');
-                    }
-                }
-            },
-            // Admin-Status prüfen
-            async checkAdminStatus() {
-                try {
-                    const user = await auth.currentUser;
-                    if (user) {
-                        const userDoc = await db.collection('users').doc(user.uid).get();
-                        const userData = userDoc.data();
-                        if (!userData.isAdmin && !userData.isMainAdmin) {
-                            this.showNotification("Sie haben keine Berechtigung, diese Seite zu sehen.", 'error');
-                            window.location.href = "home.html";
-                        } else {
-                            this.user = user;
-                        }
-                    } else {
-                        auth.onAuthStateChanged(async (user) => {
-                            if (user) {
-                                const userDoc = await db.collection('users').doc(user.uid).get();
-                                const userData = userDoc.data();
-                                if (userData.isAdmin || userData.isMainAdmin) {
-                                    this.user = user;
-                                } else {
-                                    this.showNotification("Sie haben keine Berechtigung, diese Seite zu sehen.", 'error');
-                                    window.location.href = "home.html";
-                                }
-                            } else {
-                                window.location.href = "index.html";
-                            }
-                        });
-                    }
-                } catch (error) {
-                    window.location.href = "index.html";
+                    console.log("Kein Element ausgewählt, Löschen-Taste ignoriert.");
                 }
             }
         },
-        async mounted() {
-            await this.checkAdminStatus();
-            await this.loadFormData();
-            // this.$el.focus();
+        // Element nach oben verschieben
+        moveElementUp(index) {
+            if (index > 0) {
+                const temp = this.formElements[index];
+                this.formElements.splice(index, 1);
+                this.formElements.splice(index - 1, 0, temp);
+                this.isFormSaved = false;
+                this.saveToHistory();
+            }
+        },
+        // Element nach unten verschieben
+        moveElementDown(index) {
+            if (index < this.formElements.length - 1) {
+                const temp = this.formElements[index];
+                this.formElements.splice(index, 1);
+                this.formElements.splice(index + 1, 0, temp);
+                this.isFormSaved = false;
+                this.saveToHistory();
+            }
+        },
+        // Element duplizieren
+        duplicateElement() {
+            if (this.selectedElement) {
+                const duplicate = JSON.parse(JSON.stringify(this.selectedElement)); // Tiefe Kopie erstellen
+                duplicate.id = Date.now(); // Eindeutige ID für das Duplikat setzen
+                const index = this.formElements.indexOf(this.selectedElement);
+                this.formElements.splice(index + 1, 0, duplicate); // Duplikat nach dem Original einfügen
+                this.isFormSaved = false;
+                this.selectedElement = duplicate; // Optional: das Duplikat als ausgewähltes Element setzen
+                this.saveToHistory(); // Änderung speichern
+            }
+        },
+        // Ausgewähltes Element löschen (aus Eigenschaftenbereich)
+        deleteSelectedElementFromProperties() {
+            if (this.selectedElement) {
+                const index = this.formElements.indexOf(this.selectedElement);
+                if (index > -1) {
+                    this.formElements.splice(index, 1);
+                    this.isFormSaved = false;
+                    this.saveToHistory(); // Änderung speichern
+                }
+                // Ausgewähltes Element zurücksetzen
+                this.selectedElement = null;
+            }
+        },
 
-            // Globaler Klick-Event-Listener zum Testen
-            window.addEventListener('click', (event) => {
-                console.log('Globaler Klick registriert:', event.target);
-            });
+        // Ausgewähltes Element löschen (mit Delete-Taste)
+        deleteSelectedElement() {
+            if (this.selectedElement) {
+                const index = this.formElements.indexOf(this.selectedElement);
+                if (index > -1) {
+                    console.log(`Element mit ID ${this.selectedElement.id} wird gelöscht.`);
+                    this.formElements.splice(index, 1);
+                    this.isFormSaved = false;
+                    this.saveToHistory(); // Änderung speichern
+                    this.selectedElement = null;
+                } else {
+                    console.log("Ausgewähltes Element nicht in der Liste gefunden.");
+                }
+            } else {
+                console.log("Kein Element ausgewählt. Löschen abgebrochen.");
+            }
+        },
+        // Änderungshistorie speichern
+        saveToHistory() {
+            // Zustände speichern, wenn Änderungen auftreten
+            if (this.historyIndex < this.history.length - 1) {
+                this.history = this.history.slice(0, this.historyIndex + 1);
+            }
+            this.history.push(JSON.parse(JSON.stringify(this.formElements)));
+            this.historyIndex++;
+        },
+        // Rückgängig machen
+        undo() {
+            if (this.historyIndex > 0) {
+                this.historyIndex--;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+        // Wiederholen
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+                this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+            }
+        },
+        // Formular speichern
+        async saveForm() {
+            if (!this.formName || this.formName === 'Neues Formular') {
+                this.showNameModal = true;
+                return;
+            }
+            try {
+                const formData = {
+                    name: this.formName,
+                    elements: this.formElements.map(element => ({
+                        ...element,
+                        generalProperties: {
+                            ...element.generalProperties,
+                            visible: element.generalProperties?.visible ?? true // Allgemeine Sichtbarkeit sicherstellen
+                        },
+                        specificProperties: {
+                            ...element.specificProperties,
+                            visible: element.specificProperties?.visible ?? true // Spezifische Sichtbarkeit sicherstellen
+                        }
+                    })),
+                    createdAt: new Date().toISOString(),
+                    published: false,
+                    userId: this.user ? this.user.uid : null
+                };
+                if (this.formId) {
+                    await db.collection('forms').doc(this.formId).update(formData);
+                } else {
+                    const docRef = await db.collection('forms').add(formData);
+                    this.formId = docRef.id;
+                }
+                this.showNotification("Formular erfolgreich gespeichert.", "success");
+                this.isFormSaved = true;
+            } catch (error) {
+                this.showNotification("Fehler beim Speichern des Formulars.", 'error');
+            }
+        },
+        // Zurück zum Formularmanagement mit Bestätigung
+        confirmBack() {
+            if (!this.isFormSaved) {
+                if (confirm("Sie haben ungespeicherte Änderungen. Möchten Sie wirklich zurückkehren und Änderungen verwerfen?")) {
+                    this.goBackToFormManagement();
+                }
+            } else {
+                this.goBackToFormManagement();
+            }
+        },
+        // Navigation zum Formularmanagement
+        goBackToFormManagement() {
+            window.location.href = "formmanagement.html";
+        },
+        // Formular-Daten laden
+        async loadFormData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.formId = urlParams.get('formId');
+            if (this.formId) {
+                try {
+                    const doc = await db.collection('forms').doc(this.formId).get();
+                    if (doc.exists) {
+                        const formData = doc.data();
+                        this.formName = formData.name;
+                        this.formElements = formData.elements.map(element => ({
+                            ...element,
+                            generalProperties: {
+                                ...element.generalProperties,
+                                visible: element.specificProperties?.visible ?? true // Sicherstellen, dass visible vorhanden ist
+                            }
+                        }));
+                    }
+                } catch (error) {
+                    this.showNotification("Fehler beim Laden des Formulars.", 'error');
+                }
+            }
+        },
+        // Admin-Status prüfen
+        async checkAdminStatus() {
+            try {
+                const user = await auth.currentUser;
+                if (user) {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    const userData = userDoc.data();
+                    if (!userData.isAdmin && !userData.isMainAdmin) {
+                        this.showNotification("Sie haben keine Berechtigung, diese Seite zu sehen.", 'error');
+                        window.location.href = "home.html";
+                    } else {
+                        this.user = user;
+                    }
+                } else {
+                    auth.onAuthStateChanged(async (user) => {
+                        if (user) {
+                            const userDoc = await db.collection('users').doc(user.uid).get();
+                            const userData = userDoc.data();
+                            if (userData.isAdmin || userData.isMainAdmin) {
+                                this.user = user;
+                            } else {
+                                this.showNotification("Sie haben keine Berechtigung, diese Seite zu sehen.", 'error');
+                                window.location.href = "home.html";
+                            }
+                        } else {
+                            window.location.href = "index.html";
+                        }
+                    });
+                }
+            } catch (error) {
+                window.location.href = "index.html";
+            }
+        }
+    }, // Komma hier hinzugefügt
+        mounted() {
+            (async () => {
+                await this.checkAdminStatus();
+                await this.loadFormData();
+            })();
         }
 
-    };
+}); // Sicherstellen, dass das App-Objekt hier korrekt abgeschlossen ist
 
-    // Vue-App erstellen und die Komponente mounten
-    createApp(App).mount('#app');
-})(); // <-- Fehlende schließende Klammern hinzugefügt
+// Vue-App erstellen und die Komponente mounten
+createApp(App).mount('#app');

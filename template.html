@@ -86,18 +86,13 @@
                         <i :class="item.icon" style="margin-right: 8px;"></i>
 
                         <!-- Inhalt des Elements rendern -->
-                        <!-- Hier kannst du deinen bestehenden Code zur Darstellung der Elemente einfügen -->
                         <div v-if="item.type === 'text'">
-                            <!-- Beispiel: Textbaustein -->
                             <p>{{ item.specificProperties.content }}</p>
                         </div>
 
                         <div v-if="item.type === 'img'">
-                            <!-- Beispiel: Bildbaustein -->
                             <img :src="item.specificProperties.uploadImage" alt="Bild" />
                         </div>
-
-                        <!-- Weitere Elementtypen hier hinzufügen -->
                     </div>
                 </div>
 
@@ -107,13 +102,13 @@
 
             <!-- Eigenschaftenbereich -->
             <aside id="properties" class="form-properties">
-                <div v-if="selectedElement">
+                <div v-if="selectedElement && selectedElement.specificProperties">
                     <div class="properties-header">
                         <i :class="selectedElement.icon"></i> {{ selectedElement.label }}
                     </div>
                     <p class="description">{{ selectedElement.description }}</p>
 
-                    <!-- Duplizieren und Löschen -->
+                    <!-- Duplizieren, Löschen und Sichtbarkeits-Schalter -->
                     <div class="properties-buttons">
                         <button @click="duplicateElement" class="duplicate-button">
                             <i class="fas fa-copy"></i> Duplizieren
@@ -121,16 +116,46 @@
                         <button @click="deleteSelectedElementFromProperties" class="delete-button">
                             <i class="fas fa-trash"></i> Löschen
                         </button>
-                    </div>
-
-                    <!-- Allgemeine Baustein-ID anzeigen -->
-                    <div class="property">
                         <label>Baustein ID:</label>
                         <span>{{ selectedElement.id }}</span>
+                        <!-- Sichtbarkeits-Schalter -->
+                        <!-- Nachher: Angepasster Code für den visuellen Test ohne Vue-Bindung -->
                     </div>
 
-                    <!-- Baustein spezifische Eigenschaften je nach Typ -->
-                    <!-- Füge hier deine spezifischen Eigenschaften für die Elemente hinzu -->
+                    <!-- Allgemeine Eigenschaften -->
+                    <div class="property-group">
+                        <h3 @click="toggleSection('general')">
+                            <i class="fas fa-cogs"></i> Allgemeine Eigenschaften
+                            <i :class="isGeneralVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                        </h3>
+                        <div v-show="isGeneralVisible">
+                            <div class="property">
+                                <label for="visibility">Sichtbar:</label>
+                                <input type="checkbox" id="visibility"
+                                    v-model="selectedElement.generalProperties.visible" @change="updateVisibility" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spezifische Eigenschaften -->
+                    <div class="property-group">
+                        <h3 @click="toggleSection('specific')">
+                            <i class="fas fa-sliders-h"></i> Spezifische Eigenschaften
+                            <i :class="isSpecificVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                        </h3>
+                        <div v-show="isSpecificVisible">
+                            <!-- Beispiel-Slider für Schriftgröße -->
+                            <div class="property">
+                                <label>
+                                    <i class="fas fa-text-height"></i> Schriftgröße
+                                    <span class="tooltip">Passt die Größe des Textes an.</span>
+                                </label>
+                                <input type="range" v-model="selectedElement.specificProperties.fontSize" min="12"
+                                    max="36">
+                                <div class="value-display">{{ selectedElement.specificProperties.fontSize }}px</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <p v-else>Kein Element ausgewählt</p>
             </aside>

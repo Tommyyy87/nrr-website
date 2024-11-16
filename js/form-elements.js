@@ -23,7 +23,7 @@ const formElements = [
             caption: '', // Bildunterschrift
             preview: true, // Bildvorschau aktivieren
             allowUrl: false, // URL-Eingabe deaktivieren, da Bild hochgeladen wird
-            visible: true // Sichtbarkeit des Bildes im finalen Formular
+            // visible: true // Sichtbarkeit des Bildes im finalen Formular
 
         },
     },

@@ -235,29 +235,57 @@ main {
 }
 
 
+.help-icon {
+    color: #007bff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    position: relative;
+    margin-left: 8px;
+}
+
+.help-icon:hover .tooltip {
+    display: block;
+}
+
 .tooltip {
     position: absolute;
-    bottom: 100%;
-    right: 10px;
     background-color: #333;
     color: #fff;
-    padding: 8px;
-    font-size: 0.85rem;
+    padding: 5px 10px;
+    font-size: 0.8em;
     border-radius: 4px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    top: -5px;
+    left: 105%;
     white-space: nowrap;
-    pointer-events: none;
-    z-index: 99998;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 9000;
     display: none;
 }
+
+
 
 .tooltip.show {
     display: block;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    /* Anzeige des Tooltip-Texts */
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.9;
+    z-index: 1000;
 }
 
 #form-elements li:hover .tooltip {
@@ -375,6 +403,8 @@ main {
     word-wrap: break-word;
 }
 
+
+
 /* Eigenschaften Panel */
 #properties {
     flex-basis: 25%;
@@ -477,23 +507,31 @@ main {
 
 .property input[type="text"],
 .property select {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.9em;
+    padding: 10px;
+    /* Mehr Padding für mehr Komfort */
+    border: 1px solid #ccc;
+    /* Leichter Rand für einheitliches Design */
+    border-radius: 6px;
+    /* Leichte Rundungen für modernes Design */
+    font-size: 0.95em;
+    /* Etwas größere Schrift für bessere Lesbarkeit */
     color: #333;
-    margin-top: 5px;
+    margin-top: 8px;
+    /* Mehr Abstand nach oben */
+    transition: border-color 0.3s;
+    /* Glatte Übergänge für Hover-Effekte */
 }
 
 .property input[type="text"]:focus,
 .property select:focus {
     border-color: #007bff;
-    background-color: #ffffff;
-    outline: none;
+    /* Akzentfarbe bei Fokus */
+    background-color: #f9f9f9;
+    /* Leichter Hintergrund für besseren Fokus */
 }
 
-.property input[type="checkbox"] {
-    transform: scale(1.2);
+input[type="checkbox"] {
+    transform: scale(1.8);
     margin-right: 10px;
 }
 
@@ -564,12 +602,14 @@ main {
 }
 
 /* Toggle-Switch Styling */
-/* Toggle-Schalter */
+/* Styling für den Schalter */
+/* Korrigierte Version für den Schalter */
 .toggle-switch {
     position: relative;
     display: inline-block;
     width: 42px;
     height: 22px;
+    margin-left: 8px;
 }
 
 .toggle-switch input {
@@ -578,7 +618,7 @@ main {
     height: 0;
 }
 
-.slider {
+.toggle-switch .slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -586,8 +626,42 @@ main {
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    transition: 0.4s;
+    transition: background-color 0.3s ease;
     border-radius: 34px;
+}
+
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: transform 0.3s ease;
+    border-radius: 50%;
+}
+
+input[type="checkbox"]:checked+.slider {
+    background-color: #28a745;
+}
+
+input[type="checkbox"]:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+/* Slider Wertanzeige */
+.value-display {
+    display: inline-block;
+    width: 50px;
+    text-align: center;
+    font-weight: bold;
+    background: #f0f0f0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    font-size: 0.9rem;
+    margin-top: 5px;
 }
 
 .slider:before {
@@ -598,16 +672,8 @@ main {
     left: 2px;
     bottom: 2px;
     background-color: white;
-    transition: 0.4s;
+    transition: transform 0.3s ease;
     border-radius: 50%;
-}
-
-input:checked+.slider {
-    background-color: #28a745;
-}
-
-input:checked+.slider:before {
-    transform: translateX(20px);
 }
 
 /* Beschriftung für den Toggle-Switch */
@@ -627,13 +693,24 @@ input:checked+.slider:before {
     font-size: 0.9em;
 }
 
-/* Gruppierung von verwandten Eigenschaften */
+/* Styling für das Kartenlayout der Eigenschaftsgruppen */
 .property-group {
-    background: #f9f9f9;
-    padding: 1rem;
+    background: #ffffff;
+    /* Weißer Hintergrund für Kontrast */
+    padding: 1.5rem;
+    /* Mehr Padding für komfortable Ansicht */
     margin-bottom: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    /* Stärkerer Schatten für mehr Tiefe */
+}
+
+.property-group h3 {
+    font-size: 1.2rem;
+    color: #0056b3;
+    /* Akzentfarbe für Gruppentitel */
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 .property-group .alignment-options {
