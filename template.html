@@ -19,9 +19,11 @@
     <header class="form-builder-header">
         <div class="header-title">
             <h1>{{ formName || 'Neues Formular' }}</h1>
-            <button @click="editFormName" class="edit-button header-action-button">
-                <i class="fas fa-pen"></i> Bearbeiten
-            </button>
+            <div class="header-buttons">
+                <button @click="editFormName" class="edit-button header-action-button">
+                    <i class="fas fa-pen"></i> Bearbeiten
+                </button>
+            </div>
         </div>
         <div class="header-buttons">
             <button class="undo-button" @click="undo" :disabled="historyIndex <= 0">
@@ -58,7 +60,7 @@
             <!-- Form Vorschau-Bereich -->
             <div id="form-preview" class="form-preview" @dragover.prevent="onDragOverPreview"
                 @dragleave="onDragLeavePreview" @drop="onDropPreview">
-                <h2>Vorschau</h2>
+                <h2>Formular</h2>
 
                 <div v-for="(item, index) in formElements" :key="item.id" @dragover.prevent="onDragOver($event, index)"
                     @dragleave="onDragLeave($event, index)" @drop="onDrop($event, index)">
@@ -104,6 +106,7 @@
             <!-- Eigenschaftenbereich -->
             <aside id="properties" class="form-properties">
                 <div v-if="selectedElement && selectedElement.specificProperties">
+                    <h2>Eigenschaften</h2>
                     <div class="properties-header">
                         <i :class="selectedElement.icon"></i> {{ selectedElement.label }}
                     </div>
@@ -122,14 +125,16 @@
                     </div>
 
                     <!-- Allgemeine Eigenschaften -->
+
                     <div class="property-group">
+
                         <h3 @click="toggleSection('general')">
                             <i class="fas fa-cogs"></i> Allgemeine Eigenschaften
                             <i :class="isGeneralVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                         </h3>
                         <div class="property">
                             <label>Baustein ID:</label>
-                        <span>{{ selectedElement.id }}</span>
+                            <span>{{ selectedElement.id }}</span>
                         </div>
                         <div v-show="isGeneralVisible">
                             <div class="property">
@@ -160,7 +165,12 @@
                         </div>
                     </div>
                 </div>
-                <p v-else>Kein Element ausgewählt</p>
+                <div v-else>
+                    <h2>Eigenschaften</h2>
+                    <div class="noelementselected">
+                        Kein Element ausgewählt
+                    </div>
+                </div>
             </aside>
         </section>
     </main>

@@ -89,10 +89,8 @@ header h1 {
 }
 
 .edit-button {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.85rem;
-    border-radius: 4px;
     background-color: #0056b3;
+
 }
 
 .edit-button:hover {
@@ -103,6 +101,9 @@ header h1 {
 .header-buttons {
     display: flex;
     gap: 0.5rem;
+    transition: filter 0.3s ease;
+    cursor: pointer;
+    /* Weicher Übergang beim Hover-Effekt */
 }
 
 /* Hover-Effekte und Farben der Buttons */
@@ -127,16 +128,18 @@ header h1 {
 }
 
 .header-buttons button:hover {
-    opacity: 0.8;
+    filter: brightness(85%);
+    /* Reduziert die Helligkeit um 15% */
 }
 
 /* Titel und Bearbeiten-Button anpassen */
 .header-title {
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 0.5rem;
+    gap: 2.5rem;
     color: white;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     /* Kleinere Schriftgröße für mehr Platz */
 }
 
@@ -214,7 +217,7 @@ main {
 #form-elements li i {
     margin-right: 8px;
     font-size: 1.2rem;
-    color: #27a2bb;
+    color: #036bb4;
 }
 
 #form-elements li .element-label {
@@ -307,7 +310,7 @@ main {
     /* Maximalbreite des Vorschaufelds */
     min-width: 400px;
     /* Mindestbreite des Vorschaufelds */
-    margin: auto;
+    margin: 0 auto;
     /* Zentriert das Vorschaufeld innerhalb des Bereichs */
     overflow: visible;
     /* Sicherstellen, dass nichts abgeschnitten wird */
@@ -319,7 +322,7 @@ main {
     position: relative;
     transition: background-color 0.3s;
     height: 100%;
-    color: #27a2bb
+    color: var(--maincolor)
 }
 
 #form-preview.drag-over {
@@ -333,13 +336,13 @@ main {
     text-align: center;
 }
 
-/* Stil für den Drop-Indikator, wenn Baustein darüber gezogen wird */
+/* Stil für den Drop-Indikator, wenn Baustein darüber gezogen wird
 .drop-indicator {
     height: 30px;
     background-color: rgba(0, 123, 255, 0.2);
     border: 2px dashed #007bff;
     margin: 10px 0;
-}
+} */
 
 .move-buttons button {
     background: none;
@@ -369,6 +372,7 @@ main {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     /* Leichter Schatten für 3D-Effekt */
     transition: transform 0.2s;
+    cursor: pointer;
 }
 
 .form-element:hover {
@@ -380,10 +384,10 @@ main {
     display: block;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
-    color: #555;
+    color: #333;
 }
 
-.form-element .delete-button {
+/* .form-element .delete-button {
     align-self: flex-end;
     background-color: #dc3545;
     color: white;
@@ -393,19 +397,19 @@ main {
     cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
-}
+} */
 
-.form-element .delete-button:hover {
+/* .form-element .delete-button:hover {
     background-color: #c82333;
-}
+} */
 
-.form-element.placeholder {
+/* .form-element.placeholder {
     border: 2px dashed #007bff;
     background-color: #e0f7ff;
     height: 60px;
     margin-bottom: 1.5rem;
     transition: all 0.2s ease-in-out;
-}
+} */
 
 /* Anpassungen für das Fragezeichen und Tooltip-Abstand */
 #form-elements li .help-icon:focus .tooltip,
@@ -457,7 +461,7 @@ main {
 .form-properties h3 {
     font-size: 1.1em;
     font-weight: bold;
-    color: #444;
+    color: #333;
     margin-top: 20px;
     margin-bottom: 10px;
     border-bottom: 1px solid #ddd;
@@ -468,7 +472,7 @@ main {
     display: flex;
     align-items: center;
     font-size: 1em;
-    color: #666;
+    color: #333;
     margin-bottom: 15px;
     justify-content: flex-start;
     min-height: 1rem;
@@ -550,7 +554,7 @@ main {
 }
 
 .duplicate-button {
-    background-color: #007bff;
+    background-color: var(--maincolor);
     color: #fff;
 }
 
@@ -798,7 +802,7 @@ input[type="checkbox"]:checked+.slider:before {
 
 .property-group h3 {
     font-size: 1rem;
-    color: #27a2bb;
+    color: var(--maincolor);
     /* Akzentfarbe für Gruppentitel */
     margin-bottom: 10px;
     font-weight: bold;
