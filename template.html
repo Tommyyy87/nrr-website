@@ -132,11 +132,11 @@
                             <i class="fas fa-cogs"></i> Allgemeine Eigenschaften
                             <i :class="isGeneralVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                         </h3>
-                        <div class="property">
-                            <label>Baustein ID:</label>
-                            <span>{{ selectedElement.id }}</span>
-                        </div>
                         <div v-show="isGeneralVisible">
+                            <div class="property">
+                                <label>Baustein ID:</label>
+                                <span>{{ selectedElement.id }}</span>
+                            </div>
                             <div class="property">
                                 <label for="visibility">Sichtbar:</label>
                                 <input type="checkbox" id="visibility"

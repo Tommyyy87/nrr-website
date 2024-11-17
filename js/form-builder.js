@@ -247,14 +247,14 @@ import formElements from './form-elements.js';
                 }
                 if (this.selectedElement) {
                     const index = this.formElements.indexOf(this.selectedElement);
-                    if (event.key === '+') {
+                    if (event.key === '-' || event.key === 'ArrowUp') {
                         // Element nach oben verschieben
                         if (index > 0) {
                             this.moveElementUp(index);
                             // Aktualisiere das ausgewählte Element
                             this.selectedElement = this.formElements[index - 1];
                         }
-                    } else if (event.key === '-') {
+                    } else if (event.key === '+' || event.key === 'ArrowDown') {
                         // Element nach unten verschieben
                         if (index < this.formElements.length - 1) {
                             this.moveElementDown(index);

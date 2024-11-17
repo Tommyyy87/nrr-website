@@ -540,8 +540,8 @@ main {
 /* Styling für Buttons in den Eigenschaften */
 .properties-buttons {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    justify-content: space-evenly;
+    margin: 1rem 0;
 }
 
 .properties-buttons .duplicate-button,
@@ -622,6 +622,7 @@ main {
 input[type="checkbox"] {
     transform: scale(1.8);
     margin-right: 10px;
+    cursor: pointer;
 }
 
 /* Datei-Upload-Bereich mit Bildvorschau */
@@ -653,6 +654,7 @@ input[type="checkbox"] {
     width: calc(100% - 80px);
     /* Mehr Platz für die Anzeige des Werts */
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .property .value-display {
@@ -806,6 +808,11 @@ input[type="checkbox"]:checked+.slider:before {
     /* Akzentfarbe für Gruppentitel */
     margin-bottom: 10px;
     font-weight: bold;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: nowrap;
 }
 
 .property-group .alignment-options {
