@@ -24,7 +24,7 @@ body {
     background-color: #ffffff;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     width: 100%;
     max-width: 800px;
     text-align: center;
@@ -333,6 +333,60 @@ a:hover {
     }
 }
 
+/* Modernisierte Variable-Liste */
+.variable-list-container {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.variable-list-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.variable-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    /* Buttons linksbündig ausrichten */
+}
+
+.variable-buttons button {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.variable-buttons button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.variable-buttons button:focus {
+    outline: none;
+    box-shadow: 0 0 5px #0056b3;
+}
+
+/* Responsive Design für Buttons */
+@media (max-width: 768px) {
+    .variable-buttons {
+        justify-content: center;
+        /* Zentriert auf kleineren Bildschirmen */
+    }
+}
+
 /* Platzhalter-Stil für den Drop-Bereich */
 .form-element.placeholder {
     border: 2px dashed #007bff;
@@ -369,7 +423,7 @@ a:hover {
 
 /* Individuelle Formulargenerierte Gruppen */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 
 .form-group label {

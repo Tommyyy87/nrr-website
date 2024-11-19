@@ -1,68 +1,68 @@
 // form-elements.js
 
 const formElements = [
-    {
-        id: 1,
-        label: 'Bild',
-        type: 'img',
-        icon: 'fas fa-image',
-        description: 'Ermöglicht das Hinzufügen von Bildern, wie z.B. Firmenlogos.',
-        generalProperties: {
-            id: 'bild_1',
-            label: 'Bild hinzufügen',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            uploadImage: '', // Bilddatei im Base64-Format speichern
-            maxFileSize: 2, // maximale Dateigröße in MB
-            width: '100%', // Standardbreite in Prozent
-            height: 'auto', // Standardhöhe
-            alignment: 'left', // Ausrichtung des Bildes (left, center, right)
-            title: '', // Bildtitel
-            caption: '', // Bildunterschrift
-            preview: true, // Bildvorschau aktivieren
-            allowUrl: false, // URL-Eingabe deaktivieren, da Bild hochgeladen wird
-            // visible: true // Sichtbarkeit des Bildes im finalen Formular
+    // {
+    //     id: 1,
+    //     label: 'Bild',
+    //     type: 'img',
+    //     icon: 'fas fa-image',
+    //     description: 'Ermöglicht das Hinzufügen von Bildern, wie z.B. Firmenlogos.',
+    //     generalProperties: {
+    //         id: 'bild_1',
+    //         label: 'Bild hinzufügen',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         uploadImage: '', // Bilddatei im Base64-Format speichern
+    //         maxFileSize: 2, // maximale Dateigröße in MB
+    //         width: '100%', // Standardbreite in Prozent
+    //         height: 'auto', // Standardhöhe
+    //         alignment: 'left', // Ausrichtung des Bildes (left, center, right)
+    //         title: '', // Bildtitel
+    //         caption: '', // Bildunterschrift
+    //         preview: true, // Bildvorschau aktivieren
+    //         allowUrl: false, // URL-Eingabe deaktivieren, da Bild hochgeladen wird
+    //         // visible: true // Sichtbarkeit des Bildes im finalen Formular
 
-        },
-    },
-    {
-        id: 2,
-        label: 'Dokument anzeigen',
-        type: 'document-view',
-        icon: 'fas fa-file',
-        description: 'Ermöglicht das Einbinden von Dokumenten wie PDF, Word oder Excel.',
-        generalProperties: {
-            id: 'dokument_1',
-            label: 'Dokument anzeigen',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            src: 'https://example.com/dokument.pdf',
-            fileType: 'PDF',
-            allowDownload: true,
-        },
-    },
-    {
-        id: 3,
-        label: 'Hyperlink',
-        type: 'a',
-        icon: 'fas fa-link',
-        description: 'Verlinkt auf externe Webseiten oder Dokumente.',
-        generalProperties: {
-            id: 'link_1',
-            label: 'Hyperlink',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            href: 'https://example.com',
-            linkText: 'Beispiel Link',
-            openInNewTab: true,
-        },
-    },
+    //     },
+    // },
+    // {
+    //     id: 2,
+    //     label: 'Dokument anzeigen',
+    //     type: 'document-view',
+    //     icon: 'fas fa-file',
+    //     description: 'Ermöglicht das Einbinden von Dokumenten wie PDF, Word oder Excel.',
+    //     generalProperties: {
+    //         id: 'dokument_1',
+    //         label: 'Dokument anzeigen',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         src: 'https://example.com/dokument.pdf',
+    //         fileType: 'PDF',
+    //         allowDownload: true,
+    //     },
+    // },
+    // {
+    //     id: 3,
+    //     label: 'Hyperlink',
+    //     type: 'a',
+    //     icon: 'fas fa-link',
+    //     description: 'Verlinkt auf externe Webseiten oder Dokumente.',
+    //     generalProperties: {
+    //         id: 'link_1',
+    //         label: 'Hyperlink',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         href: 'https://example.com',
+    //         linkText: 'Beispiel Link',
+    //         openInNewTab: true,
+    //     },
+    // },
     {
         id: 4,
         label: 'Text',
@@ -71,16 +71,59 @@ const formElements = [
         description: 'Zeigt festen Text an, der nicht bearbeitet werden kann.',
         generalProperties: {
             id: 'text_1',
-            label: 'Textfeld',
             duplicate: true,
             delete: true,
+            visible: true,
         },
         specificProperties: {
+            label: 'Textfeld',
             content: 'Dies ist ein Beispieltext',
             format: 'normal', // Optionen: normal, bold, italic
             textSize: 'medium', // Optionen: small, medium, large
-            textColor: '#000000',
+            textColor: '#000000', // Farbe des Textes
+            alignment: 'left', // Optionen: left, center, right, justify
+            fontFamily: 'Arial', // Beispiele: Arial, Verdana, Times New Roman
+            backgroundColor: '#ffffff', // Hintergrundfarbe
+            border: {
+                style: 'none', // Optionen: none, solid, dashed, dotted
+                width: '1px', // Dicke des Rahmens
+                color: '#000000', // Farbe des Rahmens
+            },
+            lineHeight: 'normal', // Zeilenabstand: normal, 1.5, 2
+            // padding: '10px', // Innenabstand
+            textDecoration: 'none', // Optionen: none, underline, line-through
+            variables: ['Vorname', 'Nachname', 'Benutzerrolle'], // Dynamische Variablen
         },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const border = specific.border || {};
+
+            // Variablen im Text ersetzen, wenn userData vorhanden ist
+            const contentWithVariables = (specific.content || '').replace(/\(\((.+?)\)\)/g, (match, varName) => {
+                return userData[varName.trim()] || `{{${varName.trim()}}}`;
+            });
+
+            // Fallbacks für fehlende Werte und generiertes HTML
+            return `
+                <p style="
+                    color: ${specific.textColor || '#000000'};
+                    font-weight: ${specific.format === 'bold' ? 'bold' : 'normal'};
+                    font-style: ${specific.format === 'italic' ? 'italic' : 'normal'};
+                    font-size: ${specific.textSize === 'small' ? '12px' :
+                    specific.textSize === 'medium' ? '16px' : '20px'};
+                    text-align: ${specific.alignment || 'left'};
+                    font-family: ${specific.fontFamily || 'Arial'};
+                    background-color: ${specific.backgroundColor || '#ffffff'};
+                    line-height: ${specific.lineHeight || 'normal'};
+                    text-decoration: ${specific.textDecoration || 'none'};
+                    border: ${border.style !== 'none' ? `
+                        ${border.width || '1px'} 
+                        ${border.style || 'solid'} 
+                        ${border.color || '#000000'}` : 'none'};
+                ">
+                    ${contentWithVariables}
+                </p>`;
+        }
     },
     {
         id: 5,
@@ -92,103 +135,113 @@ const formElements = [
             id: 'trennlinie_1',
             duplicate: true,
             delete: true,
+            visible: true,
         },
         specificProperties: {
-            lineStyle: 'solid', // Optionen: solid, dashed
-            lineColor: '#cccccc',
-            lineWidth: '1px',
+            lineStyle: 'solid',   // Optionen: solid, dashed
+            lineColor: '#000000', // Standardfarbe
+            lineWidth: '1px',     // Standarddicke
+        },
+        render(element) {
+            return `
+                <hr style="
+                    border: none;
+                    border-style: ${element.specificProperties.lineStyle};
+                    border-color: ${element.specificProperties.lineColor};
+                    border-width: ${element.specificProperties.lineWidth};
+                ">`;
         },
     },
-    {
-        id: 6,
-        label: 'Bewertungsskala',
-        type: 'rating-scale',
-        icon: 'fas fa-star',
-        description: 'Bietet eine Skala zur Bewertung, ideal für Feedback oder Umfragen.',
-        generalProperties: {
-            id: 'bewertung_1',
-            label: 'Bewertung',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            starCount: 5,
-            defaultRating: 3,
-        },
-    },
-    {
-        id: 7,
-        label: 'Datensatzauswahl',
-        type: 'dataset-select',
-        icon: 'fas fa-table',
-        description: 'Ermöglicht die Auswahl eines Datensatzfeldes, welches aus dem Datensatz geladen wird. Der Benutzer kann außerdem die Ausrichtung, Textgröße, Schriftart und einen optionalen Titel festlegen.',
-        generalProperties: {
-            id: 'datensatzauswahl_1',
-            label: 'Datensatzauswahl',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            dataSource: 'Excel-Datei', // Quelle oder Datenbank für die Datensätze
-            searchFunction: true, // Option für eine Suchfunktion innerhalb des Datensatzes
-            filterOptions: [], // Optionen zum Filtern der angezeigten Daten
-            datasetField: 'firstName', // Standardmäßig ausgewähltes Datensatzfeld (z.B. Vorname)
-            alignment: 'left', // Ausrichtung (z.B. 'left', 'center', 'right')
-            fontSize: 'medium', // Textgröße (z.B. 'small', 'medium', 'large')
-            fontFamily: 'Arial', // Schriftart (z.B. 'Arial', 'Verdana', 'Times New Roman')
-            title: '', // Optionaler Titel, der über dem ausgewählten Datensatzfeld angezeigt werden kann
-        },
-    },
-    {
-        id: 8,
-        label: 'Einfachauswahl',
-        type: 'radio',
-        icon: 'fas fa-check-circle',
-        description: 'Lässt den Nutzer eine Option aus einer vorgegebenen Liste auswählen.',
-        generalProperties: {
-            id: 'einfachauswahl_1',
-            label: 'Einfachauswahl',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            options: ['Option 1', 'Option 2', 'Option 3'],
-            defaultOption: 'Option 1',
-        },
-    },
-    {
-        id: 9,
-        label: 'Kontrollkästchen',
-        type: 'checkbox',
-        icon: 'fas fa-check-square',
-        description: 'Fügt ein Kontrollkästchen hinzu, mit dem der Nutzer eine Auswahl bestätigen kann.',
-        generalProperties: {
-            id: 'kontrollkaestchen_1',
-            label: 'Kontrollkästchen',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            defaultState: false,
-        },
-    },
-    {
-        id: 10,
-        label: 'Mehrfachauswahl',
-        type: 'multi-select',
-        icon: 'fas fa-tasks',
-        description: 'Erlaubt dem Nutzer, mehrere Optionen aus einer Liste auszuwählen.',
-        generalProperties: {
-            id: 'mehrfachauswahl_1',
-            label: 'Mehrfachauswahl',
-            duplicate: true,
-            delete: true,
-        },
-        specificProperties: {
-            options: ['Option 1', 'Option 2', 'Option 3'],
-            defaultSelection: ['Option 1'],
-        },
-    },
+    // {
+    //     id: 6,
+    //     label: 'Bewertungsskala',
+    //     type: 'rating-scale',
+    //     icon: 'fas fa-star',
+    //     description: 'Bietet eine Skala zur Bewertung, ideal für Feedback oder Umfragen.',
+    //     generalProperties: {
+    //         id: 'bewertung_1',
+    //         label: 'Bewertung',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         starCount: 5,
+    //         defaultRating: 3,
+    //     },
+    // },
+    // {
+    //     id: 7,
+    //     label: 'Datensatzauswahl',
+    //     type: 'dataset-select',
+    //     icon: 'fas fa-table',
+    //     description: 'Ermöglicht die Auswahl eines Datensatzfeldes, welches aus dem Datensatz geladen wird. Der Benutzer kann außerdem die Ausrichtung, Textgröße, Schriftart und einen optionalen Titel festlegen.',
+    //     generalProperties: {
+    //         id: 'datensatzauswahl_1',
+    //         label: 'Datensatzauswahl',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         dataSource: 'Excel-Datei', // Quelle oder Datenbank für die Datensätze
+    //         searchFunction: true, // Option für eine Suchfunktion innerhalb des Datensatzes
+    //         filterOptions: [], // Optionen zum Filtern der angezeigten Daten
+    //         datasetField: 'firstName', // Standardmäßig ausgewähltes Datensatzfeld (z.B. Vorname)
+    //         alignment: 'left', // Ausrichtung (z.B. 'left', 'center', 'right')
+    //         fontSize: 'medium', // Textgröße (z.B. 'small', 'medium', 'large')
+    //         fontFamily: 'Arial', // Schriftart (z.B. 'Arial', 'Verdana', 'Times New Roman')
+    //         title: '', // Optionaler Titel, der über dem ausgewählten Datensatzfeld angezeigt werden kann
+    //     },
+    // },
+    // {
+    //     id: 8,
+    //     label: 'Einfachauswahl',
+    //     type: 'radio',
+    //     icon: 'fas fa-check-circle',
+    //     description: 'Lässt den Nutzer eine Option aus einer vorgegebenen Liste auswählen.',
+    //     generalProperties: {
+    //         id: 'einfachauswahl_1',
+    //         label: 'Einfachauswahl',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         options: ['Option 1', 'Option 2', 'Option 3'],
+    //         defaultOption: 'Option 1',
+    //     },
+    // },
+    // {
+    //     id: 9,
+    //     label: 'Kontrollkästchen',
+    //     type: 'checkbox',
+    //     icon: 'fas fa-check-square',
+    //     description: 'Fügt ein Kontrollkästchen hinzu, mit dem der Nutzer eine Auswahl bestätigen kann.',
+    //     generalProperties: {
+    //         id: 'kontrollkaestchen_1',
+    //         label: 'Kontrollkästchen',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         defaultState: false,
+    //     },
+    // },
+    // {
+    //     id: 10,
+    //     label: 'Mehrfachauswahl',
+    //     type: 'multi-select',
+    //     icon: 'fas fa-tasks',
+    //     description: 'Erlaubt dem Nutzer, mehrere Optionen aus einer Liste auszuwählen.',
+    //     generalProperties: {
+    //         id: 'mehrfachauswahl_1',
+    //         label: 'Mehrfachauswahl',
+    //         duplicate: true,
+    //         delete: true,
+    //     },
+    //     specificProperties: {
+    //         options: ['Option 1', 'Option 2', 'Option 3'],
+    //         defaultSelection: ['Option 1'],
+    //     },
+    // },
     // {
     //     id: 11,
     //     label: 'Code-Scanner',

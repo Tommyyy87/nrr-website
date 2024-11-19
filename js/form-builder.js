@@ -13,6 +13,7 @@ import formElements from './form-elements.js';
             return {
                 formId: null,
                 formName: 'Neues Formular',
+                userData: {}, // `userData` hinzugefügt, damit die Fehlermeldung verschwindet
                 formNameInput: '',
                 showNameModal: false,
                 elements: formElements,
@@ -26,7 +27,6 @@ import formElements from './form-elements.js';
                 notificationType: '',
                 notificationVisible: false,
                 activeTooltipId: null,
-                proportionLocked: true,
                 uploadedImageDimensions: null,
                 dragOverIndex: null,
                 draggedElement: null,
@@ -62,6 +62,46 @@ import formElements from './form-elements.js';
                 }, 3000);
             },
 
+            // Bausteine
+            updateSpecificProperty(key, value) {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    this.selectedElement.specificProperties[key] = value;
+                    this.$forceUpdate(); // Aktualisiert die Ansicht
+                    this.saveToHistory(); // Änderungen speichern, aber nicht in die Datenbank
+                    this.isFormSaved = false; // Formular als unsaved markieren
+                }
+            },
+            // Variable in den Text einfügen
+            insertVariable(variableKey) {
+                const currentText = this.selectedElement.specificProperties.content || '';
+                this.selectedElement.specificProperties.content = `${currentText} ((${variableKey}))`;
+            },
+            // saveToDatabase() {
+            //     if (!this.formId) {
+            //         console.error("Fehler: formId ist nicht verfügbar. Speichern abgebrochen.");
+            //         return;
+            //     }
+
+            //     // Entfernen von Funktionen wie `render` für die Speicherung
+            //     const cleanElements = this.formElements.map((element) => {
+            //         const { render, ...rest } = element; // Entfernt `render`
+            //         return JSON.parse(JSON.stringify(rest)); // Entfernt restliche nicht-JSON-kompatible Werte
+            //     });
+            //     db.collection('forms').doc(this.formId).set({
+            //         name: this.formName,
+            //         elements: cleanElements, // Gespeicherte Daten enthalten keine Funktionen
+            //         createdAt: new Date().toISOString(),
+            //         published: false,
+            //         userId: this.user ? this.user.uid : null
+            //     }, { merge: true }).then(() => {
+            //         console.log("Formular erfolgreich gespeichert.");
+            //         this.showNotification("Formular erfolgreich gespeichert.", "success");
+            //     }).catch(error => {
+            //         console.error("Fehler beim Speichern des Formulars:", error);
+            //         this.showNotification("Fehler beim Speichern des Formulars.", 'error');
+            //     });
+            // },
+
             toggleSection(section) {
                 if (section === 'general') {
                     this.isGeneralVisible = !this.isGeneralVisible;
@@ -94,27 +134,12 @@ import formElements from './form-elements.js';
             selectElement(element) {
                 // Initialisierung der allgemeinen Eigenschaften, falls nicht vorhanden
                 if (!element.generalProperties) {
-                    element.generalProperties = {
-                        visible: true // Standardwert für allgemeine Sichtbarkeit
-                    };
+                    console.warn(`Allgemeine Eigenschaften fehlen für Element mit ID ${element.id}.`);
                 }
+
                 // Initialisierung der spezifischen Eigenschaften, falls nicht vorhanden
                 if (!element.specificProperties) {
-                    element.specificProperties = {
-                        datasetField: 'firstName',
-                        alignment: 'left',
-                        fontSize: 'medium',
-                        fontFamily: 'Arial',
-                        title: '',
-                    };
-                }
-                // Sicherstellen, dass proportionLocked in den spezifischen Eigenschaften existiert
-                if (typeof element.specificProperties.proportionLocked === 'undefined') {
-                    element.specificProperties.proportionLocked = true;
-                }
-                // Sicherstellen, dass visible in den spezifischen Eigenschaften existiert
-                if (typeof element.specificProperties.visible === 'undefined') {
-                    element.specificProperties.visible = true;
+                    console.warn(`Spezifische Eigenschaften fehlen für Element mit ID ${element.id}.`);
                 }
                 // Element als ausgewählt setzen
                 this.selectedElement = element;
@@ -125,19 +150,10 @@ import formElements from './form-elements.js';
             addElementToPreview(element) {
                 const newElement = {
                     ...element,
-                    id: Date.now(),
-                    generalProperties: {
-                        ...element.generalProperties,
-                        visible: element.generalProperties?.visible ?? true // Sichtbarkeit sicherstellen
-                    },
-                    specificProperties: {
-                        ...element.specificProperties,
-                        title: element.specificProperties?.title || "",
-                        datasetField: element.specificProperties?.datasetField || "firstName",
-                        alignment: element.specificProperties?.alignment || "left",
-                        fontSize: element.specificProperties?.fontSize || "medium",
-                        fontFamily: element.specificProperties?.fontFamily || "Arial"
-                    }
+                    id: Date.now(), // Neue eindeutige ID
+                    generalProperties: { ...element.generalProperties },
+                    specificProperties: { ...element.specificProperties },
+                    render: element.render, // Sicherstellen, dass `render` übernommen wird
                 };
                 this.formElements.push(newElement);
                 this.saveToHistory();
@@ -349,40 +365,63 @@ import formElements from './form-elements.js';
                     this.formElements = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
                 }
             },
+
+            async createNewForm() {
+                try {
+                    // Ein leeres Formular in Firebase erstellen und ID erhalten
+                    const docRef = await db.collection('forms').add({});
+                    this.formId = docRef.id; // Die neue ID setzen
+                    console.log(`Neue FormId erstellt: ${this.formId}`);
+
+                    // Direkt speichern mit der neuen FormId
+                    await this.saveForm();
+                    console.log("Formular sofort nach Erstellung gespeichert.");
+                } catch (error) {
+                    console.error("Fehler beim Erstellen eines neuen Formulars:", error);
+                    this.showNotification("Fehler beim Erstellen eines neuen Formulars.", 'error');
+                }
+            },
+
             // Formular speichern
             async saveForm() {
                 if (!this.formName || this.formName === 'Neues Formular') {
-                    this.showNameModal = true;
+                    this.showNameModal = true; // Zeigt Modal an, um den Formularnamen einzugeben
                     return;
                 }
+
                 try {
+                    // Entfernen von Funktionen und nicht-JSON-kompatiblen Daten
+                    const cleanElements = this.formElements.map((element) => {
+                        const { render, ...rest } = element; // Entferne `render`
+                        return JSON.parse(JSON.stringify(rest)); // Entferne alle nicht-serialisierbaren Eigenschaften
+                    });
+
+                    // Daten für Firestore vorbereiten
                     const formData = {
                         name: this.formName,
-                        elements: this.formElements.map(element => ({
-                            ...element,
-                            generalProperties: {
-                                ...element.generalProperties,
-                                visible: element.generalProperties?.visible ?? true // Allgemeine Sichtbarkeit sicherstellen
-                            },
-                            // specificProperties: {
-                            //     ...element.specificProperties,
-                            //     visible: element.specificProperties?.visible ?? true // Spezifische Sichtbarkeit sicherstellen
-                            // }
-                        })),
+                        elements: cleanElements,
                         createdAt: new Date().toISOString(),
                         published: false,
-                        userId: this.user ? this.user.uid : null
+                        userId: this.user ? this.user.uid : null // Aktuellen Benutzer speichern, falls vorhanden
                     };
+
+                    // Daten in Firestore speichern (entweder neues Formular oder Update)
                     if (this.formId) {
+                        // Update eines bestehenden Formulars
                         await db.collection('forms').doc(this.formId).update(formData);
                     } else {
+                        // Neues Formular erstellen
                         const docRef = await db.collection('forms').add(formData);
-                        this.formId = docRef.id;
+                        this.formId = docRef.id; // Speichere die neue FormId
                     }
+
+                    // Erfolgreiche Speicherung anzeigen
                     this.showNotification("Formular erfolgreich gespeichert.", "success");
-                    this.isFormSaved = true;
+                    this.isFormSaved = true; // Status auf "gespeichert" setzen
                 } catch (error) {
-                    this.showNotification("Fehler beim Speichern des Formulars.", 'error');
+                    // Fehlerbehandlung
+                    console.error("Fehler beim Speichern des Formulars:", error);
+                    this.showNotification("Fehler beim Speichern des Formulars.", "error");
                 }
             },
             // Zurück zum Formularmanagement mit Bestätigung
@@ -409,19 +448,30 @@ import formElements from './form-elements.js';
                         if (doc.exists) {
                             const formData = doc.data();
                             this.formName = formData.name;
-                            this.formElements = formData.elements.map(element => ({
-                                ...element,
-                                generalProperties: {
-                                    ...element.generalProperties,
-                                    visible: element.specificProperties?.visible ?? true // Sicherstellen, dass visible vorhanden ist
+
+                            // Wiederherstellen der `render`-Funktionen für die Vorschau
+                            this.formElements = formData.elements.map(savedElement => {
+                                const matchingDefinition = formElements.find(el => el.type === savedElement.type);
+                                if (matchingDefinition) {
+                                    return {
+                                        ...savedElement,
+                                        render: matchingDefinition.render,
+                                    };
+                                } else {
+                                    return savedElement;
                                 }
-                            }));
+                            });
                         }
                     } catch (error) {
+                        console.error("Fehler beim Laden des Formulars:", error);
                         this.showNotification("Fehler beim Laden des Formulars.", 'error');
                     }
+                } else {
+                    // Neues Formular erstellen, wenn keine ID vorhanden ist
+                    await this.createNewForm();
                 }
             },
+
             // Admin-Status prüfen
             async checkAdminStatus() {
                 try {
@@ -454,6 +504,18 @@ import formElements from './form-elements.js';
                 } catch (error) {
                     window.location.href = "index.html";
                 }
+            }
+        },
+
+        computed: {
+            // Mögliche Variablen
+            variableOptions() {
+                return {
+                    Vorname: 'Vorname',
+                    Nachname: 'Nachname',
+                    Email: 'Email Adresse',
+                    Benutzerrolle: 'Benutzerrolle'
+                };
             }
         },
         async mounted() {

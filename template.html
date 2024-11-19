@@ -63,42 +63,33 @@
                 <h2>Formular</h2>
 
                 <div v-for="(item, index) in formElements" :key="item.id" @dragover.prevent="onDragOver($event, index)"
-                    @dragleave="onDragLeave($event, index)" @drop="onDrop($event, index)">
-                    <!-- Dynamischer Drop-Indikator für die aktuelle Position -->
-                    <div v-if="dragOverIndex === index" class="drop-indicator"></div>
+                    @dragleave="onDragLeave($event, index)" @drop="onDrop($event, index)" class="form-element-wrapper">
 
-                    <!-- Vorschau des Elements -->
-                    <div class="form-element live-preview" @click="selectElement(item)"
-                        @dragstart="startReorderDrag(index, $event)" @dragend="resetDragState" draggable="true" :style="{
-                            border: selectedElement?.id === item.id ? '2px solid #007bff' : '2px solid #ccc',
-                            padding: '15px',
-                            marginBottom: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            position: 'relative'
-                        }">
+                    <!-- Container für den Baustein und die Pfeile -->
+                    <div class="controls-container">
+                        <!-- Icon des Elements -->
+                        <i :class="item.icon" class="element-icon"></i>
 
-                        <!-- Pfeile zum Verschieben -->
-                        <div class="move-buttons" style="position: absolute; right: 10px;">
+                        <!-- Pfeile für Verschiebung -->
+                        <div class="move-buttons">
                             <button @click.stop="moveElementUp(index)" :disabled="index === 0">▲</button>
                             <button @click.stop="moveElementDown(index)"
                                 :disabled="index === formElements.length - 1">▼</button>
                         </div>
 
-                        <!-- Icon des Elements anzeigen -->
-                        <i :class="item.icon" style="margin-right: 8px;"></i>
+                        <!-- Vorschau des Bausteins -->
+                        <div class="form-element live-preview" @click="selectElement(item)"
+                            @dragstart="startReorderDrag(index, $event)" @dragend="resetDragState" draggable="true"
+                            :style="{
+                border: selectedElement?.id === item.id ? '2px solid #007bff' : '2px solid #ccc',
+            }">
 
-                        <!-- Inhalt des Elements rendern -->
-                        <div v-if="item.type === 'text'">
-                            <p>{{ item.specificProperties.content }}</p>
-                        </div>
+                            <!-- Dynamisches Rendering des Elements mit der `render`-Funktion -->
+                            <div v-if="item.render" v-html="item.render(item, {})" style="width: 100%;"></div>
 
-                        <div v-if="item.type === 'img'">
-                            <img :src="item.specificProperties.uploadImage" alt="Bild" />
                         </div>
                     </div>
                 </div>
-
                 <!-- Platzhalter am Ende, falls der Drop am Schluss der Liste sein soll -->
                 <div v-if="dragOverIndex === formElements.length" class="drop-indicator"></div>
             </div>
@@ -120,8 +111,6 @@
                         <button @click="deleteSelectedElementFromProperties" class="delete-button">
                             <i class="fas fa-trash"></i> Löschen
                         </button>
-                        <!-- Sichtbarkeits-Schalter -->
-                        <!-- Nachher: Angepasster Code für den visuellen Test ohne Vue-Bindung -->
                     </div>
 
                     <!-- Allgemeine Eigenschaften -->
@@ -143,7 +132,6 @@
                                     v-model="selectedElement.generalProperties.visible" @change="updateVisibility" />
                             </div>
                         </div>
-                        <!-- </div> -->
 
                         <!-- Spezifische Eigenschaften -->
                         <!-- <div class="property-group"> -->
@@ -151,20 +139,172 @@
                             <i class="fas fa-sliders-h"></i> Spezifische Eigenschaften
                             <i :class="isSpecificVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                         </h3>
+                        <!-- Spezifische Eigenschaften Container mit Schaltfunktion -->
                         <div v-show="isSpecificVisible">
-                            <!-- Beispiel-Slider für Schriftgröße -->
-                            <div class="property">
-                                <label>
-                                    <i class="fas fa-text-height"></i> Schriftgröße
-                                    <span class="tooltip">Passt die Größe des Textes an.</span>
-                                </label>
-                                <input type="range" v-model="selectedElement.specificProperties.fontSize" min="12"
-                                    max="36">
-                                <div class="value-display">{{ selectedElement.specificProperties.fontSize }}px</div>
+                            <!-- ID 4 - Textelement - Spezifische Eigenschaften für den Text -->
+                            <div v-if="selectedElement.type === 'input'" class="property-group">
+                                <!-- Textinhalt -->
+                                <div class="property">
+                                    <label for="content">Text:</label>
+                                    <textarea id="content" v-model="selectedElement.specificProperties.content"
+                                        @input="updateSpecificProperty('content', $event.target.value)" rows="4"
+                                        placeholder="Geben Sie hier den Text ein..."></textarea>
+                                </div>
+
+                                <div class="variable-list-container property">
+                                    <p class="variable-list-title">Mögliche Variablen:</p>
+                                    <div class="variable-buttons">
+                                        <button v-for="(label, key) in variableOptions" :key="key"
+                                            @click="insertVariable(key)">
+                                            {{ label }}
+                                        </button>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Textfarbe -->
+                                <div class="property">
+                                    <label for="textColor">Textfarbe:</label>
+                                    <input type="color" id="textColor"
+                                        v-model="selectedElement.specificProperties.textColor"
+                                        @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                </div>
+
+
+                                <!-- Textgröße -->
+                                <div class="property">
+                                    <label for="textSize">Textgröße:</label>
+                                    <select id="textSize" v-model="selectedElement.specificProperties.textSize"
+                                        @change="updateSpecificProperty('textSize', $event.target.value)">
+                                        <option value="small">Klein</option>
+                                        <option value="medium">Mittel</option>
+                                        <option value="large">Groß</option>
+                                    </select>
+                                </div>
+
+                                <!-- Textformatierung -->
+                                <div class="property">
+                                    <label for="format">Formatierung:</label>
+                                    <select id="format" v-model="selectedElement.specificProperties.format"
+                                        @change="updateSpecificProperty('format', $event.target.value)">
+                                        <option value="normal">Normal</option>
+                                        <option value="bold">Fett</option>
+                                        <option value="italic">Kursiv</option>
+                                    </select>
+                                </div>
+
+                                <!-- Textausrichtung -->
+                                <div class="property">
+                                    <label for="alignment">Ausrichtung:</label>
+                                    <select id="alignment" v-model="selectedElement.specificProperties.alignment"
+                                        @change="updateSpecificProperty('alignment', $event.target.value)">
+                                        <option value="left">Links</option>
+                                        <option value="center">Zentriert</option>
+                                        <option value="right">Rechts</option>
+                                        <option value="justify">Blocksatz</option>
+                                    </select>
+                                </div>
+
+                                <!-- Schriftart -->
+                                <div class="property">
+                                    <label for="fontFamily">Schriftart:</label>
+                                    <select id="fontFamily" v-model="selectedElement.specificProperties.fontFamily"
+                                        @change="updateSpecificProperty('fontFamily', $event.target.value)">
+                                        <option value="Arial">Arial</option>
+                                        <option value="Verdana">Verdana</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                    </select>
+                                </div>
+
+                                <!-- Hintergrundfarbe -->
+                                <div class="property">
+                                    <label for="backgroundColor">Hintergrundfarbe:</label>
+                                    <input type="color" id="backgroundColor"
+                                        v-model="selectedElement.specificProperties.backgroundColor"
+                                        @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                </div>
+
+                                <!-- Rahmen -->
+                                <div class="property">
+                                    <label for="borderStyle">Rahmenstil:</label>
+                                    <select id="borderStyle" v-model="selectedElement.specificProperties.border.style"
+                                        @change="updateSpecificProperty('border.style', $event.target.value)">
+                                        <option value="none">Kein Rahmen</option>
+                                        <option value="solid">Durchgezogen</option>
+                                        <option value="dashed">Gestrichelt</option>
+                                        <option value="dotted">Gepunktet</option>
+                                    </select>
+                                </div>
+                                <div class="property">
+                                    <label for="borderWidth">Rahmenbreite:</label>
+                                    <input type="range" min="1" max="10" step="1"
+                                        v-model="selectedElement.specificProperties.border.width"
+                                        @input="updateSpecificProperty('border.width', $event.target.value + 'px')" />
+                                </div>
+                                <div class="property">
+                                    <label for="borderColor">Rahmenfarbe:</label>
+                                    <input type="color" id="borderColor"
+                                        v-model="selectedElement.specificProperties.border.color"
+                                        @input="updateSpecificProperty('border.color', $event.target.value)" />
+                                </div>
+
+                                <!-- Zeilenhöhe -->
+                                <div class="property">
+                                    <label for="lineHeight">Zeilenhöhe:</label>
+                                    <select id="lineHeight" v-model="selectedElement.specificProperties.lineHeight"
+                                        @change="updateSpecificProperty('lineHeight', $event.target.value)">
+                                        <option value="normal">Normal</option>
+                                        <option value="1.5">1.5</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+
+                                <!-- Textdekoration -->
+                                <div class="property">
+                                    <label for="textDecoration">Textdekoration:</label>
+                                    <select id="textDecoration"
+                                        v-model="selectedElement.specificProperties.textDecoration"
+                                        @change="updateSpecificProperty('textDecoration', $event.target.value)">
+                                        <option value="none">Keine</option>
+                                        <option value="underline">Unterstrichen</option>
+                                        <option value="line-through">Durchgestrichen</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- ID 4 Freier Text Ende -->
+                            <!-- ID 5 - Trennlinie - Spezifische Eigenschaften für die Trennlinie -->
+                            <div v-if="selectedElement.type === 'hr'" class="property-group">
+                                <!-- Stil der Linie -->
+                                <div class="property">
+                                    <label for="lineStyle">Stil:</label>
+                                    <select v-model="selectedElement.specificProperties.lineStyle"
+                                        @change="updateSpecificProperty('lineStyle', $event.target.value)">
+                                        <option value="solid">Durchgezogen</option>
+                                        <option value="dashed">Gestrichelt</option>
+                                    </select>
+                                </div>
+                                <!-- Farbe der Linie -->
+                                <div class="property">
+                                    <label for="lineColor">Farbe:</label>
+                                    <input type="color" v-model="selectedElement.specificProperties.lineColor"
+                                        @input="updateSpecificProperty('lineColor', $event.target.value)" />
+                                </div>
+                                <!-- Dicke der Linie -->
+                                <div class="property">
+                                    <label for="lineWidth">Dicke:</label>
+                                    <input type="range" min="1" max="10" step="1"
+                                        :value="parseInt(selectedElement.specificProperties.lineWidth) || 1"
+                                        @input="updateSpecificProperty('lineWidth', $event.target.value + 'px')" />
+                                    <div class="value-display">{{ selectedElement.specificProperties.lineWidth }}
+                                    </div>
+                                    <!-- Ende Baustein Trennlinie -->
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div v-else>
                     <h2>Eigenschaften</h2>
                     <div class="noelementselected">

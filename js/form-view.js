@@ -1,12 +1,12 @@
-// js/form-view.js
+import formElements from './form-elements.js'; // Importiere zentrale Baustein-Definition
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
         el: '#app',
         data: {
             formName: 'Lade Formular...',
-            formElements: [],
-            userData: {},  // Speichert Benutzerdaten wie Vorname, Nachname
+            formElements: [], // Bausteine aus der Datenbank
+            userData: {}, // Benutzerdaten
             notification: {
                 message: '',
                 type: '',
@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", function () {
             },
         },
         methods: {
+            // Formular aus der Datenbank laden
             async loadForm() {
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
                         try {
                             const urlParams = new URLSearchParams(window.location.search);
                             const formId = urlParams.get('formId');
-
                             if (!formId) throw new Error("Keine Formular-ID gefunden.");
 
                             console.log("Lade Formular für ID:", formId);
@@ -29,12 +29,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             if (formDoc.exists) {
                                 const formData = formDoc.data();
-                                this.formName = formData.name;
+                                this.formName = formData.name || 'Unbenanntes Formular';
                                 this.formElements = formData.elements || [];
 
-                                // Lade Benutzerdaten aus der Datenbank
+                                if (!Array.isArray(this.formElements)) {
+                                    console.error('Formularelemente sind ungültig:', this.formElements);
+                                    this.showNotification("Ungültige Formularelemente gefunden.", "error");
+                                    return;
+                                }
+
                                 await this.loadUserData(user.uid);
                             } else {
+                                console.warn("Formular nicht gefunden:", formId);
                                 this.showNotification("Formular nicht gefunden.", "error");
                             }
                         } catch (error) {
@@ -46,11 +52,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
             },
+
+            // Benutzerdaten laden
+            // Benutzerdaten und Variablen aus der Datenbank laden
             async loadUserData(userId) {
                 try {
                     const userDoc = await db.collection('users').doc(userId).get();
                     if (userDoc.exists) {
-                        this.userData = userDoc.data();
+                        this.userData = {
+                            Vorname: userDoc.data().firstName || 'Unbekannt',
+                            Nachname: userDoc.data().lastName || 'Unbekannt',
+                            Email: userDoc.data().email || 'Keine E-Mail angegeben',
+                            Benutzerrolle: userDoc.data().role || 'Unbekannt'
+                        };
                     } else {
                         console.warn("Benutzerdaten nicht gefunden.");
                     }
@@ -58,37 +72,40 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error("Fehler beim Laden der Benutzerdaten:", error);
                 }
             },
-            getRenderedValue(element) {
-                // Funktion zur Rückgabe des gerenderten Werts basierend auf den ausgewählten Eigenschaften
-                const field = element.specificProperties.datasetField;
-                const title = element.specificProperties.title || '';
-                const alignment = element.specificProperties.alignment || 'left';
-                const fontSize = element.specificProperties.fontSize || 'medium';
-                const fontFamily = element.specificProperties.fontFamily || 'Arial';
-                const value = this.userData[field] || "Daten nicht verfügbar";
 
-                return {
-                    text: `${title} ${value}`,
-                    style: {
-                        textAlign: alignment,
-                        fontSize: fontSize === 'small' ? '12px' : fontSize === 'medium' ? '16px' : '20px',
-                        fontFamily: fontFamily,
-                        fontWeight: 'bold'
+            // Dynamisches Rendern der Elemente basierend auf `form-elements.js`
+            renderElement(element) {
+                const definition = formElements.find(el => el.type === element.type);
+                if (!definition) {
+                    console.error(`Unbekannter Typ: ${element.type}`);
+                    return `<div>Unbekannter Typ: ${element.type}</div>`;
+                }
+
+                if (typeof definition.render === 'function') {
+                    try {
+                        return definition.render(element, this.userData || {}); // Übergibt userData
+                    } catch (error) {
+                        console.error(`Fehler beim Rendern von ${definition.label}:`, error);
+                        return `<div>Fehler beim Rendern von ${definition.label}</div>`;
                     }
-                };
+                }
+
+                console.warn(`Kein Renderer definiert für: ${definition.label}`);
+                return `<div>Kein Renderer für ${definition.label} definiert</div>`;
             },
+
+            // Benachrichtigungen
             showNotification(message, type) {
                 this.notification.message = message;
                 this.notification.type = type;
                 this.notification.visible = true;
-
                 setTimeout(() => {
                     this.notification.visible = false;
                 }, 3000);
             },
         },
         mounted() {
-            this.loadForm();
+            this.loadForm(); // Daten laden
         },
     });
 });
