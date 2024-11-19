@@ -413,6 +413,28 @@ a:hover {
     margin-bottom: 20px;
 }
 
+.responsive-picker-container {
+    max-width: 100%;
+    margin: 0px 0;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
+.responsive-picker-input {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .responsive-picker-container {
+        margin: 5px 0;
+    }
+
+    .responsive-picker-input {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
+
+
 /* Layout für die generierten Formularelemente */
 .form-container {
     display: flex;

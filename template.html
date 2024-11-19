@@ -161,8 +161,6 @@
                                     </div>
                                 </div>
 
-
-
                                 <!-- Textfarbe -->
                                 <div class="property">
                                     <label for="textColor">Textfarbe:</label>
@@ -170,7 +168,6 @@
                                         v-model="selectedElement.specificProperties.textColor"
                                         @input="updateSpecificProperty('textColor', $event.target.value)" />
                                 </div>
-
 
                                 <!-- Textgröße -->
                                 <div class="property">
@@ -236,12 +233,14 @@
                                         <option value="dotted">Gepunktet</option>
                                     </select>
                                 </div>
+
                                 <div class="property">
                                     <label for="borderWidth">Rahmenbreite:</label>
                                     <input type="range" min="1" max="10" step="1"
                                         v-model="selectedElement.specificProperties.border.width"
                                         @input="updateSpecificProperty('border.width', $event.target.value + 'px')" />
                                 </div>
+
                                 <div class="property">
                                     <label for="borderColor">Rahmenfarbe:</label>
                                     <input type="color" id="borderColor"
@@ -273,6 +272,7 @@
                                 </div>
                             </div>
                             <!-- ID 4 Freier Text Ende -->
+
                             <!-- ID 5 - Trennlinie - Spezifische Eigenschaften für die Trennlinie -->
                             <div v-if="selectedElement.type === 'hr'" class="property-group">
                                 <!-- Stil der Linie -->
@@ -284,12 +284,14 @@
                                         <option value="dashed">Gestrichelt</option>
                                     </select>
                                 </div>
+
                                 <!-- Farbe der Linie -->
                                 <div class="property">
                                     <label for="lineColor">Farbe:</label>
                                     <input type="color" v-model="selectedElement.specificProperties.lineColor"
                                         @input="updateSpecificProperty('lineColor', $event.target.value)" />
                                 </div>
+
                                 <!-- Dicke der Linie -->
                                 <div class="property">
                                     <label for="lineWidth">Dicke:</label>
@@ -298,20 +300,119 @@
                                         @input="updateSpecificProperty('lineWidth', $event.target.value + 'px')" />
                                     <div class="value-display">{{ selectedElement.specificProperties.lineWidth }}
                                     </div>
-                                    <!-- Ende Baustein Trennlinie -->
                                 </div>
                             </div>
+                            <!-- Ende Baustein Trennlinie -->
+
+                            <!-- ID 12 - Datums- und Zeitauswahl - Spezifische Eigenschaften -->
+                            <div v-if="selectedElement.type === 'datetime-picker'" class="property-group">
+                                <!-- Beschriftung -->
+                                <div class="property">
+                                    <label for="label">Beschriftung:</label>
+                                    <input type="text" id="label" v-model="selectedElement.specificProperties.label"
+                                        @input="updateSpecificProperty('label', $event.target.value)"
+                                        placeholder="Beschriftung eingeben" />
+                                </div>
+
+                                <!-- Hinweistext -->
+                                <div class="property">
+                                    <label for="placeholder">Hinweistext:</label>
+                                    <input type="text" id="placeholder"
+                                        v-model="selectedElement.specificProperties.placeholder"
+                                        @input="updateSpecificProperty('placeholder', $event.target.value)"
+                                        placeholder="Platzhaltertext eingeben" />
+                                </div>
+
+                                <!-- Format -->
+                                <div class="property">
+                                    <label for="format">Format:</label>
+                                    <select id="format" v-model="selectedElement.specificProperties.format"
+                                        @change="updateSpecificProperty('format', $event.target.value)">
+                                        <option value="datetime">Datum & Zeit</option>
+                                        <option value="date">Nur Datum</option>
+                                        <option value="time">Nur Zeit</option>
+                                    </select>
+                                </div>
+
+                                <!-- Datumsformat -->
+                                <div class="property">
+                                    <label for="dateFormat">Datumsformat:</label>
+                                    <input type="text" id="dateFormat"
+                                        v-model="selectedElement.specificProperties.dateFormat"
+                                        @input="updateSpecificProperty('dateFormat', $event.target.value)"
+                                        placeholder="z.B. DD.MM.YYYY" />
+                                </div>
+
+                                <!-- Zeitformat -->
+                                <div class="property">
+                                    <label for="timeFormat">Zeitformat:</label>
+                                    <input type="text" id="timeFormat"
+                                        v-model="selectedElement.specificProperties.timeFormat"
+                                        @input="updateSpecificProperty('timeFormat', $event.target.value)"
+                                        placeholder="z.B. HH:mm" />
+                                </div>
+
+                                <!-- Mindestdatum -->
+                                <div class="property">
+                                    <label for="minDate">Mindestdatum:</label>
+                                    <input type="date" id="minDate" v-model="selectedElement.specificProperties.minDate"
+                                        @input="updateSpecificProperty('minDate', $event.target.value)" />
+                                </div>
+
+                                <!-- Höchstdatum -->
+                                <div class="property">
+                                    <label for="maxDate">Höchstdatum:</label>
+                                    <input type="date" id="maxDate" v-model="selectedElement.specificProperties.maxDate"
+                                        @input="updateSpecificProperty('maxDate', $event.target.value)" />
+                                </div>
+
+                                <!-- Standardwert -->
+                                <div class="property">
+                                    <label for="defaultValue">Standardwert:</label>
+                                    <input type="datetime-local" id="defaultValue"
+                                        v-model="selectedElement.specificProperties.defaultValue"
+                                        @input="updateSpecificProperty('defaultValue', $event.target.value)" />
+                                </div>
+
+                                <!-- Schrittweite bei Zeit -->
+                                <div class="property">
+                                    <label for="stepMinutes">Schrittweite (Minuten):</label>
+                                    <input type="number" id="stepMinutes"
+                                        v-model="selectedElement.specificProperties.stepMinutes"
+                                        @input="updateSpecificProperty('stepMinutes', $event.target.value)" min="1"
+                                        placeholder="z.B. 15" />
+                                </div>
+
+                                <!-- Hintergrundfarbe -->
+                                <div class="property">
+                                    <label for="backgroundColor">Hintergrundfarbe:</label>
+                                    <input type="color" id="backgroundColor"
+                                        v-model="selectedElement.specificProperties.backgroundColor"
+                                        @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                </div>
+
+                                <!-- Textfarbe -->
+                                <div class="property">
+                                    <label for="textColor">Textfarbe:</label>
+                                    <input type="color" id="textColor"
+                                        v-model="selectedElement.specificProperties.textColor"
+                                        @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                </div>
+                            </div>
+                            <!-- Ende Baustein "Datums- und Zeitauswahl" -->
+
                         </div>
                     </div>
                 </div>
+</div>
 
-                <div v-else>
-                    <h2>Eigenschaften</h2>
-                    <div class="noelementselected">
-                        Kein Element ausgewählt
-                    </div>
-                </div>
-            </aside>
-        </section>
-    </main>
+<div v-else>
+    <h2>Eigenschaften</h2>
+    <div class="noelementselected">
+        Kein Element ausgewählt
+    </div>
+</div>
+</aside>
+</section>
+</main>
 </div>
