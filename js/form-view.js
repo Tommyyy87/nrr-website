@@ -53,8 +53,85 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             },
 
+            validateRequiredFields(formElements) {
+                const errors = [];
+                formElements.forEach(element => {
+                    if (element.generalProperties.isRequired && element.generalProperties.visible) {
+                        const value = element.userInput || ''; // Benutzerinput überprüfen
+                        if (!value.trim() && element.type !== 'file-upload') {
+                            errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
+                            element.hasError = true; // Markiere das Feld als fehlerhaft
+                        } else if (element.type === 'file-upload' && (!element.uploadedFiles || element.uploadedFiles.length === 0)) {
+                            errors.push(`Mindestens eine Datei muss für "${element.generalProperties.label}" hochgeladen werden.`);
+                            element.hasError = true; // Markiere das Feld als fehlerhaft
+                        } else {
+                            element.hasError = false; // Entferne die Fehlermarkierung
+                        }
+                    }
+                });
+                return errors;
+            },
+
+            handleSubmit() {
+                const errors = this.validateRequiredFields(this.formElements);
+                if (errors.length > 0) {
+                    this.notification.message = errors.join('\n'); // Fehlermeldungen anzeigen
+                    this.notification.type = 'error';
+                    this.notification.visible = true;
+                    setTimeout(() => (this.notification.visible = false), 5000); // Meldung ausblenden
+                    return false; // Verhindert Absenden/Speichern
+                }
+
+                // Falls keine Fehler vorhanden sind
+                console.log('Formular wurde erfolgreich abgesendet!');
+                this.showNotification("Formular erfolgreich abgesendet!", "success");
+                return true;
+            },
+
+            // Verarbeitet hochgeladene Dateien
+            handleFileUpload(event, element) {
+                const files = event.target.files;
+                const allowedFileTypes = element.specificProperties.allowedFileTypes || ['pdf', 'jpg', 'png'];
+                const maxFileSizeMB = parseInt(element.specificProperties.maxFileSize) || 4;
+
+                if (!element.uploadedFiles) {
+                    element.uploadedFiles = [];
+                }
+
+                for (let file of files) {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    const fileSizeMB = file.size / (1024 * 1024);
+
+                    if (!allowedFileTypes.includes(fileExtension)) {
+                        this.showNotification(`Dateityp nicht erlaubt: ${file.name}`, 'error');
+                        continue;
+                    }
+
+                    if (fileSizeMB > maxFileSizeMB) {
+                        this.showNotification(`Datei zu groß: ${file.name}`, 'error');
+                        continue;
+                    }
+
+                    // Datei zur Liste hinzufügen
+                    element.uploadedFiles.push({
+                        name: file.name,
+                        size: fileSizeMB.toFixed(2) + ' MB',
+                        type: file.type,
+                        lastModified: file.lastModified,
+                        fileObject: file,
+                    });
+                }
+
+                // Zurücksetzen des Datei-Input-Felds, um mehrfache Uploads zu ermöglichen
+                event.target.value = '';
+            },
+
+            // Entfernt eine hochgeladene Datei aus der Liste
+            removeUploadedFile(element, index) {
+                element.uploadedFiles.splice(index, 1);
+            },
+
             // Benutzerdaten laden
-            // Benutzerdaten und Variablen aus der Datenbank laden
             async loadUserData(userId) {
                 try {
                     const userDoc = await db.collection('users').doc(userId).get();
@@ -83,7 +160,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (typeof definition.render === 'function') {
                     try {
-                        return definition.render(element, this.userData || {}); // Übergibt userData
+                        const renderedHtml = definition.render(element, this.userData || {});
+                        if (element.type === 'file-upload' && element.uploadedFiles) {
+                            const fileListHtml = `
+                                <ul class="uploaded-files">
+                                    ${element.uploadedFiles
+                                    .map(
+                                        (file, index) =>
+                                            `<li>
+                                                    ${file.name} (${file.size})
+                                                    <button type="button" onclick="app.removeUploadedFile(${element.id}, ${index})">Löschen</button>
+                                                </li>`
+                                    )
+                                    .join('')}
+                                </ul>
+                            `;
+                            return renderedHtml + fileListHtml;
+                        }
+                        return renderedHtml;
                     } catch (error) {
                         console.error(`Fehler beim Rendern von ${definition.label}:`, error);
                         return `<div>Fehler beim Rendern von ${definition.label}</div>`;

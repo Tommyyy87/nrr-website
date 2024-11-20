@@ -74,6 +74,7 @@ const formElements = [
             duplicate: true,
             delete: true,
             visible: true,
+            isRequired: false // Standard: Pflichtfeld ist deaktiviert
         },
         specificProperties: {
             label: 'Textfeld',
@@ -136,6 +137,8 @@ const formElements = [
             duplicate: true,
             delete: true,
             visible: true,
+            isRequired: false // Standard: Pflichtfeld ist deaktiviert
+
         },
         specificProperties: {
             lineStyle: 'solid',   // Optionen: solid, dashed
@@ -260,35 +263,37 @@ const formElements = [
     //     },
     // },
     // {
-        {
-            id: 12,
+    {
+        id: 12,
+        label: 'Datums- und Zeitauswahl',
+        type: 'datetime-picker',
+        icon: 'fas fa-calendar-alt',
+        description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
+        generalProperties: {
+            id: 'datum_zeit_1',
             label: 'Datums- und Zeitauswahl',
-            type: 'datetime-picker',
-            icon: 'fas fa-calendar-alt',
-            description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
-            generalProperties: {
-                id: 'datum_zeit_1',
-                label: 'Datums- und Zeitauswahl',
-                duplicate: true,
-                delete: true,
-                visible: true,
-            },
-            specificProperties: {
-                label: 'Datum und Zeit',        // Beschriftung
-                placeholder: 'Wählen Sie Datum und/oder Zeit', // Hinweistext
-                format: 'datetime',            // Optionen: 'date', 'time', 'datetime'
-                timeZone: 'local',             // Zeitzone (z.B. 'local' oder 'UTC')
-                firstDayOfWeek: 'monday',      // Erster Wochentag ('monday' oder 'sunday')
-                textColor: '#000000',          // Textfarbe
-            },
-            render(element, userData = {}) {
-                const specific = element.specificProperties || {};
-                const dateTimeType = specific.format || 'datetime'; // Standard: datetime
-                const placeholder = specific.placeholder || 'Wählen Sie Datum und/oder Zeit';
-                const inputId = `datetime-picker-${element.id}`;
-        
-                // Generiere das HTML für den Baustein
-                const html = `
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false // Standard: Pflichtfeld ist deaktiviert
+
+        },
+        specificProperties: {
+            label: 'Datum und Zeit',        // Beschriftung
+            placeholder: 'Wählen Sie Datum und/oder Zeit', // Hinweistext
+            format: 'datetime',            // Optionen: 'date', 'time', 'datetime'
+            timeZone: 'local',             // Zeitzone (z.B. 'local' oder 'UTC')
+            firstDayOfWeek: 'monday',      // Erster Wochentag ('monday' oder 'sunday')
+            textColor: '#000000',          // Textfarbe
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const dateTimeType = specific.format || 'datetime'; // Standard: datetime
+            const placeholder = specific.placeholder || 'Wählen Sie Datum und/oder Zeit';
+            const inputId = `datetime-picker-${element.id}`;
+
+            // Generiere das HTML für den Baustein
+            const html = `
                     <div class="responsive-picker-container" style="padding: 0px; border-radius: 5px;">
                         <label for="${inputId}" style="display: block; margin-bottom: 5px; font-weight: bold;">
                             ${specific.label || 'Datum/Zeit auswählen'}
@@ -301,49 +306,80 @@ const formElements = [
                             style="width: 100%; padding: 1rem; border: 1px solid #ccc; border-radius: 10px; color: ${specific.textColor};">
                     </div>
                 `;
-        
-                // Nach Rendern flatpickr initialisieren
-                setTimeout(() => {
-                    const input = document.getElementById(inputId);
-                    if (input) {
-                        // Konfiguration basierend auf dem Format
-                        const config = {
-                            enableTime: dateTimeType !== 'date',
-                            noCalendar: dateTimeType === 'time',
-                            dateFormat: dateTimeType === 'date'
-                                ? 'Y-m-d' // Nur Datum
-                                : dateTimeType === 'time'
-                                    ? 'H:i'  // Nur Zeit
-                                    : 'Y-m-d H:i', // Datum & Zeit
-                            time_24hr: true,
-                        };
-        
-                        flatpickr(input, config);
-                    }
-                }, 0);
-        
-                return html;
-            }
-        },
 
-    // },
-    // {
-    //     id: 13,
-    //     label: 'Dokument anhängen',
-    //     type: 'file-upload',
-    //     icon: 'fas fa-paperclip',
-    //     description: 'Lässt den Nutzer ein Dokument hochladen und an das Formular anhängen.',
-    //     generalProperties: {
-    //         id: 'dokument_anhaengen_1',
-    //         label: 'Dokument anhängen',
-    //         duplicate: true,
-    //         delete: true,
-    //     },
-    //     specificProperties: {
-    //         allowedFileTypes: ['PDF', 'Word', 'Excel'],
-    //         maxFileSize: '4MB',
-    //     },
-    // },
+            // Nach Rendern flatpickr initialisieren
+            setTimeout(() => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    // Konfiguration basierend auf dem Format
+                    const config = {
+                        enableTime: dateTimeType !== 'date',
+                        noCalendar: dateTimeType === 'time',
+                        dateFormat: dateTimeType === 'date'
+                            ? 'Y-m-d' // Nur Datum
+                            : dateTimeType === 'time'
+                                ? 'H:i'  // Nur Zeit
+                                : 'Y-m-d H:i', // Datum & Zeit
+                        time_24hr: true,
+                    };
+
+                    flatpickr(input, config);
+                }
+            }, 0);
+
+            return html;
+        }
+    },
+
+    {
+        id: 13,
+        label: 'Dokument anhängen',
+        type: 'file-upload',
+        icon: 'fas fa-paperclip',
+        description: 'Lässt den Nutzer ein Dokument hochladen und an das Formular anhängen.',
+        generalProperties: {
+            id: 'dokument_anhaengen_1',
+            label: 'Dokument anhängen',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false,
+        },
+        specificProperties: {
+            allowedFileTypes: ['PDF', 'JPG', 'PNG'], // Erlaubte Dateitypen
+            maxFileSize: 5, // Maximalgröße in MB
+            multipleFiles: true, // Ermöglicht mehrere Dateien
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const allowedFileTypes = specific.allowedFileTypes.join(', ');
+            const maxFileSize = specific.maxFileSize || 5;
+            const inputId = `file-upload-${element.id}`;
+    
+            const html = `
+                <div class="file-upload-container" style="padding: 10px; border-radius: 5px;">
+                    <label for="${inputId}" style="display: block; font-weight: bold;">
+                        ${element.generalProperties.label || 'Datei hochladen'}
+                    </label>
+                    <input 
+                        id="${inputId}" 
+                        type="file" 
+                        accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
+                        ${specific.multipleFiles ? 'multiple' : ''}
+                        onchange="handleFileUpload(event, '${element.id}')"
+                    >
+                    <small style="display: block; margin-top: 5px;">
+                        Erlaubte Dateitypen: ${allowedFileTypes} | Max. Dateigröße: ${maxFileSize} MB
+                    </small>
+                    <ul id="file-list-${element.id}" class="uploaded-file-list" style="margin-top: 10px; padding: 0;">
+                    </ul>
+                </div>
+            `;
+    
+            return html;
+        },
+    },
     // {
     //     id: 14,
     //     label: 'E-Mail Eingabefeld',

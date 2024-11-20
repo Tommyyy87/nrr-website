@@ -23,17 +23,39 @@
             </a>
         </div>
         <h2>{{ formName }}</h2>
-        <form id="dynamicForm" class="form-container">
+        <form id="dynamicForm" class="form-container" @submit.prevent="handleSubmit">
             <!-- Dynamische Render-Logik: Elemente werden basierend auf form-elements.js gerendert -->
             <div v-for="element in formElements" :key="element.id" class="form-group"
-                v-if="element.generalProperties.visible">
+                :class="{ 'error': element.hasError }" v-if="element.generalProperties.visible">
                 <!-- Render-Methode aufrufen -->
                 <div v-html="renderElement(element)"></div>
+
+                <!-- Fehleranzeige -->
+                <div v-if="element.hasError" class="error-message">Dieses Feld ist erforderlich.</div>
+
+                <!-- Hochgeladene Dateien anzeigen (nur für Datei-Uploads) -->
+                <div v-if="element.type === 'file-upload' && element.uploadedFiles && element.uploadedFiles.length > 0">
+                    <h4>Hochgeladene Dateien:</h4>
+                    <ul class="uploaded-files-list">
+                        <li v-for="(file, index) in element.uploadedFiles" :key="index">
+                            {{ file.name }} ({{ file.size }})
+                            <button type="button" class="delete-file-button"
+                                @click="removeUploadedFile(element, index)">
+                                Löschen
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
+
+            <!-- Senden-Button -->
+            <button type="submit" class="submit-button">Senden</button>
         </form>
 
         <!-- Benachrichtigung -->
-        <div v-if="notification.visible" :class="['notification', notification.type]">{{ notification.message }}</div>
+        <div v-if="notification.visible" :class="['notification', notification.type]">
+            {{ notification.message }}
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

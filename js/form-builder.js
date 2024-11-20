@@ -197,6 +197,13 @@ import formElements from './form-elements.js';
                     this.dragOverIndex = null;
                 }
             },
+
+            updateGeneralProperty(property, value) {
+                if (this.selectedElement && this.selectedElement.generalProperties) {
+                    this.selectedElement.generalProperties[property] = value;
+                }
+            },
+
             // Drop-Ereignis für bestehende Elemente
             onDrop(event, index) {
                 event.preventDefault();

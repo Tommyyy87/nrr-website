@@ -198,8 +198,13 @@ input[type="file"] {
 /* Fehlernachricht-Styling */
 .error-message {
     color: red;
-    margin-top: 10px;
+    margin-top: 5px;
     font-size: 0.9em;
+}
+
+.form-element-wrapper.error {
+    border: 2px solid red;
+    border-radius: 5px;
 }
 
 /* Link zur Registrierung */
@@ -262,6 +267,102 @@ a:hover {
     max-width: 80%;
     height: auto;
 }
+
+/* Datei-Upload Container */
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px dashed #007bff;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.file-upload-container:hover {
+    background-color: #e6f7ff;
+}
+
+/* Datei-Upload Button */
+.file-upload-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.file-upload-button:hover {
+    background-color: #0056b3;
+}
+
+/* Hochgeladene Dateien Liste */
+.uploaded-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.uploaded-files-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.uploaded-files-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Datei-Entfernen Button */
+.delete-file-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #dc3545;
+    background: none;
+    border: 1px solid #dc3545;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.delete-file-button:hover {
+    color: #fff;
+    background-color: #dc3545;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .file-upload-container {
+        padding: 10px;
+    }
+
+    .file-upload-button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .uploaded-files-list li {
+        font-size: 12px;
+    }
+
+    .delete-file-button {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+}
+
 
 /* Benutzerkarten für Admin- und Benutzeraktionen auf Mobilgeräten */
 @media (max-width: 768px) {
