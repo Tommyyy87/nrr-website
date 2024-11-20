@@ -413,26 +413,92 @@ a:hover {
     margin-bottom: 20px;
 }
 
+/* Container für die Datums- und Zeitauswahl */
 .responsive-picker-container {
-    max-width: 100%;
-    margin: 0px 0;
-    font-family: 'Roboto', Arial, sans-serif;
+    width: 100%;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    transition: all 0.3s ease-in-out;
 }
 
+/* Label für die Datums- und Zeitauswahl */
+.responsive-picker-container label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Input-Feld für die Datums- und Zeitauswahl */
 .responsive-picker-input {
-    font-size: 16px;
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-@media (max-width: 768px) {
-    .responsive-picker-container {
-        margin: 5px 0;
-    }
-
-    .responsive-picker-input {
-        font-size: 14px;
-        padding: 8px;
-    }
+/* Fokuszustand für das Input-Feld */
+.responsive-picker-input:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+    outline: none;
 }
+
+/* Platzhaltertext für das Input-Feld */
+.responsive-picker-input::placeholder {
+    font-style: italic;
+    color: #aaa;
+}
+
+/* Container Hover-Effekt */
+.responsive-picker-container:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Flatpickr spezifische Anpassungen */
+.flatpickr-calendar {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.flatpickr-day {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    border-radius: 5px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.flatpickr-day:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Aktueller Tag */
+.flatpickr-day.today {
+    border: 1px solid #007bff;
+    color: #007bff;
+}
+
+/* Ausgewählter Tag */
+.flatpickr-day.selected {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
 
 
 /* Layout für die generierten Formularelemente */

@@ -260,47 +260,36 @@ const formElements = [
     //     },
     // },
     // {
-    {
-        id: 12,
-        label: 'Datums- und Zeitauswahl',
-        type: 'datetime-picker',
-        icon: 'fas fa-calendar-alt',
-        description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
-        generalProperties: {
-            id: 'datum_zeit_1',
+        {
+            id: 12,
             label: 'Datums- und Zeitauswahl',
-            duplicate: true,
-            delete: true,
-            visible: true,
-        },
-        specificProperties: {
-            label: 'Datum und Zeit',        // Beschriftung
-            placeholder: 'Wählen Sie Datum und/oder Zeit', // Hinweistext
-            format: 'datetime',            // Optionen: 'date', 'time', 'datetime'
-            dateFormat: 'YYYY-MM-DD',      // HTML5-konformes Anzeigeformat für Datum
-            timeFormat: 'HH:mm',           // HTML 5-konformes Anzeigeformat für Zeit (24-Stunden)
-            minDate: '',                   // Frühestes auswählbares Datum (ISO 8601)
-            maxDate: '',                   // Spätestes auswählbares Datum (ISO 8601)
-            defaultValue: '',              // Standardwert (ISO 8601)
-            stepMinutes: 15,               // Schritte bei Zeitauswahl (z.B. alle 15 Minuten)
-            timeZone: 'local',             // Zeitzone (z.B. 'local' oder 'UTC')
-            firstDayOfWeek: 'monday',      // Erster Wochentag ('monday' oder 'sunday')
-            backgroundColor: '#ffffff',    // Hintergrundfarbe des Widgets
-            textColor: '#000000',          // Textfarbe
-        },
-        render(element, userData = {}) {
-            const specific = element.specificProperties || {};
-
-            const dateTimeType = specific.format || 'datetime';
-            const placeholder = specific.placeholder || 'Wählen Sie Datum und/oder Zeit';
-            const minDate = specific.minDate || null;
-            const maxDate = specific.maxDate || null;
-            const stepMinutes = specific.stepMinutes || 1;
-
-            const inputId = `datetime-picker-${element.id}`;
-
-            const html = `
-                    <div class="responsive-picker-container" style="padding: 10px; border-radius: 5px;">
+            type: 'datetime-picker',
+            icon: 'fas fa-calendar-alt',
+            description: 'Ermöglicht dem Nutzer, ein Datum und/oder eine Uhrzeit auszuwählen.',
+            generalProperties: {
+                id: 'datum_zeit_1',
+                label: 'Datums- und Zeitauswahl',
+                duplicate: true,
+                delete: true,
+                visible: true,
+            },
+            specificProperties: {
+                label: 'Datum und Zeit',        // Beschriftung
+                placeholder: 'Wählen Sie Datum und/oder Zeit', // Hinweistext
+                format: 'datetime',            // Optionen: 'date', 'time', 'datetime'
+                timeZone: 'local',             // Zeitzone (z.B. 'local' oder 'UTC')
+                firstDayOfWeek: 'monday',      // Erster Wochentag ('monday' oder 'sunday')
+                textColor: '#000000',          // Textfarbe
+            },
+            render(element, userData = {}) {
+                const specific = element.specificProperties || {};
+                const dateTimeType = specific.format || 'datetime'; // Standard: datetime
+                const placeholder = specific.placeholder || 'Wählen Sie Datum und/oder Zeit';
+                const inputId = `datetime-picker-${element.id}`;
+        
+                // Generiere das HTML für den Baustein
+                const html = `
+                    <div class="responsive-picker-container" style="padding: 0px; border-radius: 5px;">
                         <label for="${inputId}" style="display: block; margin-bottom: 5px; font-weight: bold;">
                             ${specific.label || 'Datum/Zeit auswählen'}
                         </label>
@@ -309,29 +298,33 @@ const formElements = [
                             class="responsive-picker-input"
                             type="text"
                             placeholder="${placeholder}"
-                            style="width: 100%; padding: 1rem; border: 1px solid #ccc; border-radius: 10px;">
+                            style="width: 100%; padding: 1rem; border: 1px solid #ccc; border-radius: 10px; color: ${specific.textColor};">
                     </div>
                 `;
-
-            // Nach Rendern flatpickr initialisieren
-            setTimeout(() => {
-                const input = document.getElementById(inputId);
-                if (input) {
-                    flatpickr(input, {
-                        enableTime: dateTimeType !== 'date',
-                        noCalendar: dateTimeType === 'time',
-                        dateFormat: dateTimeType === 'date' ? specific.dateFormat || 'Y-m-d' : 'Y-m-d H:i',
-                        minDate: minDate,
-                        maxDate: maxDate,
-                        time_24hr: true,
-                        minuteIncrement: stepMinutes,
-                    });
-                }
-            }, 0);
-
-            return html;
-        }
-    },
+        
+                // Nach Rendern flatpickr initialisieren
+                setTimeout(() => {
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        // Konfiguration basierend auf dem Format
+                        const config = {
+                            enableTime: dateTimeType !== 'date',
+                            noCalendar: dateTimeType === 'time',
+                            dateFormat: dateTimeType === 'date'
+                                ? 'Y-m-d' // Nur Datum
+                                : dateTimeType === 'time'
+                                    ? 'H:i'  // Nur Zeit
+                                    : 'Y-m-d H:i', // Datum & Zeit
+                            time_24hr: true,
+                        };
+        
+                        flatpickr(input, config);
+                    }
+                }, 0);
+        
+                return html;
+            }
+        },
 
     // },
     // {

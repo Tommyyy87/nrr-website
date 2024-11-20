@@ -334,63 +334,6 @@
                                     </select>
                                 </div>
 
-                                <!-- Datumsformat -->
-                                <div class="property">
-                                    <label for="dateFormat">Datumsformat:</label>
-                                    <input type="text" id="dateFormat"
-                                        v-model="selectedElement.specificProperties.dateFormat"
-                                        @input="updateSpecificProperty('dateFormat', $event.target.value)"
-                                        placeholder="z.B. DD.MM.YYYY" />
-                                </div>
-
-                                <!-- Zeitformat -->
-                                <div class="property">
-                                    <label for="timeFormat">Zeitformat:</label>
-                                    <input type="text" id="timeFormat"
-                                        v-model="selectedElement.specificProperties.timeFormat"
-                                        @input="updateSpecificProperty('timeFormat', $event.target.value)"
-                                        placeholder="z.B. HH:mm" />
-                                </div>
-
-                                <!-- Mindestdatum -->
-                                <div class="property">
-                                    <label for="minDate">Mindestdatum:</label>
-                                    <input type="date" id="minDate" v-model="selectedElement.specificProperties.minDate"
-                                        @input="updateSpecificProperty('minDate', $event.target.value)" />
-                                </div>
-
-                                <!-- Höchstdatum -->
-                                <div class="property">
-                                    <label for="maxDate">Höchstdatum:</label>
-                                    <input type="date" id="maxDate" v-model="selectedElement.specificProperties.maxDate"
-                                        @input="updateSpecificProperty('maxDate', $event.target.value)" />
-                                </div>
-
-                                <!-- Standardwert -->
-                                <div class="property">
-                                    <label for="defaultValue">Standardwert:</label>
-                                    <input type="datetime-local" id="defaultValue"
-                                        v-model="selectedElement.specificProperties.defaultValue"
-                                        @input="updateSpecificProperty('defaultValue', $event.target.value)" />
-                                </div>
-
-                                <!-- Schrittweite bei Zeit -->
-                                <div class="property">
-                                    <label for="stepMinutes">Schrittweite (Minuten):</label>
-                                    <input type="number" id="stepMinutes"
-                                        v-model="selectedElement.specificProperties.stepMinutes"
-                                        @input="updateSpecificProperty('stepMinutes', $event.target.value)" min="1"
-                                        placeholder="z.B. 15" />
-                                </div>
-
-                                <!-- Hintergrundfarbe -->
-                                <div class="property">
-                                    <label for="backgroundColor">Hintergrundfarbe:</label>
-                                    <input type="color" id="backgroundColor"
-                                        v-model="selectedElement.specificProperties.backgroundColor"
-                                        @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
-                                </div>
-
                                 <!-- Textfarbe -->
                                 <div class="property">
                                     <label for="textColor">Textfarbe:</label>
@@ -401,18 +344,20 @@
                             </div>
                             <!-- Ende Baustein "Datums- und Zeitauswahl" -->
 
+
                         </div>
                     </div>
-                </div>
-</div>
 
-<div v-else>
-    <h2>Eigenschaften</h2>
-    <div class="noelementselected">
-        Kein Element ausgewählt
-    </div>
-</div>
-</aside>
-</section>
-</main>
+
+                </div>
+
+                <div v-else>
+                    <h2>Eigenschaften</h2>
+                    <div class="noelementselected">
+                        Kein Element ausgewählt
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
 </div>
