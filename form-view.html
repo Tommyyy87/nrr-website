@@ -41,7 +41,7 @@
                         <li v-for="(file, index) in element.specificProperties.uploadedFiles" :key="index">
                             {{ file.name }} ({{ file.size }})
                             <button type="button" class="delete-file-button"
-                                @click="() => import('./file-upload-utils.js').then(module => module.updateFileList(element.id, formElements))">
+                                @click="() => import('./js/file-upload-utils.js').then(module => module.updateFileList(element.id, formElements))">
                                 Löschen
                             </button>
                         </li>

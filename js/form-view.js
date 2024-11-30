@@ -124,12 +124,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (typeof definition.render === 'function') {
                     try {
+                        // Sicherstellen, dass specificProperties und uploadedFiles initialisiert sind
+                        element.specificProperties = element.specificProperties || {};
+                        element.specificProperties.uploadedFiles = element.specificProperties.uploadedFiles || [];
+
                         const renderedHtml = definition.render(element, this.userData || {});
                         if (element.type === 'file-upload') {
                             const fileListHtml = `
                                 <ul id="file-list-${element.id}" class="uploaded-files">
                                     ${element.specificProperties.uploadedFiles
-                                    ?.map(
+                                    .map(
                                         (file, index) =>
                                             `<li>
                                                     ${file.name} (${file.size})

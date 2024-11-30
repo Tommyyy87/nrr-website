@@ -368,7 +368,7 @@ const formElements = [
                         accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
                         style="width: 100%; padding: 0rem; border: 1px solid #ccc; border-radius: 5px;"
                         ${specific.multipleFiles ? 'multiple' : ''}
-                        onchange="import('./file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}', window.formElements))"
+                        onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}', window.formElements))"
                     >
                     <small style="display: block; margin-top: 0rem;">
                         Erlaubte Dateitypen: ${allowedFileTypes} | Max. Dateigröße: ${maxFileSize} MB
@@ -379,7 +379,7 @@ const formElements = [
                         (file, index) =>
                             `<li>
                                             ${file.name} (${file.size})
-                                            <button type="button" onclick="import('./file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
+                                            <button type="button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
                                         </li>`
                     )
                     .join('') || '<li>Keine Dateien hochgeladen</li>'}

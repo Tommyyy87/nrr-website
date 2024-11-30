@@ -178,7 +178,10 @@ import { handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploade
                     ...element,
                     id: Date.now(), // Neue eindeutige ID
                     generalProperties: { ...element.generalProperties },
-                    specificProperties: { ...element.specificProperties },
+                    specificProperties: {
+                        ...element.specificProperties,
+                        uploadedFiles: element.specificProperties?.uploadedFiles || [] // Initialisiere `uploadedFiles`, falls nicht vorhanden
+                    },
                     render: element.render, // Sicherstellen, dass `render` übernommen wird
                 };
                 this.formElements.push(newElement);
