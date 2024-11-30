@@ -223,13 +223,31 @@ a:hover {
 }
 
 /* Canvas für Unterschrift */
-#signaturePad {
-    border: 2px solid #ccc;
-    border-radius: 6px;
+.signature-container {
+    margin-bottom: 20px;
+}
+
+.signature-pad {
+    border: 1px solid #ccc;
+    border-radius: 4px;
     width: 100%;
     height: 200px;
     display: block;
-    margin: 0 auto;
+    margin: 10px auto;
+}
+
+.clear-signature-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.clear-signature-button:hover {
+    background-color: #c82333;
 }
 
 /* Benachrichtigungen */

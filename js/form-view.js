@@ -124,21 +124,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (typeof definition.render === 'function') {
                     try {
-                        // Sicherstellen, dass specificProperties und uploadedFiles initialisiert sind
                         element.specificProperties = element.specificProperties || {};
                         element.specificProperties.uploadedFiles = element.specificProperties.uploadedFiles || [];
 
                         const renderedHtml = definition.render(element, this.userData || {});
-                        if (element.type === 'file-upload') {
-                            // Hochgeladene Dateien in der Liste anzeigen
+
+                        // Initialisiere das Signatur-Element, wenn es sich um einen Signatur-Baustein handelt
+                        if (element.type === 'signature') {
                             setTimeout(() => {
-                                if (typeof updateFileList === 'function') {
-                                    updateFileList(element.id, window.formElements);
-                                } else {
-                                    console.error('updateFileList ist keine gültige Funktion.');
-                                }
+                                import('./signature.js')
+                                    .then(module => {
+                                        const inputId = `signature-pad-${element.id}`;
+                                        const clearButtonId = `clear-button-${element.id}`;
+                                        module.initializeSignaturePad(inputId, clearButtonId, element.specificProperties);
+                                    })
+                                    .catch(error => console.error("Fehler beim Import von signature.js:", error));
                             }, 0);
                         }
+
                         return renderedHtml;
                     } catch (error) {
                         console.error(`Fehler beim Rendern von ${definition.label}:`, error);

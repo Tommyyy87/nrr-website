@@ -350,7 +350,7 @@ const formElements = [
             const maxFileSize = specific.maxFileSize || 5;
             const inputId = `file-upload-${element.id}`;
             const cameraId = `camera-upload-${element.id}`;
-    
+
             const html = `
                 <div class="file-upload-container">
                     <label for="${inputId}" class="form-label">
@@ -385,9 +385,9 @@ const formElements = [
     
                     <div id="file-list-${element.id}" class="uploaded-file-list">
                         ${specific.uploadedFiles.length > 0
-                            ? specific.uploadedFiles
-                                .map(
-                                    (file, index) => `
+                    ? specific.uploadedFiles
+                        .map(
+                            (file, index) => `
                                         <div class="uploaded-file-item">
                                             <span>${file.name} (${file.size})</span>
                                             <button type="button" class="delete-file-button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile('${element.id}', ${index}))">
@@ -395,10 +395,10 @@ const formElements = [
                                             </button>
                                         </div>
                                     `
-                                )
-                                .join('')
-                            : '<span class="no-files-text">Keine Dateien hochgeladen</span>'
-                        }
+                        )
+                        .join('')
+                    : '<span class="no-files-text">Keine Dateien hochgeladen</span>'
+                }
                     </div>
     
                     <small class="file-info-text">
@@ -406,7 +406,7 @@ const formElements = [
                     </small>
                 </div>
             `;
-    
+
             return html;
         },
     },
@@ -514,23 +514,49 @@ const formElements = [
     //         quality: 'hoch', // Optionen: niedrig, mittel, hoch
     //     },
     // },
-    // {
-    //     id: 20,
-    //     label: 'Unterschrift',
-    //     type: 'signature',
-    //     icon: 'fas fa-pen',
-    //     description: 'Ermöglicht dem Nutzer, eine Unterschrift direkt auf dem Gerät zu leisten.',
-    //     generalProperties: {
-    //         id: 'unterschrift_1',
-    //         label: 'Unterschrift',
-    //         duplicate: true,
-    //         delete: true,
-    //     },
-    //     specificProperties: {
-    //         penColor: '#000000',
-    //         fieldSize: 'medium', // Optionen: klein, mittel, groß
-    //     },
-    // },
+    {
+        id: 20,
+        label: 'Unterschrift',
+        type: 'signature',
+        icon: 'fas fa-pen',
+        description: 'Ermöglicht dem Nutzer, eine Unterschrift direkt auf dem Gerät zu leisten.',
+        generalProperties: {
+            id: 'unterschrift_1',
+            label: 'Unterschrift',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false, // Standard: Pflichtfeld ist deaktiviert
+        },
+        specificProperties: {
+            penColor: '#000000',
+            fieldSize: 'medium', // Optionen: klein, mittel, groß
+            penSize: '2px', // Optionen: dünn, mittel, dick
+        },
+        render(element) {
+            const specific = element.specificProperties || {};
+            const inputId = `signature-pad-${element.id}`;
+            const clearButtonId = `clear-button-${element.id}`;
+    
+            return `
+                <div class="signature-container">
+                    <label for="${inputId}" class="form-label">
+                        ${element.generalProperties.label || 'Unterschrift'}
+                    </label>
+                    <canvas 
+                        id="${inputId}" 
+                        class="signature-pad"
+                        style="border: 1px solid #ccc; width: ${specific.fieldSize === 'small' ? '200px' : specific.fieldSize === 'medium' ? '400px' : '600px'}; height: 200px;">
+                    </canvas>
+                    <button id="${clearButtonId}" type="button" class="button clear-signature-button">
+                        Unterschrift löschen
+                    </button>
+                </div>
+            `;
+        },
+    },
+    
+
     // {
     //     id: 21,
     //     label: 'Zahleneingabefeld',
