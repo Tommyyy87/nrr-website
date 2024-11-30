@@ -32,19 +32,6 @@
 
                 <!-- Fehleranzeige -->
                 <div v-if="element.hasError" class="error-message">Dieses Feld ist erforderlich.</div>
-
-                <!-- Hochgeladene Dateien anzeigen (nur für Datei-Uploads) -->
-                <div v-if="element.type === 'file-upload' && element.specificProperties.uploadedFiles.length > 0">
-                    <h4>Hochgeladene Dateien:</h4>
-                    <ul :id="'file-list-' + element.id" class="uploaded-files-list">
-                        <li v-for="(file, index) in element.specificProperties.uploadedFiles" :key="index">
-                            {{ file.name }} ({{ file.size }})
-                            <button type="button" @click="removeFile(element.id, index)">
-                                Löschen
-                            </button>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
             <!-- Senden-Button -->

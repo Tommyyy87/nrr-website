@@ -276,7 +276,6 @@ const formElements = [
             delete: true,
             visible: true,
             isRequired: false // Standard: Pflichtfeld ist deaktiviert
-
         },
         specificProperties: {
             label: 'Datum und Zeit',        // Beschriftung
@@ -288,14 +287,13 @@ const formElements = [
         },
         render(element, userData = {}) {
             const specific = element.specificProperties || {};
-            const dateTimeType = specific.format || 'datetime'; // Standard: datetime
+            const dateTimeType = specific.format || 'datetime';
             const placeholder = specific.placeholder || 'Wählen Sie Datum und/oder Zeit';
             const inputId = `datetime-picker-${element.id}`;
 
-            // Generiere das HTML für den Baustein
             const html = `
-                    <div class="responsive-picker-container" style="padding: 0px; border-radius: 5px;">
-                        <label for="${inputId}" style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <div class="responsive-picker-container">
+                        <label for="${inputId}" class="form-label">
                             ${specific.label || 'Datum/Zeit auswählen'}
                         </label>
                         <input
@@ -303,7 +301,7 @@ const formElements = [
                             class="responsive-picker-input"
                             type="text"
                             placeholder="${placeholder}"
-                            style="width: 100%; padding: 1rem; border: 1px solid #ccc; border-radius: 10px; color: ${specific.textColor};">
+                            style="color: ${specific.textColor};">
                     </div>
                 `;
 
@@ -311,15 +309,10 @@ const formElements = [
             setTimeout(() => {
                 const input = document.getElementById(inputId);
                 if (input) {
-                    // Konfiguration basierend auf dem Format
                     const config = {
                         enableTime: dateTimeType !== 'date',
                         noCalendar: dateTimeType === 'time',
-                        dateFormat: dateTimeType === 'date'
-                            ? 'Y-m-d' // Nur Datum
-                            : dateTimeType === 'time'
-                                ? 'H:i'  // Nur Zeit
-                                : 'Y-m-d H:i', // Datum & Zeit
+                        dateFormat: dateTimeType === 'date' ? 'Y-m-d' : dateTimeType === 'time' ? 'H:i' : 'Y-m-d H:i',
                         time_24hr: true,
                     };
 
@@ -330,6 +323,7 @@ const formElements = [
             return html;
         }
     },
+
 
     {
         id: 13,
@@ -358,40 +352,52 @@ const formElements = [
             const inputId = `file-upload-${element.id}`;
 
             const html = `
-                <div class="file-upload-container" style="padding: 0rem; border-radius: 5px;">
-                    <label for="${inputId}" style="display: block; font-weight: bold;">
+                <div class="file-upload-container">
+                    <label for="${inputId}" class="form-label">
                         ${element.generalProperties.label || 'Datei hochladen'}
                     </label>
+                    <button type="button" class="file-upload-button" onclick="document.getElementById('${inputId}').click()">
+                        Datei hochladen
+                    </button>
                     <input 
-                        <input 
-                            id="${inputId}" 
-                            type="file" 
-                            accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
-                            style="width: 100%; padding: 0rem; border: 1px solid #ccc; border-radius: 5px;"
-                            ${specific.multipleFiles ? 'multiple' : ''}
-                            onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}'))"
-                        />
-
-                    <small style="display: block; margin-top: 0rem;">
+                        id="${inputId}" 
+                        type="file" 
+                        accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
+                        style="display: none;"
+                        ${specific.multipleFiles ? 'multiple' : ''}
+                        onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}'))"
+                    />
+    
+                    <div id="file-list-${element.id}" class="uploaded-file-list">
+                        ${specific.uploadedFiles.length > 0
+                    ? specific.uploadedFiles
+                        .map(
+                            (file, index) => `
+                            <div class="uploaded-file-item">
+                                <span>${file.name} (${file.size})</span>
+                                <button type="button" class="delete-file-button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile('${element.id}', ${index}))">
+                                    Löschen
+                                </button>
+                            </div>
+                        `
+                        )
+                        .join('')
+                    : '<span class="no-files-text">Keine Dateien hochgeladen</span>'
+                }
+                    </div>
+    
+                    <small class="file-info-text">
                         Erlaubte Dateitypen: ${allowedFileTypes} | Max. Dateigröße: ${maxFileSize} MB
                     </small>
-                        <ul id="file-list-${element.id}" class="uploaded-file-list" style="margin-top: 1rem; padding: 0;">
-                            ${specific.uploadedFiles
-                    ?.map(
-                        (file, index) =>
-                            `<li>
-                                            ${file.name} (${file.size})
-                                            <button type="button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
-                                        </li>`
-                    )
-                    .join('') || '<li>Keine Dateien hochgeladen</li>'}
-                        </ul>
                 </div>
             `;
 
             return html;
         },
     },
+
+
+
 
 
     // {

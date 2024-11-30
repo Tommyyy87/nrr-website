@@ -108,19 +108,19 @@ export function updateFileList(elementId, formElements) {
         return;
     }
 
-    fileListContainer.innerHTML = ''; // Bestehende Einträge löschen
+    // Bestehende Einträge löschen
+    fileListContainer.innerHTML = '';
 
+    // Hochgeladene Dateien hinzufügen
     element.specificProperties.uploadedFiles.forEach((file, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${file.name} (${file.size})`;
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Löschen';
-        deleteButton.onclick = () => {
-            removeUploadedFile(elementId, index); // Datei entfernen
-        };
-
-        listItem.appendChild(deleteButton);
+        const listItem = document.createElement('div');
+        listItem.classList.add('uploaded-file-item'); // Hinzufügen einer Klasse für bessere Gestaltung
+        listItem.innerHTML = `
+            <span>${file.name} (${file.size})</span>
+            <button type="button" class="delete-file-button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile('${elementId}', ${index}))">
+                Löschen
+            </button>
+        `;
         fileListContainer.appendChild(listItem);
     });
 }

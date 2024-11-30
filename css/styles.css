@@ -268,92 +268,117 @@ a:hover {
     height: auto;
 }
 
-/* Datei-Upload Container */
-.file-upload-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    /* padding: 15px; */
-    background-color: #f9f9f9;
-    /* border: 1px dashed #007bff; */
-    /* border-radius: 8px; */
-    transition: background-color 0.3s ease;
+/* Zentrale Klasse für Formular Labels */
+.form-label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #333;
+    font-size: 1rem;
+    /* Einheitliche Schriftgröße */
 }
 
-.file-upload-container:hover {
-    background-color: #e6f7ff;
+
+/* Datei-Upload Container */
+.file-upload-container {
+    padding: 0;
+    border-radius: 5px;
 }
+
 
 /* Datei-Upload Button */
 .file-upload-button {
     display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 18px;
+    font-size: 15px;
     color: #fff;
-    background-color: #007bff;
+    background-color: var(--maincolor);
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     text-align: center;
+    outline: none;
 }
 
 .file-upload-button:hover {
     background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.file-upload-button:focus {
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
 }
 
 /* Hochgeladene Dateien Liste */
-.uploaded-files-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.uploaded-file-list {
+    margin-top: 0.5rem;
+    /* padding: 0.5rem; */
+    /* border: 1px solid #ddd; */
+    border-radius: 5px;
+    background-color: #f9f9f9;
 }
 
-.uploaded-files-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background-color: #f1f1f1;
+/* Input-Feld für den Datei-Upload */
+.file-upload-container input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 14px;
 }
 
-.uploaded-files-list li:last-child {
-    margin-bottom: 0;
-}
-
-/* Datei-Entfernen Button */
-.delete-file-button {
-    padding: 5px 10px;
-    font-size: 14px;
-    color: #dc3545;
-    background: none;
-    border: 1px solid #dc3545;
+/* Einzelnes Element der hochgeladenen Dateien */
+.uploaded-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
     border-radius: 3px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+/* Button zum Löschen einer hochgeladenen Datei */
+.delete-file-button {
+    margin-left: 1rem;
+    background-color: #ff5e57;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 0.5rem;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .delete-file-button:hover {
-    color: #fff;
-    background-color: #dc3545;
+    background-color: #ff4444;
+    transform: translateY(-2px);
 }
 
-/* Responsive Design */
-@media (max-width: 600px) {
-    .file-upload-container {
-        padding: 10px;
-    }
+/* Hinweistext für Dateitypen und -größe */
+.file-info-text {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 14px;
+}
 
+/* Kein Datei Text */
+.no-files-text {
+    font-style: italic;
+    color: #888;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 600px) {
     .file-upload-button {
         font-size: 14px;
-        padding: 8px 16px;
+        padding: 10px 16px;
     }
 
-    .uploaded-files-list li {
+    .uploaded-file-item {
         font-size: 12px;
     }
 
@@ -517,7 +542,7 @@ a:hover {
 /* Container für die Datums- und Zeitauswahl */
 .responsive-picker-container {
     width: 100%;
-    padding: 10px;
+    padding: 0px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
