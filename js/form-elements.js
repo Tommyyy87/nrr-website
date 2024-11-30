@@ -324,16 +324,15 @@ const formElements = [
         }
     },
 
-
     {
         id: 13,
-        label: 'Dokument anhängen',
-        type: 'file-upload',
+        label: 'Dokument anhängen oder Foto aufnehmen',
+        type: 'file-upload', // Bleibt 'file-upload' für Typkompatibilität
         icon: 'fas fa-paperclip',
-        description: 'Lässt den Nutzer ein Dokument hochladen und an das Formular anhängen.',
+        description: 'Lässt den Nutzer ein Dokument hochladen oder ein Foto aufnehmen und an das Formular anhängen.',
         generalProperties: {
             id: 'dokument_anhaengen_1',
-            label: 'Dokument anhängen',
+            label: 'Dokument anhängen oder Foto aufnehmen',
             duplicate: true,
             delete: true,
             visible: true,
@@ -350,15 +349,22 @@ const formElements = [
             const allowedFileTypes = specific.allowedFileTypes.join(', ');
             const maxFileSize = specific.maxFileSize || 5;
             const inputId = `file-upload-${element.id}`;
-
+            const cameraId = `camera-upload-${element.id}`;
+    
             const html = `
                 <div class="file-upload-container">
                     <label for="${inputId}" class="form-label">
-                        ${element.generalProperties.label || 'Datei hochladen'}
+                        ${element.generalProperties.label || 'Datei hochladen oder Foto aufnehmen'}
                     </label>
-                    <button type="button" class="file-upload-button" onclick="document.getElementById('${inputId}').click()">
-                        Datei hochladen
-                    </button>
+                    <div class="upload-options">
+                        <button type="button" class="file-upload-button" onclick="document.getElementById('${inputId}').click()">
+                            Datei hochladen
+                        </button>
+                        <button type="button" class="file-upload-button" onclick="document.getElementById('${cameraId}').click()">
+                            Foto aufnehmen
+                        </button>
+                    </div>
+                    
                     <input 
                         id="${inputId}" 
                         type="file" 
@@ -368,22 +374,31 @@ const formElements = [
                         onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}'))"
                     />
     
+                    <input 
+                        id="${cameraId}" 
+                        type="file" 
+                        accept="image/*" 
+                        capture="environment"
+                        style="display: none;"
+                        onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}'))"
+                    />
+    
                     <div id="file-list-${element.id}" class="uploaded-file-list">
                         ${specific.uploadedFiles.length > 0
-                    ? specific.uploadedFiles
-                        .map(
-                            (file, index) => `
-                            <div class="uploaded-file-item">
-                                <span>${file.name} (${file.size})</span>
-                                <button type="button" class="delete-file-button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile('${element.id}', ${index}))">
-                                    Löschen
-                                </button>
-                            </div>
-                        `
-                        )
-                        .join('')
-                    : '<span class="no-files-text">Keine Dateien hochgeladen</span>'
-                }
+                            ? specific.uploadedFiles
+                                .map(
+                                    (file, index) => `
+                                        <div class="uploaded-file-item">
+                                            <span>${file.name} (${file.size})</span>
+                                            <button type="button" class="delete-file-button" onclick="import('./js/file-upload-utils.js').then(module => module.removeUploadedFile('${element.id}', ${index}))">
+                                                Löschen
+                                            </button>
+                                        </div>
+                                    `
+                                )
+                                .join('')
+                            : '<span class="no-files-text">Keine Dateien hochgeladen</span>'
+                        }
                     </div>
     
                     <small class="file-info-text">
@@ -391,14 +406,10 @@ const formElements = [
                     </small>
                 </div>
             `;
-
+    
             return html;
         },
     },
-
-
-
-
 
     // {
     //     id: 14,
