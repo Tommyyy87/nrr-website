@@ -1,4 +1,6 @@
 import formElements from './form-elements.js'; // Importiere zentrale Baustein-Definition
+import { handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploadedFiles } from './file-upload-utils.js';
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
@@ -61,7 +63,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (!value.trim() && element.type !== 'file-upload') {
                             errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
                             element.hasError = true; // Markiere das Feld als fehlerhaft
-                        } else if (element.type === 'file-upload' && (!element.uploadedFiles || element.uploadedFiles.length === 0)) {
+                        } else if (
+                            element.type === 'file-upload' &&
+                            (!element.specificProperties?.uploadedFiles || element.specificProperties.uploadedFiles.length === 0)
+                        ) {
                             errors.push(`Mindestens eine Datei muss für "${element.generalProperties.label}" hochgeladen werden.`);
                             element.hasError = true; // Markiere das Feld als fehlerhaft
                         } else {
@@ -71,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 return errors;
             },
+
 
             handleSubmit() {
                 const errors = this.validateRequiredFields(this.formElements);
@@ -88,48 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return true;
             },
 
-            // Verarbeitet hochgeladene Dateien
-            handleFileUpload(event, element) {
-                const files = event.target.files;
-                const allowedFileTypes = element.specificProperties.allowedFileTypes || ['pdf', 'jpg', 'png'];
-                const maxFileSizeMB = parseInt(element.specificProperties.maxFileSize) || 4;
-
-                if (!element.uploadedFiles) {
-                    element.uploadedFiles = [];
-                }
-
-                for (let file of files) {
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-                    const fileSizeMB = file.size / (1024 * 1024);
-
-                    if (!allowedFileTypes.includes(fileExtension)) {
-                        this.showNotification(`Dateityp nicht erlaubt: ${file.name}`, 'error');
-                        continue;
-                    }
-
-                    if (fileSizeMB > maxFileSizeMB) {
-                        this.showNotification(`Datei zu groß: ${file.name}`, 'error');
-                        continue;
-                    }
-
-                    // Datei zur Liste hinzufügen
-                    element.uploadedFiles.push({
-                        name: file.name,
-                        size: fileSizeMB.toFixed(2) + ' MB',
-                        type: file.type,
-                        lastModified: file.lastModified,
-                        fileObject: file,
-                    });
-                }
-
-                // Zurücksetzen des Datei-Input-Felds, um mehrfache Uploads zu ermöglichen
-                event.target.value = '';
-            },
-
-            // Entfernt eine hochgeladene Datei aus der Liste
-            removeUploadedFile(element, index) {
-                element.uploadedFiles.splice(index, 1);
-            },
 
             // Benutzerdaten laden
             async loadUserData(userId) {
@@ -161,18 +125,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (typeof definition.render === 'function') {
                     try {
                         const renderedHtml = definition.render(element, this.userData || {});
-                        if (element.type === 'file-upload' && element.uploadedFiles) {
+                        if (element.type === 'file-upload') {
                             const fileListHtml = `
-                                <ul class="uploaded-files">
-                                    ${element.uploadedFiles
-                                    .map(
+                                <ul id="file-list-${element.id}" class="uploaded-files">
+                                    ${element.specificProperties.uploadedFiles
+                                    ?.map(
                                         (file, index) =>
                                             `<li>
                                                     ${file.name} (${file.size})
-                                                    <button type="button" onclick="app.removeUploadedFile(${element.id}, ${index})">Löschen</button>
+                                                    <button type="button" onclick="import('./file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
                                                 </li>`
                                     )
-                                    .join('')}
+                                    .join('') || '<li>Keine Dateien hochgeladen</li>'}
                                 </ul>
                             `;
                             return renderedHtml + fileListHtml;

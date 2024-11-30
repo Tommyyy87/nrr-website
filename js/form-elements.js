@@ -349,15 +349,16 @@ const formElements = [
             allowedFileTypes: ['PDF', 'JPG', 'PNG'], // Erlaubte Dateitypen
             maxFileSize: 5, // Maximalgröße in MB
             multipleFiles: true, // Ermöglicht mehrere Dateien
+            uploadedFiles: [], // Initialisierung für hochgeladene Dateien
         },
         render(element, userData = {}) {
             const specific = element.specificProperties || {};
             const allowedFileTypes = specific.allowedFileTypes.join(', ');
             const maxFileSize = specific.maxFileSize || 5;
             const inputId = `file-upload-${element.id}`;
-    
+
             const html = `
-                <div class="file-upload-container" style="padding: 10px; border-radius: 5px;">
+                <div class="file-upload-container" style="padding: 0rem; border-radius: 5px;">
                     <label for="${inputId}" style="display: block; font-weight: bold;">
                         ${element.generalProperties.label || 'Datei hochladen'}
                     </label>
@@ -365,21 +366,32 @@ const formElements = [
                         id="${inputId}" 
                         type="file" 
                         accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
-                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
+                        style="width: 100%; padding: 0rem; border: 1px solid #ccc; border-radius: 5px;"
                         ${specific.multipleFiles ? 'multiple' : ''}
-                        onchange="handleFileUpload(event, '${element.id}')"
+                        onchange="import('./file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}', window.formElements))"
                     >
-                    <small style="display: block; margin-top: 5px;">
+                    <small style="display: block; margin-top: 0rem;">
                         Erlaubte Dateitypen: ${allowedFileTypes} | Max. Dateigröße: ${maxFileSize} MB
                     </small>
-                    <ul id="file-list-${element.id}" class="uploaded-file-list" style="margin-top: 10px; padding: 0;">
-                    </ul>
+                        <ul id="file-list-${element.id}" class="uploaded-file-list" style="margin-top: 1rem; padding: 0;">
+                            ${specific.uploadedFiles
+                    ?.map(
+                        (file, index) =>
+                            `<li>
+                                            ${file.name} (${file.size})
+                                            <button type="button" onclick="import('./file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
+                                        </li>`
+                    )
+                    .join('') || '<li>Keine Dateien hochgeladen</li>'}
+                        </ul>
                 </div>
             `;
-    
+
             return html;
         },
     },
+
+
     // {
     //     id: 14,
     //     label: 'E-Mail Eingabefeld',

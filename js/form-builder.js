@@ -1,5 +1,8 @@
 import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js';
 import formElements from './form-elements.js';
+import { handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploadedFiles } from './file-upload-utils.js';
+
+
 
 (async () => {
     // Laden des Templates
@@ -62,13 +65,19 @@ import formElements from './form-elements.js';
                 }, 3000);
             },
 
+
             // Bausteine
             updateSpecificProperty(key, value) {
                 if (this.selectedElement && this.selectedElement.specificProperties) {
                     this.selectedElement.specificProperties[key] = value;
-                    this.$forceUpdate(); // Aktualisiert die Ansicht
-                    this.saveToHistory(); // Änderungen speichern, aber nicht in die Datenbank
-                    this.isFormSaved = false; // Formular als unsaved markieren
+                    this.$forceUpdate(); // Ansicht aktualisieren
+                    this.saveToHistory(); // Änderungen speichern
+                    this.isFormSaved = false; // Formular als nicht gespeichert markieren
+
+                    // Delegiere Datei-Handling an die zentrale Funktion
+                    if (key === 'uploadedFiles' && value instanceof FileList) {
+                        handleFileUpload(value, this.selectedElement);
+                    }
                 }
             },
             // Variable in den Text einfügen
@@ -129,6 +138,23 @@ import formElements from './form-elements.js';
                 }
             },
 
+
+            toggleFileType(fileType) {
+                const allowedFileTypes = this.selectedElement.specificProperties.allowedFileTypes || [];
+
+                if (allowedFileTypes.includes(fileType)) {
+                    // Entferne den Dateityp, wenn er bereits vorhanden ist
+                    this.selectedElement.specificProperties.allowedFileTypes = allowedFileTypes.filter(
+                        (type) => type !== fileType
+                    );
+                } else {
+                    // Füge den Dateityp hinzu, wenn er noch nicht vorhanden ist
+                    this.selectedElement.specificProperties.allowedFileTypes.push(fileType);
+                }
+
+                // Speichere Änderungen und aktualisiere die Ansicht
+                this.updateSpecificProperty('allowedFileTypes', this.selectedElement.specificProperties.allowedFileTypes);
+            },
 
             // Ausgewähltes Element setzen
             selectElement(element) {

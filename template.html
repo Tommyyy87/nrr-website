@@ -361,12 +361,30 @@
 
                                 <!-- Erlaubte Dateitypen -->
                                 <div class="property">
-                                    <label for="allowedFileTypes">Erlaubte Dateitypen:</label>
-                                    <input type="text" id="allowedFileTypes"
-                                        v-model="selectedElement.specificProperties.allowedFileTypes"
-                                        @input="updateSpecificProperty('allowedFileTypes', $event.target.value.split(','))"
-                                        placeholder="z. B. PDF,JPG,PNG" />
-                                    <small>Trennen Sie Dateitypen mit einem Komma (z. B. PDF, JPG, PNG)</small>
+                                    <label>Erlaubte Dateitypen:</label>
+                                    <div class="checkbox-group">
+                                        <label>
+                                            <input type="checkbox" value="PDF"
+                                                :checked="selectedElement.specificProperties.allowedFileTypes.includes('PDF')"
+                                                @change="toggleFileType('PDF')" /> PDF
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" value="JPG"
+                                                :checked="selectedElement.specificProperties.allowedFileTypes.includes('JPG')"
+                                                @change="toggleFileType('JPG')" /> JPG
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" value="PNG"
+                                                :checked="selectedElement.specificProperties.allowedFileTypes.includes('PNG')"
+                                                @change="toggleFileType('PNG')" /> PNG
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" value="DOCX"
+                                                :checked="selectedElement.specificProperties.allowedFileTypes.includes('DOCX')"
+                                                @change="toggleFileType('DOCX')" /> DOCX
+                                        </label>
+                                    </div>
+                                    <small>Wählen Sie die erlaubten Dateitypen aus.</small>
                                 </div>
 
                                 <!-- Maximale Dateigröße -->
@@ -386,19 +404,9 @@
                                         @change="updateSpecificProperty('multipleFiles', $event.target.checked)" />
                                 </div>
 
-                                <!-- Hochgeladene Dateien anzeigen -->
-                                <div class="property">
-                                    <label>Hochgeladene Dateien:</label>
-                                    <ul id="file-list" class="uploaded-file-list">
-                                        <li v-for="(file, index) in getUploadedFiles(selectedElement.id)" :key="index">
-                                            {{ file.name }}
-                                            <button
-                                                @click="removeUploadedFile(selectedElement.id, index)">Löschen</button>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
                             <!-- Ende Baustein "Dokument anhängen" -->
+
 
 
                         </div>

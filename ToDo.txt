@@ -1,0 +1,15 @@
+Bausteine in folgender Reihenfolge einbauen:
+
+Dateiupload sichern
+Unterschriftenfeld
+Dropdown Menü
+Freitexteingabe durch User
+Checkboxen / mehrere Optionen
+Radiobuttons / mehrere Optionen - eins klickbar
+
+
+
+Speichern / Erstellen Flow 
+Senden an konfigurieren / API einstellen / Adminauswahl ? Oder nur durch mich?
+Butten "Veröffentlichen" / "Unveröffentlichen" - Switch? Grün / Rot? 
+Senden Button optisch anpassen
