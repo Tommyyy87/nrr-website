@@ -1,6 +1,5 @@
 import formElements from './form-elements.js'; // Importiere zentrale Baustein-Definition
-import { handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploadedFiles } from './file-upload-utils.js';
-
+import { updateFileList, handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploadedFiles } from './file-upload-utils.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
@@ -40,6 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                     return;
                                 }
 
+                                // Speichere formElements im globalen Window-Objekt
+                                window.formElements = this.formElements;
+
                                 await this.loadUserData(user.uid);
                             } else {
                                 console.warn("Formular nicht gefunden:", formId);
@@ -77,7 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return errors;
             },
 
-
             handleSubmit() {
                 const errors = this.validateRequiredFields(this.formElements);
                 if (errors.length > 0) {
@@ -93,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 this.showNotification("Formular erfolgreich abgesendet!", "success");
                 return true;
             },
-
 
             // Benutzerdaten laden
             async loadUserData(userId) {
@@ -130,20 +130,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const renderedHtml = definition.render(element, this.userData || {});
                         if (element.type === 'file-upload') {
-                            const fileListHtml = `
-                                <ul id="file-list-${element.id}" class="uploaded-files">
-                                    ${element.specificProperties.uploadedFiles
-                                    .map(
-                                        (file, index) =>
-                                            `<li>
-                                                    ${file.name} (${file.size})
-                                                    <button type="button" onclick="import('./file-upload-utils.js').then(module => module.removeUploadedFile(${index}, '${element.id}', window.formElements))">Löschen</button>
-                                                </li>`
-                                    )
-                                    .join('') || '<li>Keine Dateien hochgeladen</li>'}
-                                </ul>
-                            `;
-                            return renderedHtml + fileListHtml;
+                            // Hochgeladene Dateien in der Liste anzeigen
+                            setTimeout(() => {
+                                if (typeof updateFileList === 'function') {
+                                    updateFileList(element.id, window.formElements);
+                                } else {
+                                    console.error('updateFileList ist keine gültige Funktion.');
+                                }
+                            }, 0);
                         }
                         return renderedHtml;
                     } catch (error) {
@@ -156,6 +150,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 return `<div>Kein Renderer für ${definition.label} definiert</div>`;
             },
 
+            // Datei-Upload-Handling
+            handleFileInput(event, elementId) {
+                if (window.formElements && Array.isArray(window.formElements)) {
+                    handleFileUpload(event, elementId, window.formElements);
+                } else {
+                    console.error("Fehler: formElements ist nicht definiert oder kein Array.", window.formElements);
+                }
+            },
+
             // Benachrichtigungen
             showNotification(message, type) {
                 this.notification.message = message;
@@ -165,9 +168,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     this.notification.visible = false;
                 }, 3000);
             },
+
+            // Datei entfernen
+            removeFile(elementId, index) {
+                removeUploadedFile(elementId, index, window.formElements);
+            },
         },
         mounted() {
             this.loadForm(); // Daten laden
+
+            // Reaktive Überwachung, um sicherzustellen, dass window.formElements immer aktuell bleibt
+            this.$watch('formElements', {
+                handler(newValue) {
+                    window.formElements = newValue;
+                },
+                deep: true,
+            });
         },
+
     });
 });

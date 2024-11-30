@@ -363,13 +363,15 @@ const formElements = [
                         ${element.generalProperties.label || 'Datei hochladen'}
                     </label>
                     <input 
-                        id="${inputId}" 
-                        type="file" 
-                        accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
-                        style="width: 100%; padding: 0rem; border: 1px solid #ccc; border-radius: 5px;"
-                        ${specific.multipleFiles ? 'multiple' : ''}
-                        onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}', window.formElements))"
-                    >
+                        <input 
+                            id="${inputId}" 
+                            type="file" 
+                            accept="${specific.allowedFileTypes.map(type => '.' + type.toLowerCase()).join(', ')}"
+                            style="width: 100%; padding: 0rem; border: 1px solid #ccc; border-radius: 5px;"
+                            ${specific.multipleFiles ? 'multiple' : ''}
+                            onchange="import('./js/file-upload-utils.js').then(module => module.handleFileUpload(event, '${element.id}'))"
+                        />
+
                     <small style="display: block; margin-top: 0rem;">
                         Erlaubte Dateitypen: ${allowedFileTypes} | Max. Dateigröße: ${maxFileSize} MB
                     </small>
