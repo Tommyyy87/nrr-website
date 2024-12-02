@@ -526,36 +526,31 @@ const formElements = [
             duplicate: true,
             delete: true,
             visible: true,
-            isRequired: false, // Standard: Pflichtfeld ist deaktiviert
+            isRequired: false,
         },
         specificProperties: {
             penColor: '#000000',
             fieldSize: 'medium', // Optionen: klein, mittel, groß
-            penSize: '2px', // Optionen: dünn, mittel, dick
         },
         render(element) {
-            const specific = element.specificProperties || {};
             const inputId = `signature-pad-${element.id}`;
-            const clearButtonId = `clear-button-${element.id}`;
+            const popupButtonId = `popup-button-${element.id}`;
     
             return `
                 <div class="signature-container">
                     <label for="${inputId}" class="form-label">
                         ${element.generalProperties.label || 'Unterschrift'}
                     </label>
-                    <canvas 
-                        id="${inputId}" 
-                        class="signature-pad"
-                        style="border: 1px solid #ccc; width: ${specific.fieldSize === 'small' ? '200px' : specific.fieldSize === 'medium' ? '400px' : '600px'}; height: 200px;">
-                    </canvas>
-                    <button id="${clearButtonId}" type="button" class="button clear-signature-button">
-                        Unterschrift löschen
+                    <button id="${popupButtonId}" type="button" class="button signature-popup-button">
+                        Unterschreiben
                     </button>
+                    <div id="signature-result-${element.id}" class="signature-result-container"></div>
                 </div>
             `;
         },
     },
     
+
 
     // {
     //     id: 21,

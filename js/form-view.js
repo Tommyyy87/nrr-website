@@ -1,5 +1,7 @@
-import formElements from './form-elements.js'; // Importiere zentrale Baustein-Definition
-import { updateFileList, handleFileUpload, removeUploadedFile, getUploadedFiles, validateUploadedFiles } from './file-upload-utils.js';
+// Importiere zentrale Baustein-Definition
+import formElements from './form-elements.js';
+// Importiere die modularisierten Funktionen aus signature.js
+import './signature.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
@@ -13,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 type: '',
                 visible: false,
             },
+            activePopup: null, // Aktives Popup für die Signatur
         },
         methods: {
             // Formular aus der Datenbank laden
@@ -43,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 window.formElements = this.formElements;
 
                                 await this.loadUserData(user.uid);
+                                this.bindSignatureButtons(); // Binde die Signatur-Buttons nach dem Laden
                             } else {
                                 console.warn("Formular nicht gefunden:", formId);
                                 this.showNotification("Formular nicht gefunden.", "error");
@@ -57,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             },
 
+            // Validierung der Pflichtfelder
             validateRequiredFields(formElements) {
                 const errors = [];
                 formElements.forEach(element => {
@@ -114,6 +119,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             },
 
+            // Methode, um Signatur-Buttons zu binden
+            bindSignatureButtons() {
+                this.formElements.forEach(element => {
+                    if (element.type === 'signature') {
+                        const buttonId = `popup-button-${element.id}`;
+                        const buttonElement = document.getElementById(buttonId);
+                        if (buttonElement) {
+                            buttonElement.addEventListener('click', () => {
+                                this.openSignaturePopup(element.id);
+                            });
+                        }
+                    }
+                });
+            },
+
+            // Methoden für Signaturen
+            openSignaturePopup(elementId) {
+                window.signatureUtils.openSignaturePopup(elementId);
+            },
+            saveSignature(elementId) {
+                window.signatureUtils.saveSignature(elementId);
+            },
+            clearSignatureResult(elementId) {
+                window.signatureUtils.clearSignatureResult(elementId);
+            },
+            clearSignature(canvasId) {
+                window.signatureUtils.clearSignature(canvasId);
+            },
+            closeSignaturePopup() {
+                window.signatureUtils.closeSignaturePopup();
+            },
+
             // Dynamisches Rendern der Elemente basierend auf `form-elements.js`
             renderElement(element) {
                 const definition = formElements.find(el => el.type === element.type);
@@ -124,24 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (typeof definition.render === 'function') {
                     try {
-                        element.specificProperties = element.specificProperties || {};
-                        element.specificProperties.uploadedFiles = element.specificProperties.uploadedFiles || [];
-
                         const renderedHtml = definition.render(element, this.userData || {});
-
-                        // Initialisiere das Signatur-Element, wenn es sich um einen Signatur-Baustein handelt
-                        if (element.type === 'signature') {
-                            setTimeout(() => {
-                                import('./signature.js')
-                                    .then(module => {
-                                        const inputId = `signature-pad-${element.id}`;
-                                        const clearButtonId = `clear-button-${element.id}`;
-                                        module.initializeSignaturePad(inputId, clearButtonId, element.specificProperties);
-                                    })
-                                    .catch(error => console.error("Fehler beim Import von signature.js:", error));
-                            }, 0);
-                        }
-
                         return renderedHtml;
                     } catch (error) {
                         console.error(`Fehler beim Rendern von ${definition.label}:`, error);
@@ -171,23 +191,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     this.notification.visible = false;
                 }, 3000);
             },
-
-            // Datei entfernen
-            removeFile(elementId, index) {
-                removeUploadedFile(elementId, index, window.formElements);
-            },
         },
         mounted() {
             this.loadForm(); // Daten laden
-
-            // Reaktive Überwachung, um sicherzustellen, dass window.formElements immer aktuell bleibt
-            this.$watch('formElements', {
-                handler(newValue) {
-                    window.formElements = newValue;
-                },
-                deep: true,
-            });
         },
-
     });
 });

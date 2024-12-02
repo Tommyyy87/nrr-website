@@ -222,32 +222,129 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Canvas für Unterschrift */
-.signature-container {
-    margin-bottom: 20px;
+/* Popup Styling für das Signaturfeld */
+.signature-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    /* Dezente Verdunkelung für ein seriöses Design */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
-.signature-pad {
+.signature-popup-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    position: relative;
+    max-width: 500px;
+    /* Breitere maximale Größe für mehr Benutzerfreundlichkeit */
+    width: 90%;
+    text-align: left;
+    /* Links ausgerichtet für eine seriösere Struktur */
+}
+
+.popup-signature-pad {
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 100%;
-    height: 200px;
-    display: block;
-    margin: 10px auto;
+    height: 250px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Leichtere Schatten für Klarheit */
 }
 
-.clear-signature-button {
-    background-color: #dc3545;
-    color: #fff;
+/* Modernisierte und seriöse Buttons */
+.signature-popup-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Abstand zwischen den Buttons */
+    margin-top: 20px;
+    /* Abstand zum Canvas */
+}
+
+.button.save-signature-button,
+.button.delete-signature-button {
+    background-color: var(--maincolor);
+    color: #ffffff;
     border: none;
     border-radius: 6px;
-    padding: 10px 15px;
+    /* Leichte Rundungen für modernes, seriöses Aussehen */
+    padding: 15px 20px;
+    /* Größere Polsterung für Klarheit und Benutzerfreundlichkeit */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 1em;
+    transition: background-color 0.3s ease, box-shadow 0.2s ease;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    /* Maximale Breite für konsistente Darstellung */
+    margin: 0 auto;
+    /* Zentriere die Buttons */
 }
 
-.clear-signature-button:hover {
+.button.save-signature-button {
+    background-color: #28a745;
+    /* Grüner Farbton für "Speichern" */
+}
+
+.button.save-signature-button:hover {
+    background-color: #218838;
+    /* Dunklerer Grünton für den Hover-Effekt */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button.delete-signature-button {
+    background-color: #dc3545;
+    /* Roter Farbton für "Löschen" */
+}
+
+.button.delete-signature-button:hover {
     background-color: #c82333;
+    /* Dunklerer Rotton für den Hover-Effekt */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button zum Schließen des Popups */
+.button.close-signature-popup-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    color: #6c757d;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.button.close-signature-popup-button:hover {
+    color: #343a40;
+    /* Dunklerer Farbton für den Hover-Effekt */
+}
+
+/* Optimierungen für mobile Geräte */
+@media (max-width: 768px) {
+    .signature-popup-content {
+        max-width: 90%;
+        width: 100%;
+    }
+
+    .button.save-signature-button,
+    .button.delete-signature-button,
+    .button.close-signature-popup-button {
+        font-size: 1em;
+        padding: 12px 15px;
+        max-width: unset;
+        /* Breite der Buttons für Mobilgeräte anpassen */
+    }
 }
 
 /* Benachrichtigungen */
