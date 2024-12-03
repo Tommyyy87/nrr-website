@@ -7,6 +7,17 @@ export function initializeSignaturePad(canvasId) {
         return;
     }
 
+    // Funktion zur korrekten Skalierung des Canvas
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1); // Gerätedichte berücksichtigen
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio); // Skalierung für den Zeichenkontext
+    }
+
+    resizeCanvas(); // Initial skalieren
+    window.addEventListener('resize', resizeCanvas); // Skalierung bei Größenänderung anpassen
+
     // Initialisiere SignaturePad von der globalen CDN-Bibliothek
     const signaturePad = new SignaturePad(canvas, {
         penColor: 'black',
@@ -80,11 +91,13 @@ export function clearSignatureResult(elementId) {
 export function closeSignaturePopup() {
     const popupContainer = document.querySelector('.signature-popup-overlay');
     if (popupContainer) {
-        // Entferne das Popup nur, wenn es existiert
         popupContainer.parentNode.removeChild(popupContainer);
     } else {
-        console.warn('Popup-Container nicht gefunden oder bereits entfernt.'); // Warnung statt Fehler
+        console.info('Kein Popup-Container gefunden. Es gibt nichts zu schließen.'); // Info statt Warnung
     }
+
+    // Zusätzliche Sicherstellung: Entferne verbleibende Event-Listener
+    window.signaturePads = {}; // Resette globale Signaturinstanzen
 }
 
 // Globale Signatur-Werkzeuge registrieren

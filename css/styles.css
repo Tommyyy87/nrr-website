@@ -229,123 +229,179 @@ a:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    /* Dezente Verdunkelung für ein seriöses Design */
+    background: rgba(0, 0, 0, 0.5);
+    /* Etwas dunklere Verdunkelung für stärkeren Fokus */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 }
 
+/* Popup-Container */
 .signature-popup-content {
     background: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    /* Weniger Padding für mehr Klarheit */
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    /* Modernerer Schatten */
     position: relative;
-    max-width: 500px;
-    /* Breitere maximale Größe für mehr Benutzerfreundlichkeit */
+    max-width: 450px;
+    /* Reduzierte Maximalbreite für kompaktes Design */
     width: 90%;
-    text-align: left;
-    /* Links ausgerichtet für eine seriösere Struktur */
+    text-align: center;
+    /* Zentriert für einheitlichen Look */
+    color: #333;
+    /* Passender Farbton für den Text */
 }
 
+/* Unterschrift Canvas */
 .popup-signature-pad {
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid var(--maincolor);
+    /* Hauptfarbe der Seite */
+    border-radius: 8px;
     width: 100%;
-    height: 250px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    /* Leichtere Schatten für Klarheit */
+    height: 220px;
+    /* Kleinere Höhe für Mobilgeräte */
+    margin-bottom: 15px;
+    /* Weniger Abstand für kompakteres Design */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Dezente Schatten nach innen */
 }
 
-/* Modernisierte und seriöse Buttons */
+/* Buttons-Container */
 .signature-popup-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Buttons nebeneinander statt untereinander */
+    justify-content: space-between;
+    /* Gleichmäßige Verteilung */
     gap: 10px;
-    /* Abstand zwischen den Buttons */
-    margin-top: 20px;
-    /* Abstand zum Canvas */
+    margin-top: 15px;
+    /* Weniger Abstand */
 }
 
+/* Gespeichertes Unterschriftsbild */
+.saved-signature {
+    max-width: 100%;
+    /* Verhindert, dass das Bild breiter als sein Container wird */
+    height: auto;
+    /* Beibehaltung des Seitenverhältnisses */
+    display: block;
+    /* Block-Element für bessere Kontrolle */
+    margin: 10px auto;
+    /* Zentriere das Bild mit automatischen Rändern */
+    border: 1px solid #ccc;
+    /* Dezente Umrandung für bessere Sichtbarkeit */
+    border-radius: 4px;
+    /* Abgerundete Ecken */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Leichter Schatten für modernes Design */
+}
+
+/* Container für die Unterschrift */
+.signature-result-container {
+    text-align: center;
+    /* Zentriere den Inhalt */
+    margin: 0 auto;
+    /* Halte den Container zentriert */
+    max-width: 90%;
+    /* Begrenze die Breite auf mobilen Geräten */
+    overflow: hidden;
+    /* Verhindert, dass der Inhalt herausragt */
+}
+
+/* Allgemeine Button-Styling */
 .button.save-signature-button,
 .button.delete-signature-button {
     background-color: var(--maincolor);
+    /* Hauptfarbe der Website */
     color: #ffffff;
     border: none;
     border-radius: 6px;
-    /* Leichte Rundungen für modernes, seriöses Aussehen */
-    padding: 15px 20px;
-    /* Größere Polsterung für Klarheit und Benutzerfreundlichkeit */
-    cursor: pointer;
+    padding: 12px 18px;
+    /* Kompakteres Padding */
     font-size: 1em;
-    transition: background-color 0.3s ease, box-shadow 0.2s ease;
-    display: block;
-    width: 100%;
-    max-width: 300px;
-    /* Maximale Breite für konsistente Darstellung */
-    margin: 0 auto;
-    /* Zentriere die Buttons */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 48%;
+    /* Buttons nehmen jeweils 48% der Breite ein */
+    text-align: center;
 }
 
+/* Speichern-Button */
 .button.save-signature-button {
     background-color: #28a745;
-    /* Grüner Farbton für "Speichern" */
+    /* Grün für positive Aktion */
 }
 
 .button.save-signature-button:hover {
     background-color: #218838;
-    /* Dunklerer Grünton für den Hover-Effekt */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    /* Dunklerer Grünton */
+    transform: translateY(-2px);
+    /* Leichte Animation */
 }
 
+/* Löschen-Button */
 .button.delete-signature-button {
     background-color: #dc3545;
-    /* Roter Farbton für "Löschen" */
+    /* Rot für Löschaktion */
 }
 
 .button.delete-signature-button:hover {
     background-color: #c82333;
-    /* Dunklerer Rotton für den Hover-Effekt */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
-/* Button zum Schließen des Popups */
+/* Schließen-Button */
 .button.close-signature-popup-button {
     position: absolute;
     top: 10px;
     right: 10px;
     background-color: transparent;
-    color: #6c757d;
+    color: var(--maincolor);
+    /* Hauptfarbe */
     border: none;
     font-size: 1.5em;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .button.close-signature-popup-button:hover {
-    color: #343a40;
-    /* Dunklerer Farbton für den Hover-Effekt */
+    color: #025d9a;
+    /* Dunklerer Blau-Ton */
+    transform: scale(1.2);
+    /* Leichte Vergrößerung */
 }
 
-/* Optimierungen für mobile Geräte */
+/* Mobile Optimierungen */
 @media (max-width: 768px) {
     .signature-popup-content {
         max-width: 90%;
-        width: 100%;
+        padding: 15px;
+    }
+
+    .popup-signature-pad {
+        height: 180px;
+        /* Kleinere Höhe für Mobilgeräte */
     }
 
     .button.save-signature-button,
-    .button.delete-signature-button,
-    .button.close-signature-popup-button {
-        font-size: 1em;
-        padding: 12px 15px;
-        max-width: unset;
-        /* Breite der Buttons für Mobilgeräte anpassen */
+    .button.delete-signature-button {
+        font-size: 0.9em;
+        /* Kleinere Schriftgröße */
+        padding: 10px 15px;
+        /* Reduziertes Padding */
     }
 }
+
+/* Allgemeines für die Benutzerfreundlichkeit */
+.signature-popup-buttons .button {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    /* Bessere Lesbarkeit */
+}
+
 
 /* Benachrichtigungen */
 .notification {

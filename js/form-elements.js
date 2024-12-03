@@ -535,21 +535,32 @@ const formElements = [
         render(element) {
             const inputId = `signature-pad-${element.id}`;
             const popupButtonId = `popup-button-${element.id}`;
-    
+            const fieldSizeClass = element.specificProperties.fieldSize || 'medium'; // Standardgröße mittel
+
             return `
-                <div class="signature-container">
+                <div class="signature-container ${fieldSizeClass}">
                     <label for="${inputId}" class="form-label">
                         ${element.generalProperties.label || 'Unterschrift'}
                     </label>
                     <button id="${popupButtonId}" type="button" class="button signature-popup-button">
                         Unterschreiben
                     </button>
-                    <div id="signature-result-${element.id}" class="signature-result-container"></div>
+                    <div id="signature-result-${element.id}" class="signature-result-container">
+                        ${element.signatureData
+                    ? `<img src="${element.signatureData}" alt="Unterschrift" class="saved-signature">
+                                   <button type="button" class="button clear-signature-button" 
+                                   onclick="window.signatureUtils.clearSignatureResult('${element.id}')">
+                                       Unterschrift löschen
+                                   </button>`
+                    : ''
+                }
+                    </div>
                 </div>
             `;
         },
     },
-    
+
+
 
 
     // {
