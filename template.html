@@ -1,4 +1,4 @@
-<!-- template.html -->
+<!-- Das ist die template.html -->
 <div class="form-builder-container" @keyup="handleKeyUp" tabindex="0">
     <!-- Benachrichtigungsbereich -->
     <div id="notification" :class="['notification', notificationType, { show: notificationVisible }]">
@@ -407,6 +407,367 @@
                             </div>
                             <!-- Ende Baustein "Dokument anhängen" -->
 
+                            <!--  ID14- Senden-Baustein spezifische Eigenschaften -->
+                            <div v-if="selectedElement.type === 'submit-button'" class="property-group">
+                                <!-- Ziel-Cloud Auswahl -->
+                                <div class="property">
+                                    <label for="targetCloud">Ziel-Cloud:</label>
+                                    <select id="targetCloud" v-model="selectedElement.specificProperties.targetCloud"
+                                        @change="updateSpecificProperty('targetCloud', $event.target.value)">
+                                        <option value="GoogleDrive">Google Drive</option>
+                                        <option value="OneDrive">OneDrive</option>
+                                        <option value="Dropbox">Dropbox</option>
+                                        <option value="Nextcloud">Nextcloud</option>
+                                    </select>
+                                </div>
+
+                                <!-- Ordner-Namenskonvention -->
+                                <div class="property">
+                                    <label for="folderNamingConvention">Ordner-Namenskonvention:</label>
+                                    <input type="text" id="folderNamingConvention"
+                                        v-model="selectedElement.specificProperties.folderNamingConvention"
+                                        @input="updateSpecificProperty('folderNamingConvention', $event.target.value)"
+                                        placeholder="Ordnername eingeben..." />
+                                </div>
+
+                                <!-- Datei-Namenskonvention -->
+                                <div class="property">
+                                    <label for="fileNamingConvention">Datei-Namenskonvention:</label>
+                                    <input type="text" id="fileNamingConvention"
+                                        v-model="selectedElement.specificProperties.fileNamingConvention"
+                                        @input="updateSpecificProperty('fileNamingConvention', $event.target.value)"
+                                        placeholder="Dateiname eingeben..." />
+                                </div>
+
+                                <!-- Nutzer benachrichtigen -->
+                                <div class="property">
+                                    <label for="notifyUser">Nutzer benachrichtigen:</label>
+                                    <input type="checkbox" id="notifyUser"
+                                        v-model="selectedElement.specificProperties.notifyUser"
+                                        @change="updateSpecificProperty('notifyUser', $event.target.checked)" />
+                                </div>
+                            </div>
+
+                            <!--  ID 31 -- Spezifische Eigenschaften für Radio Buttons -->
+                            <div v-if="selectedElement.type === 'radio-group'" class="property-group">
+                                <div class="radio-options-container">
+                                    <!-- NEU: Gruppen-Beschriftung -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Gruppen-Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.groupLabel"
+                                            @input="updateSpecificProperty('groupLabel', $event.target.value)"
+                                            placeholder="Beschriftung über den Optionen" />
+                                    </div>
+                                    <h3>Radio Button Optionen</h3>
+
+                                    <!-- Optionen Verwaltung -->
+                                    <div v-for="(option, index) in selectedElement.specificProperties.options"
+                                        :key="index" class="radio-option-row">
+                                        <span class="option-number">Option {{ index + 1 }}</span>
+
+                                        <label class="radio-option-label">Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.optionLabels[index]"
+                                            placeholder="Beschriftung eingeben"
+                                            @input="updateRadioOption(index, $event.target.value)" />
+
+                                        <button @click="removeOption(index)" class="delete-option-button"
+                                            title="Option löschen">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <button @click="addOption" class="add-option-button">
+                                        <i class="fas fa-plus"></i> Neue Option hinzufügen
+                                    </button>
+
+                                    <!-- Layout Einstellungen -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Ausrichtung:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.layout"
+                                            @change="updateSpecificProperty('layout', $event.target.value)">
+                                            <option value="vertical">Vertikal</option>
+                                            <option value="horizontal">Horizontal</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Abstände -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Abstände:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.spacing"
+                                            @change="updateSpecificProperty('spacing', $event.target.value)">
+                                            <option value="small">Klein</option>
+                                            <option value="medium">Mittel</option>
+                                            <option value="large">Groß</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Farben -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Textfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.textColor"
+                                            @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                    </div>
+
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Hintergrundfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.backgroundColor"
+                                            @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                    </div>
+
+                                    <!-- Standardauswahl -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Standardauswahl:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.defaultSelected"
+                                            @change="updateSpecificProperty('defaultSelected', $event.target.value)">
+                                            <option v-for="option in selectedElement.specificProperties.options"
+                                                :key="option" :value="option">
+                                                {{ option }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ID 18 - Freitexteingabe -->
+                            <div v-if="selectedElement.type === 'textarea'" class="property-group">
+                                <!-- Beschriftung -->
+                                <div class="property">
+                                    <label for="label">Beschriftung:</label>
+                                    <input type="text" id="label" v-model="selectedElement.generalProperties.label"
+                                        @input="updateGeneralProperty('label', $event.target.value)" />
+                                </div>
+
+                                <!-- Platzhaltertext -->
+                                <div class="property">
+                                    <label for="placeholder">Platzhaltertext:</label>
+                                    <input type="text" id="placeholder"
+                                        v-model="selectedElement.specificProperties.placeholder"
+                                        @input="updateSpecificProperty('placeholder', $event.target.value)" />
+                                </div>
+
+                                <!-- Standardwert -->
+                                <div class="property">
+                                    <label for="defaultValue">Standardwert:</label>
+                                    <textarea id="defaultValue"
+                                        v-model="selectedElement.specificProperties.defaultValue"
+                                        @input="updateSpecificProperty('defaultValue', $event.target.value)"
+                                        rows="3"></textarea>
+                                </div>
+
+                                <!-- Zeilen -->
+                                <div class="property">
+                                    <label for="rows">Anzahl Zeilen:</label>
+                                    <input type="number" id="rows" min="2" max="10"
+                                        v-model="selectedElement.specificProperties.rows"
+                                        @input="updateSpecificProperty('rows', parseInt($event.target.value))" />
+                                </div>
+
+                                <!-- Minimale Länge -->
+                                <div class="property">
+                                    <label for="minLength">Minimale Länge:</label>
+                                    <input type="number" id="minLength" min="0"
+                                        v-model="selectedElement.specificProperties.minLength"
+                                        @input="updateSpecificProperty('minLength', parseInt($event.target.value))" />
+                                </div>
+
+                                <!-- Maximale Länge -->
+                                <div class="property">
+                                    <label for="maxLength">Maximale Länge:</label>
+                                    <input type="number" id="maxLength" min="0"
+                                        v-model="selectedElement.specificProperties.maxLength"
+                                        @input="updateSpecificProperty('maxLength', parseInt($event.target.value))" />
+                                </div>
+
+                                <!-- Schriftgröße -->
+                                <div class="property">
+                                    <label for="fontSize">Schriftgröße:</label>
+                                    <select id="fontSize" v-model="selectedElement.specificProperties.fontSize"
+                                        @change="updateSpecificProperty('fontSize', $event.target.value)">
+                                        <option value="small">Klein</option>
+                                        <option value="medium">Mittel</option>
+                                        <option value="large">Groß</option>
+                                    </select>
+                                </div>
+
+                                <!-- Schriftart -->
+                                <div class="property">
+                                    <label for="fontFamily">Schriftart:</label>
+                                    <select id="fontFamily" v-model="selectedElement.specificProperties.fontFamily"
+                                        @change="updateSpecificProperty('fontFamily', $event.target.value)">
+                                        <option value="Arial">Arial</option>
+                                        <option value="Verdana">Verdana</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+
+                                <!-- Größenänderung -->
+                                <div class="property">
+                                    <label for="resize">Größenänderung erlauben:</label>
+                                    <select id="resize" v-model="selectedElement.specificProperties.resize"
+                                        @change="updateSpecificProperty('resize', $event.target.value)">
+                                        <option value="none">Keine</option>
+                                        <option value="vertical">Vertikal</option>
+                                        <option value="both">Beide Richtungen</option>
+                                    </select>
+                                </div>
+
+                                <!-- Textfarbe -->
+                                <div class="property">
+                                    <label for="textColor">Textfarbe:</label>
+                                    <input type="color" id="textColor"
+                                        v-model="selectedElement.specificProperties.textColor"
+                                        @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                </div>
+
+                                <!-- Hintergrundfarbe -->
+                                <div class="property">
+                                    <label for="backgroundColor">Hintergrundfarbe:</label>
+                                    <input type="color" id="backgroundColor"
+                                        v-model="selectedElement.specificProperties.backgroundColor"
+                                        @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                </div>
+
+                                <!-- Rahmenfarbe -->
+                                <div class="property">
+                                    <label for="borderColor">Rahmenfarbe:</label>
+                                    <input type="color" id="borderColor"
+                                        v-model="selectedElement.specificProperties.borderColor"
+                                        @input="updateSpecificProperty('borderColor', $event.target.value)" />
+                                </div>
+
+                                <!-- Rechtschreibprüfung -->
+                                <div class="property">
+                                    <label for="spellcheck">Rechtschreibprüfung:</label>
+                                    <input type="checkbox" id="spellcheck"
+                                        v-model="selectedElement.specificProperties.spellcheck"
+                                        @change="updateSpecificProperty('spellcheck', $event.target.checked)" />
+                                </div>
+
+                                <!-- Nur-Lesen-Modus -->
+                                <div class="property">
+                                    <label for="readonly">Nur-Lesen-Modus:</label>
+                                    <input type="checkbox" id="readonly"
+                                        v-model="selectedElement.specificProperties.readonly"
+                                        @change="updateSpecificProperty('readonly', $event.target.checked)" />
+                                </div>
+                            </div>
+
+                            <!-- Eigenschaften für das Zahleneingabefeld -->
+                            <div v-if="selectedElement.type === 'number-input'" class="property-group">
+                                <!-- Titel/Label Einstellung -->
+                                <div class="property">
+                                    <label for="elementLabel">Titel:</label>
+                                    <input type="text" id="elementLabel"
+                                        v-model="selectedElement.generalProperties.label"
+                                        @input="updateGeneralProperty('label', $event.target.value)"
+                                        placeholder="Titel des Eingabefelds">
+                                </div>
+
+                                <!-- Allgemeine Einstellungen für Zahlen -->
+                                <div class="property">
+                                    <label for="minValue">Minimalwert:</label>
+                                    <input type="number" id="minValue"
+                                        v-model="selectedElement.specificProperties.minValue"
+                                        @input="updateSpecificProperty('minValue', parseInt($event.target.value))"
+                                        placeholder="Minimaler Wert">
+                                </div>
+
+                                <div class="property">
+                                    <label for="maxValue">Maximalwert:</label>
+                                    <input type="number" id="maxValue"
+                                        v-model="selectedElement.specificProperties.maxValue"
+                                        @input="updateSpecificProperty('maxValue', parseInt($event.target.value))"
+                                        placeholder="Maximaler Wert">
+                                </div>
+
+                                <div class="property">
+                                    <label for="stepSize">Schrittweite:</label>
+                                    <input type="number" id="stepSize"
+                                        v-model="selectedElement.specificProperties.stepSize"
+                                        @input="updateSpecificProperty('stepSize', parseFloat($event.target.value))"
+                                        step="0.1" placeholder="Schrittweite">
+                                </div>
+
+                                <div class="property">
+                                    <label for="defaultValue">Standardwert:</label>
+                                    <input type="number" id="defaultValue"
+                                        v-model="selectedElement.specificProperties.defaultValue"
+                                        @input="updateSpecificProperty('defaultValue', parseFloat($event.target.value))"
+                                        placeholder="Standardwert">
+                                </div>
+
+                                <!-- Einheit -->
+                                <div class="property">
+                                    <label for="unit">Einheit:</label>
+                                    <input type="text" id="unit" v-model="selectedElement.specificProperties.unit"
+                                        @input="updateSpecificProperty('unit', $event.target.value)"
+                                        placeholder="z.B. €, km, m">
+                                </div>
+
+                                <!-- Dezimalzahlen-Einstellungen -->
+                                <div class="property">
+                                    <label for="allowDecimals">Dezimalzahlen erlauben:</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="allowDecimals"
+                                            v-model="selectedElement.specificProperties.allowDecimals"
+                                            @change="updateNumberInputSettings('allowDecimals', $event.target.checked)">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Dezimalstellen nur anzeigen, wenn Dezimalzahlen erlaubt sind -->
+                                <div class="property" v-if="selectedElement.specificProperties.allowDecimals === true">
+                                    <label for="decimalPlaces">Dezimalstellen:</label>
+                                    <input type="number" id="decimalPlaces"
+                                        v-model="selectedElement.specificProperties.decimalPlaces"
+                                        @input="updateSpecificProperty('decimalPlaces', parseInt($event.target.value))"
+                                        min="0" max="10">
+                                </div>
+
+                                <!-- Ausrichtung -->
+                                <div class="property">
+                                    <label for="alignment">Ausrichtung:</label>
+                                    <select id="alignment" v-model="selectedElement.specificProperties.alignment"
+                                        @change="updateSpecificProperty('alignment', $event.target.value)">
+                                        <option value="left">Links</option>
+                                        <option value="center">Zentriert</option>
+                                        <option value="right">Rechts</option>
+                                    </select>
+                                </div>
+
+                                <!-- Farbeinstellungen -->
+                                <div class="property">
+                                    <label for="backgroundColor">Hintergrundfarbe:</label>
+                                    <input type="color" id="backgroundColor"
+                                        v-model="selectedElement.specificProperties.backgroundColor"
+                                        @input="updateSpecificProperty('backgroundColor', $event.target.value)">
+                                </div>
+
+                                <div class="property">
+                                    <label for="textColor">Textfarbe:</label>
+                                    <input type="color" id="textColor"
+                                        v-model="selectedElement.specificProperties.textColor"
+                                        @input="updateSpecificProperty('textColor', $event.target.value)">
+                                </div>
+
+                                <!-- Variablenname für Berechnungen -->
+                                <div class="property">
+                                    <label for="variableName">Variablenname für Berechnungen:</label>
+                                    <input type="text" id="variableName"
+                                        v-model="selectedElement.specificProperties.variableName"
+                                        @input="updateSpecificProperty('variableName', $event.target.value)"
+                                        placeholder="z.B. preis, menge">
+                                    <small class="hint-text">Der Variablenname wird für Berechnungen verwendet</small>
+                                </div>
+                            </div>
 
 
                         </div>

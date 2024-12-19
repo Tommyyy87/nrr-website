@@ -1,3 +1,5 @@
+// Das ist die auth.js
+
 // Warten, bis das DOM vollständig geladen ist
 document.addEventListener("DOMContentLoaded", function () {
     console.log('Firebase in auth.js:', firebase);

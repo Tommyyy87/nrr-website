@@ -1,3 +1,5 @@
+// Das ist die usercontrol.js:
+
 document.addEventListener("DOMContentLoaded", async function () {
     // Überprüft, ob der Benutzer angemeldet ist
     window.auth.onAuthStateChanged(async function (user) {

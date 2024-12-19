@@ -1,3 +1,5 @@
+// Das ist die firebase-config.js
+
 // Überprüfen, ob Firebase verfügbar ist
 console.log('Firebase vor Initialisierung:', firebase);
 

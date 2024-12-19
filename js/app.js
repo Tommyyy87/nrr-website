@@ -1,4 +1,5 @@
-// App.js
+// Das ist die App.js:
+
 import formElements from './form-elements.js';
 
 export default {

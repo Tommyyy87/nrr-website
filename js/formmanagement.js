@@ -1,3 +1,5 @@
+// Das ist die formmanagement.js:
+
 document.addEventListener("DOMContentLoaded", function () {
     const formList = document.getElementById("formList");
 

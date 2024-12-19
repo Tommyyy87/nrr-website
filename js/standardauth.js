@@ -1,3 +1,5 @@
+// Das ist die standardauth.js:
+
 document.addEventListener("DOMContentLoaded", async () => {
     // Firebase-Dienste initialisieren
     const auth = firebase.auth();

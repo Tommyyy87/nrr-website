@@ -327,7 +327,7 @@ main {
     /* Lässt Platz zwischen Label und Checkbox */
     gap: 0;
     /* Kein zusätzlicher Abstand */
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
     /* Etwas weniger Abstand für kompakteres Layout */
 }
 
@@ -346,6 +346,7 @@ main {
     color: #666;
     margin: 0;
     text-align: left;
+    margin-right: 1rem;
     /* Text linksbündig */
 }
 

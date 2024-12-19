@@ -1,24 +1,31 @@
-// Importiere zentrale Baustein-Definition
+// form-view.js
 import formElements from './form-elements.js';
-// Importiere die modularisierten Funktionen aus signature.js
-import './signature.js';
+import {
+    convertFormToPDF,
+    getUploadedFiles,
+    convertFilesToPDF,
+    mergePDFs,
+    uploadToGoogleDrive,
+    updateProgressBar,
+    showNotification,
+    handleSubmitButton
+} from './submit-elements.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
         el: '#app',
         data: {
             formName: 'Lade Formular...',
-            formElements: [], // Bausteine aus der Datenbank
-            userData: {}, // Benutzerdaten
+            formElements: [],
+            userData: {},
             notification: {
                 message: '',
                 type: '',
                 visible: false,
             },
-            activePopup: null, // Aktives Popup für die Signatur
+            activePopup: null,
         },
         methods: {
-            // Formular aus der Datenbank laden
             async loadForm() {
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
@@ -42,11 +49,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     return;
                                 }
 
-                                // Speichere formElements im globalen Window-Objekt
                                 window.formElements = this.formElements;
 
                                 await this.loadUserData(user.uid);
-                                this.bindSignatureButtons(); // Binde die Signatur-Buttons nach dem Laden
+                                this.bindSignatureButtons();
+                                this.initializeCharacterCounters();
                             } else {
                                 console.warn("Formular nicht gefunden:", formId);
                                 this.showNotification("Formular nicht gefunden.", "error");
@@ -61,46 +68,286 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             },
 
-            // Validierung der Pflichtfelder
+            initializeCharacterCounters() {
+                this.$nextTick(() => {
+                    this.formElements.forEach(element => {
+                        if (element.type === 'textarea') {
+                            const textarea = document.getElementById(`textarea-${element.id}`);
+                            if (textarea) {
+                                this.updateCharacterCount(textarea);
+                            }
+                        }
+                    });
+                });
+            },
+
+            updateCharacterCount(textarea) {
+                const counterId = textarea.getAttribute('data-counter-id');
+                const counter = document.getElementById(counterId);
+                const maxLength = parseInt(textarea.getAttribute('maxlength'));
+
+                if (counter) {
+                    const length = textarea.value.length;
+                    counter.textContent = length;
+
+                    if (maxLength > 0) {
+                        if (length >= maxLength) {
+                            counter.style.color = '#dc3545';
+                        } else if (length >= maxLength * 0.9) {
+                            counter.style.color = '#ffc107';
+                        } else {
+                            counter.style.color = '#666';
+                        }
+                    }
+                }
+            },
+
+            handleNumberInput(elementId, action) {
+                const input = document.querySelector(`#number-input-${elementId}`);
+                if (!input) return;
+
+                const element = this.formElements.find(el => el.id === parseInt(elementId));
+                if (!element || !element.specificProperties) return;
+
+                const allowDecimals = element.specificProperties.allowDecimals === true;
+                const step = allowDecimals ?
+                    (parseFloat(input.step) || 0.1) :
+                    1;
+
+                let currentValue = parseFloat(input.value) || 0;
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+
+                if (action === 'increment') {
+                    currentValue = Math.min(max, currentValue + step);
+                } else if (action === 'decrement') {
+                    currentValue = Math.max(min, currentValue - step);
+                }
+
+                if (!allowDecimals) {
+                    currentValue = Math.round(currentValue);
+                }
+
+                input.value = currentValue;
+                element.userInput = currentValue;
+
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            },
+
+            validateNumberInput(element) {
+                if (!element || element.type !== 'number-input') return true;
+
+                const input = document.getElementById(`number-input-${element.id}`);
+                if (!input) return true;
+
+                const value = parseFloat(input.value);
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+
+                if (element.generalProperties.isRequired && (!input.value || isNaN(value))) {
+                    return false;
+                }
+
+                if (!isNaN(value)) {
+                    if (!isNaN(min) && value < min) return false;
+                    if (!isNaN(max) && value > max) return false;
+                }
+
+                if (element.specificProperties.allowDecimals === false && !Number.isInteger(value)) {
+                    return false;
+                }
+
+                return true;
+            },
+
+            validateNumberKeyPress(event, allowDecimals) {
+                // Erlaube: Backspace, Delete, ArrowKeys, Tab
+                if (event.key === 'Backspace' ||
+                    event.key === 'Delete' ||
+                    event.key === 'Tab' ||
+                    event.key === 'ArrowLeft' ||
+                    event.key === 'ArrowRight' ||
+                    event.key === 'ArrowUp' ||
+                    event.key === 'ArrowDown') {
+                    return true;
+                }
+
+                // Erlaube: Strg+A, Strg+C, Strg+V, Strg+X
+                if (event.ctrlKey && ['a', 'c', 'v', 'x'].includes(event.key.toLowerCase())) {
+                    return true;
+                }
+
+                // Erlaube: Minus-Zeichen am Anfang für negative Zahlen
+                if (event.key === '-' && event.target.selectionStart === 0 && !event.target.value.includes('-')) {
+                    return true;
+                }
+
+                // Erlaube Dezimalpunkt nur wenn Dezimalzahlen erlaubt sind
+                if ((event.key === '.' || event.key === ',') && allowDecimals && !event.target.value.includes('.')) {
+                    return true;
+                }
+
+                // Erlaube nur Zahlen
+                return !isNaN(Number(event.key));
+            },
+
+            validateNumberPaste(event, allowDecimals) {
+                event.preventDefault();
+                let pastedText = (event.clipboardData || window.clipboardData).getData('text');
+                let regex = allowDecimals ? /[^0-9.-]/g : /[^0-9-]/g;
+                pastedText = pastedText.replace(regex, '');
+
+                if (allowDecimals) {
+                    const parts = pastedText.split('.');
+                    if (parts.length > 2) {
+                        pastedText = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                }
+
+                if (pastedText.includes('-')) {
+                    pastedText = pastedText.replace(/-/g, '');
+                    if (pastedText.length > 0) {
+                        pastedText = '-' + pastedText;
+                    }
+                }
+
+                if (pastedText) {
+                    const start = event.target.selectionStart;
+                    const end = event.target.selectionEnd;
+                    const value = event.target.value;
+                    const newValue = value.substring(0, start) + pastedText + value.substring(end);
+                    event.target.value = newValue;
+                    event.target.setSelectionRange(start + pastedText.length, start + pastedText.length);
+                    event.target.dispatchEvent(new Event('input'));
+                }
+
+                return false;
+            },
+
+            handleNumberInputChange(input, elementId) {
+                const element = this.formElements.find(el => el.id === parseInt(elementId));
+                if (!element || !element.specificProperties) return;
+
+                const allowDecimals = element.specificProperties.allowDecimals === true;
+
+                let value = input.value;
+                value = value.replace(/[^\d.-]/g, '');
+
+                if (value.includes('-')) {
+                    value = value.replace(/-/g, '');
+                    if (value.length > 0) {
+                        value = '-' + value;
+                    }
+                }
+
+                if (!allowDecimals) {
+                    value = value.replace(/\./g, '');
+                    if (value) {
+                        value = Math.round(parseFloat(value));
+                    }
+                } else {
+                    const parts = value.split('.');
+                    if (parts.length > 1) {
+                        const decimalPlaces = element.specificProperties.decimalPlaces || 2;
+                        value = parts[0] + '.' + parts[1].substring(0, decimalPlaces);
+                    }
+                }
+
+                input.value = value;
+                element.userInput = value;
+            },
+
+            validateTextarea(element) {
+                if (!element || element.type !== 'textarea') return true;
+
+                const textarea = document.getElementById(`textarea-${element.id}`);
+                if (!textarea) return true;
+
+                if (element.generalProperties.isRequired && (!textarea.value || textarea.value.trim() === '')) {
+                    return false;
+                }
+
+                if (element.specificProperties.minLength > 0 &&
+                    textarea.value.length < element.specificProperties.minLength) {
+                    return false;
+                }
+
+                if (element.specificProperties.maxLength > 0 &&
+                    textarea.value.length > element.specificProperties.maxLength) {
+                    return false;
+                }
+
+                return true;
+            },
+
+            resetTextarea(element) {
+                if (!element || element.type !== 'textarea') return;
+
+                const textarea = document.getElementById(`textarea-${element.id}`);
+                if (textarea) {
+                    textarea.value = '';
+                    this.updateCharacterCount(textarea);
+                    element.specificProperties.defaultValue = '';
+                    element.specificProperties.currentLength = 0;
+                }
+            },
+
             validateRequiredFields(formElements) {
                 const errors = [];
                 formElements.forEach(element => {
                     if (element.generalProperties.isRequired && element.generalProperties.visible) {
-                        const value = element.userInput || ''; // Benutzerinput überprüfen
-                        if (!value.trim() && element.type !== 'file-upload') {
-                            errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
-                            element.hasError = true; // Markiere das Feld als fehlerhaft
-                        } else if (
-                            element.type === 'file-upload' &&
-                            (!element.specificProperties?.uploadedFiles || element.specificProperties.uploadedFiles.length === 0)
-                        ) {
-                            errors.push(`Mindestens eine Datei muss für "${element.generalProperties.label}" hochgeladen werden.`);
-                            element.hasError = true; // Markiere das Feld als fehlerhaft
+                        if (element.type === 'textarea') {
+                            if (!this.validateTextarea(element)) {
+                                errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
+                        } else if (element.type === 'number-input') {
+                            if (!this.validateNumberInput(element)) {
+                                errors.push(`Das Feld "${element.generalProperties.label}" ist ungültig oder muss ausgefüllt werden.`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
                         } else {
-                            element.hasError = false; // Entferne die Fehlermarkierung
+                            const value = element.userInput || '';
+                            if (!value.trim() && element.type !== 'file-upload') {
+                                errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
+                                element.hasError = true;
+                            } else if (
+                                element.type === 'file-upload' &&
+                                (!element.specificProperties?.uploadedFiles || element.specificProperties.uploadedFiles.length === 0)
+                            ) {
+                                errors.push(`Mindestens eine Datei muss für "${element.generalProperties.label}" hochgeladen werden.`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
                         }
                     }
                 });
                 return errors;
             },
 
-            handleSubmit() {
+            async handleSubmit() {
                 const errors = this.validateRequiredFields(this.formElements);
                 if (errors.length > 0) {
-                    this.notification.message = errors.join('\n'); // Fehlermeldungen anzeigen
+                    this.notification.message = errors.join('\n');
                     this.notification.type = 'error';
                     this.notification.visible = true;
-                    setTimeout(() => (this.notification.visible = false), 5000); // Meldung ausblenden
-                    return false; // Verhindert Absenden/Speichern
+                    setTimeout(() => (this.notification.visible = false), 5000);
+                    return false;
                 }
 
-                // Falls keine Fehler vorhanden sind
-                console.log('Formular wurde erfolgreich abgesendet!');
-                this.showNotification("Formular erfolgreich abgesendet!", "success");
+                const sendButtonElement = this.formElements.find(el => el.type === 'submit-button' && el.generalProperties.id === 'senden_1');
+                if (sendButtonElement) {
+                    await handleSubmitButton(this.formElements, `progress-${sendButtonElement.generalProperties.id}`);
+                }
                 return true;
             },
 
-            // Benutzerdaten laden
             async loadUserData(userId) {
                 try {
                     const userDoc = await db.collection('users').doc(userId).get();
@@ -119,7 +366,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             },
 
-            // Methode, um Signatur-Buttons zu binden
             bindSignatureButtons() {
                 this.formElements.forEach(element => {
                     if (element.type === 'signature') {
@@ -134,24 +380,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             },
 
-            // Methoden für Signaturen
             openSignaturePopup(elementId) {
                 window.signatureUtils.openSignaturePopup(elementId);
             },
+
             saveSignature(elementId) {
                 window.signatureUtils.saveSignature(elementId);
             },
+
             clearSignatureResult(elementId) {
                 window.signatureUtils.clearSignatureResult(elementId);
             },
+
             clearSignature(canvasId) {
                 window.signatureUtils.clearSignature(canvasId);
             },
+
             closeSignaturePopup() {
                 window.signatureUtils.closeSignaturePopup();
             },
 
-            // Dynamisches Rendern der Elemente basierend auf `form-elements.js`
             renderElement(element) {
                 const definition = formElements.find(el => el.type === element.type);
                 if (!definition) {
@@ -173,7 +421,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return `<div>Kein Renderer für ${definition.label} definiert</div>`;
             },
 
-            // Datei-Upload-Handling
             handleFileInput(event, elementId) {
                 if (window.formElements && Array.isArray(window.formElements)) {
                     handleFileUpload(event, elementId, window.formElements);
@@ -182,7 +429,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             },
 
-            // Benachrichtigungen
             showNotification(message, type) {
                 this.notification.message = message;
                 this.notification.type = type;
@@ -190,10 +436,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 setTimeout(() => {
                     this.notification.visible = false;
                 }, 3000);
-            },
+            }
         },
         mounted() {
-            this.loadForm(); // Daten laden
+            this.loadForm();
+            window.updateCharacterCount = (textarea) => {
+                this.updateCharacterCount(textarea);
+            };
         },
+        created() {
+            window.app = this;
+        }
     });
 });

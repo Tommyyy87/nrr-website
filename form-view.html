@@ -1,3 +1,4 @@
+// form-view.html
 <!DOCTYPE html>
 <html lang="de">
 
@@ -10,49 +11,51 @@
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
     <link rel="manifest" href="icons/site.webmanifest">
     <meta name="theme-color" content="#ffffff">
+
+    <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+
+    <!-- Signature Pad Library -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script type="module" defer src="js/form-view.js"></script>
+
+    <!-- Flatpickr für Datums/Zeit-Auswahl -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="./js/standardauth.js"></script>
+
+    <!-- Anwendungsskripte -->
+    <script type="module" src="js/signature.js"></script>
+    <script type="module" src="js/form-view.js"></script>
 </head>
 
 <body>
-
     <div id="app" class="container">
         <div>
-            <!-- Logo mit Link zum Hauptmenü -->
             <a href="home.html">
                 <img src="img/logo.png" alt="Logo der Notfallschule Rhein Ruhr" class="logo">
             </a>
         </div>
         <h2>{{ formName }}</h2>
         <form id="dynamicForm" class="form-container" @submit.prevent="handleSubmit">
-            <!-- Dynamische Render-Logik: Elemente werden basierend auf form-elements.js gerendert -->
             <div v-for="element in formElements" :key="element.id" class="form-group"
                 :class="{ 'error': element.hasError }" v-if="element.generalProperties.visible">
-                <!-- Render-Methode aufrufen -->
                 <div v-html="renderElement(element)"></div>
-
-                <!-- Fehleranzeige -->
                 <div v-if="element.hasError" class="error-message">Dieses Feld ist erforderlich.</div>
+                <div v-if="element.type === 'submit-button'" :id="'progress-' + element.generalProperties.id"
+                    class="progress-bar"></div>
             </div>
-
-            <!-- Senden-Button -->
-            <button type="submit" class="submit-button">Senden</button>
         </form>
 
-        <!-- Benachrichtigung -->
         <div v-if="notification.visible" :class="['notification', notification.type]">
             {{ notification.message }}
         </div>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="./js/standardauth.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 
 </html>

@@ -1,5 +1,4 @@
-// Nutze die globale Variable "SignaturePad" von der CDN-Bibliothek
-
+// signature.js
 export function initializeSignaturePad(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) {
@@ -7,18 +6,16 @@ export function initializeSignaturePad(canvasId) {
         return;
     }
 
-    // Funktion zur korrekten Skalierung des Canvas
     function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1); // Gerätedichte berücksichtigen
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = canvas.offsetWidth * ratio;
         canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext('2d').scale(ratio, ratio); // Skalierung für den Zeichenkontext
+        canvas.getContext('2d').scale(ratio, ratio);
     }
 
-    resizeCanvas(); // Initial skalieren
-    window.addEventListener('resize', resizeCanvas); // Skalierung bei Größenänderung anpassen
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    // Initialisiere SignaturePad von der globalen CDN-Bibliothek
     const signaturePad = new SignaturePad(canvas, {
         penColor: 'black',
     });
@@ -37,7 +34,7 @@ export function clearSignature(canvasId) {
 
 export function getSignatureData(canvasId) {
     if (window.signaturePads && window.signaturePads[canvasId] && !window.signaturePads[canvasId].isEmpty()) {
-        return window.signaturePads[canvasId].toDataURL(); // Unterschrift als Base64 zurückgeben
+        return window.signaturePads[canvasId].toDataURL();
     } else {
         console.error('No signature data available or signature pad is empty.');
         return null;
@@ -45,10 +42,8 @@ export function getSignatureData(canvasId) {
 }
 
 export function openSignaturePopup(elementId) {
-    // Prüfen, ob bereits ein Popup existiert und ggf. schließen
     closeSignaturePopup();
 
-    // Popup erstellen und anzeigen
     const popupContainer = document.createElement('div');
     popupContainer.classList.add('signature-popup-overlay');
     popupContainer.innerHTML = `
@@ -63,7 +58,6 @@ export function openSignaturePopup(elementId) {
     `;
     document.body.appendChild(popupContainer);
 
-    // Signature Pad initialisieren
     initializeSignaturePad(`popup-signature-pad-${elementId}`);
 }
 
@@ -92,21 +86,6 @@ export function closeSignaturePopup() {
     const popupContainer = document.querySelector('.signature-popup-overlay');
     if (popupContainer) {
         popupContainer.parentNode.removeChild(popupContainer);
-    } else {
-        console.info('Kein Popup-Container gefunden. Es gibt nichts zu schließen.'); // Info statt Warnung
     }
-
-    // Zusätzliche Sicherstellung: Entferne verbleibende Event-Listener
-    window.signaturePads = {}; // Resette globale Signaturinstanzen
+    window.signaturePads = {};
 }
-
-// Globale Signatur-Werkzeuge registrieren
-window.signatureUtils = {
-    initializeSignaturePad,
-    clearSignature,
-    getSignatureData,
-    openSignaturePopup,
-    saveSignature,
-    clearSignatureResult,
-    closeSignaturePopup,
-};

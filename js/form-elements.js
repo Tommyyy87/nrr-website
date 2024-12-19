@@ -411,6 +411,44 @@ const formElements = [
         },
     },
 
+    // form-elements.js
+
+    {
+        id: 14, // Neue ID für den "Senden"-Baustein
+        label: 'Senden',
+        type: 'submit-button',
+        icon: 'fas fa-paper-plane',
+        description: 'Formular absenden und alle Eingaben verarbeiten.',
+        generalProperties: {
+            id: 'senden_1',
+            label: 'Formular absenden',
+            duplicate: false, // Senden-Button soll nicht dupliziert werden können
+            delete: true,
+            visible: true,
+        },
+        specificProperties: {
+            targetCloud: 'GoogleDrive', // Standardmäßig Google Drive, später erweiterbar
+            folderNamingConvention: '', // Optionaler Name für den Zielordner, z.B. dynamisch basierend auf Bausteinwerten
+            fileNamingConvention: '', // Dynamischer Dateiname, z.B. basierend auf Datumswerten
+            notifyUser: false, // Option, ob eine Benachrichtigung verschickt werden soll
+            apiCredentials: { // Platzhalter für die Cloud-API-Zugangsdaten
+                clientId: '',
+                clientSecret: '',
+                redirectUri: '',
+            },
+        },
+        render(element) {
+            // HTML Rendering des "Senden"-Buttons mit Eigenschaften
+            return `
+            <button type="button" class="submit-button" id="${element.generalProperties.id}">
+                <i class="${element.icon}"></i> ${element.generalProperties.label}
+            </button>
+            <div class="progress-bar" id="progress-${element.generalProperties.id}" style="display: none;"></div>
+        `;
+        }
+    },
+
+
     // {
     //     id: 14,
     //     label: 'E-Mail Eingabefeld',
@@ -481,22 +519,78 @@ const formElements = [
     //     },
     // },
     // {
-    //     id: 18,
-    //     label: 'Texteingabefeld',
-    //     type: 'textarea',
-    //     icon: 'fas fa-keyboard',
-    //     description: 'Lässt den Nutzer Text eingeben, z.B. für Kommentare oder Notizen.',
-    //     generalProperties: {
-    //         id: 'textfeld_1',
-    //         label: 'Texteingabefeld',
-    //         duplicate: true,
-    //         delete: true,
-    //     },
-    //     specificProperties: {
-    //         placeholder: 'Text eingeben...',
-    //         maxCharacters: 500,
-    //     },
-    // },
+    {
+        id: 18,
+        label: 'Freitext-Eingabe',
+        type: 'textarea',
+        icon: 'fas fa-keyboard',
+        description: 'Ermöglicht die Eingabe von längeren Texten, ideal für Kommentare, Beschreibungen oder Notizen.',
+        generalProperties: {
+            id: 'freitext_1',
+            label: 'Freitext-Eingabe',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false
+        },
+        specificProperties: {
+            placeholder: 'Text hier eingeben...',
+            defaultValue: '',
+            minLength: 0,
+            maxLength: 1000,
+            rows: 4,
+            textColor: '#000000',
+            backgroundColor: '#ffffff',
+            borderColor: '#cccccc',
+            fontSize: 'medium',
+            fontFamily: 'Arial',
+            resize: 'vertical',
+            spellcheck: true,
+            readonly: false,
+            currentLength: 0
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const textareaId = `textarea-${element.id}`;
+            const counterId = `counter-${element.id}`;
+
+            return `
+                    <div class="textarea-container">
+                        <label for="${textareaId}" class="form-label">
+                            ${element.generalProperties.label}
+                            ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
+                        </label>
+                        <textarea
+                            id="${textareaId}"
+                            class="form-textarea"
+                            data-font-size="${specific.fontSize}"
+                            data-resize="${specific.resize}"
+                            data-counter-id="${counterId}"
+                            placeholder="${specific.placeholder}"
+                            minlength="${specific.minLength}"
+                            maxlength="${specific.maxLength}"
+                            rows="${specific.rows}"
+                            spellcheck="${specific.spellcheck}"
+                            oninput="updateCharacterCount(this)"
+                            ${specific.readonly ? 'readonly' : ''}
+                            ${element.generalProperties.isRequired ? 'required' : ''}
+                            style="
+                                color: ${specific.textColor};
+                                background-color: ${specific.backgroundColor};
+                                border-color: ${specific.borderColor};
+                                font-family: ${specific.fontFamily};
+                            "
+                        >${specific.defaultValue}</textarea>
+                        <div class="character-count">
+                            <small>
+                                <span id="${counterId}">${specific.defaultValue.length}</span>
+                                ${specific.maxLength > 0 ? ` / ${specific.maxLength}` : ''} Zeichen
+                            </small>
+                        </div>
+                    </div>
+                `;
+        }
+    },
     // {
     //     id: 19,
     //     label: 'Tonaufnahme',
@@ -563,24 +657,96 @@ const formElements = [
 
 
 
-    // {
-    //     id: 21,
-    //     label: 'Zahleneingabefeld',
-    //     type: 'number',
-    //     icon: 'fas fa-hashtag',
-    //     description: 'Lässt den Nutzer eine Zahl eingeben. Der Wertebereich kann festgelegt werden.',
-    //     generalProperties: {
-    //         id: 'zahleneingabe_1',
-    //         label: 'Zahleneingabefeld',
-    //         duplicate: true,
-    //         delete: true,
-    //     },
-    //     specificProperties: {
-    //         minValue: 0,
-    //         maxValue: 100,
-    //         stepSize: 1,
-    //     },
-    // },
+    // Erweiterung in form-elements.js
+    // Neuer Baustein für Zahleneingabe
+
+    {
+        id: 21,
+        label: 'Zahleneingabefeld',
+        type: 'number-input',
+        icon: 'fas fa-hashtag',
+        description: 'Ermöglicht die Eingabe von Zahlen mit definierbarem Wertebereich und Schrittweite.',
+        generalProperties: {
+            id: 'zahleneingabe_1',
+            label: 'Zahleneingabe',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false
+        },
+        specificProperties: {
+            minValue: 0,
+            maxValue: 100,
+            stepSize: 1,
+            defaultValue: '',
+            unit: '',
+            allowDecimals: false,
+            decimalPlaces: 2,
+            alignment: 'left',
+            backgroundColor: '#ffffff',
+            textColor: '#000000',
+            variableName: ''
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const inputId = `number-input-${element.id}`;
+
+            // Step-Berechnung basierend auf allowDecimals
+            const step = specific.allowDecimals === true ?
+                (specific.stepSize || Math.pow(0.1, specific.decimalPlaces)) :
+                1;
+
+            // Standardwert-Formatierung
+            let defaultValue = specific.defaultValue;
+            if (specific.allowDecimals === true && defaultValue !== '') {
+                defaultValue = parseFloat(defaultValue).toFixed(specific.decimalPlaces);
+            } else if (!specific.allowDecimals && defaultValue !== '') {
+                defaultValue = Math.round(parseFloat(defaultValue));
+            }
+
+            return `
+                <div class="number-input-container">
+                    <label for="${inputId}" class="form-label">
+                        ${element.generalProperties.label}
+                        ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
+                    </label>
+                    <div class="input-with-unit">
+                        <input
+                            id="${inputId}"
+                            type="number"
+                            class="number-input ${element.generalProperties.isRequired ? 'required' : ''}"
+                            min="${specific.minValue}"
+                            max="${specific.maxValue}"
+                            step="${step}"
+                            value="${defaultValue}"
+                            style="
+                                text-align: ${specific.alignment};
+                                background-color: ${specific.backgroundColor};
+                                color: ${specific.textColor};
+                            "
+                            data-variable-name="${specific.variableName}"
+                            data-allow-decimals="${specific.allowDecimals}"
+                            onkeydown="return window.app.validateNumberKeyPress(event, ${specific.allowDecimals})"
+                            oninput="window.app.handleNumberInputChange(this, '${element.id}')"
+                            onpaste="return window.app.validateNumberPaste(event, ${specific.allowDecimals})"
+                            ${element.generalProperties.isRequired ? 'required' : ''}
+                        />
+                        ${specific.unit ? `<span class="unit-label">${specific.unit}</span>` : ''}
+                    </div>
+                    <div class="input-controls">
+                        <button type="button" 
+                                class="number-control-button" 
+                                onclick="window.app.handleNumberInput('${element.id}', 'decrement')"
+                                title="Wert verringern">-</button>
+                        <button type="button" 
+                                class="number-control-button" 
+                                onclick="window.app.handleNumberInput('${element.id}', 'increment')"
+                                title="Wert erhöhen">+</button>
+                    </div>
+                </div>
+            `;
+        }
+    },
     // {
     //     id: 22,
     //     label: 'Zeitstempel',
@@ -730,6 +896,77 @@ const formElements = [
     //         allowNewEntries: true,
     //     },
     // },
+    {
+        id: 31,
+        label: 'Radio Buttons',
+        type: 'radio-group',
+        icon: 'fas fa-dot-circle',
+        description: 'Fügt eine Gruppe von Radio-Buttons hinzu, aus denen der Benutzer eine Option auswählen kann.',
+        generalProperties: {
+            id: 'radio_1',
+            label: 'Radio Button Gruppe',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false
+        },
+        specificProperties: {
+            // NEU: Beschriftung für die Radio-Button Gruppe
+            groupLabel: 'Bitte wählen Sie eine Option:', // Standard-Beschriftung
+            options: ['Option 1', 'Option 2', 'Option 3'],
+            defaultSelected: 'Option 1',
+            layout: 'vertical',
+            optionLabels: ['Option 1', 'Option 2', 'Option 3'],
+            optionValues: ['1', '2', '3'],
+            textColor: '#000000',
+            backgroundColor: '#ffffff',
+            spacing: 'medium',
+            customCSS: '',
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const layoutClass = specific.layout === 'horizontal' ? 'flex-row' : 'flex-col';
+            const spacingClass = `gap-${specific.spacing === 'small' ? '2' : specific.spacing === 'medium' ? '4' : '6'}`;
+
+            // NEU: Label-HTML hinzugefügt
+            const labelHtml = specific.groupLabel ?
+                `<label class="form-label" style="color: ${specific.textColor}; margin-bottom: 0.5rem;">
+                    ${specific.groupLabel}
+                </label>` : '';
+
+            const options = specific.options.map((option, index) => {
+                const label = specific.optionLabels[index] || option;
+                const value = specific.optionValues[index] || option;
+                const isChecked = specific.defaultSelected === option;
+
+                return `
+                    <label class="radio-option">
+                        <input 
+                            type="radio"
+                            name="radio_${element.id}"
+                            value="${value}"
+                            ${isChecked ? 'checked' : ''}
+                        />
+                        <span style="color: ${specific.textColor}">
+                            ${label}
+                        </span>
+                    </label>
+                `;
+            }).join('');
+
+            return `
+                <div class="radio-group-container">
+                    ${labelHtml}
+                    <div class="radio-group ${layoutClass} ${spacingClass}"
+                         style="background-color: ${specific.backgroundColor}; 
+                                padding: ${specific.spacing === 'small' ? '0.5rem' :
+                    specific.spacing === 'medium' ? '1rem' : '1.5rem'}">
+                        ${options}
+                    </div>
+                </div>
+            `;
+        }
+    },
 ];
 
 export default formElements;

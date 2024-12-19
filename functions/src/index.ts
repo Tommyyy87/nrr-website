@@ -1,7 +1,8 @@
 import * as functionsV2 from 'firebase-functions/v2'; // Für HTTP-Trigger (v2)
-import * as functions from 'firebase-functions/v1'; // Für Auth-Trigger (v1)
+import * as functions from 'firebase-functions/v1'; // Für Auth-Trigger, onCall etc. (v1)
 import * as admin from 'firebase-admin';
 import * as cors from 'cors';
+import { google } from 'googleapis'; // Für den Zugriff auf Google APIs (Drive)
 
 admin.initializeApp();
 
@@ -11,11 +12,11 @@ const corsHandler = cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 });
 
-// Funktion, um Admins bei neuer Benutzerregistrierung zu benachrichtigen (v1 Auth-Trigger)
+// ********** Auth-Trigger: Admin-Benachrichtigung bei neuer Registrierung **********
 export const sendAdminNotification = functions.auth.user().onCreate(async (user: admin.auth.UserRecord) => {
     try {
         const adminUsersSnapshot = await admin.firestore().collection("users")
-            .where("isAdmin", "==", true)  // Nur Benutzer mit Admin-Rechten
+            .where("isAdmin", "==", true)
             .get();
 
         const adminEmails: string[] = [];
@@ -28,7 +29,7 @@ export const sendAdminNotification = functions.auth.user().onCreate(async (user:
 
         if (adminEmails.length === 0) {
             console.log("Keine Admins gefunden. Keine E-Mails gesendet.");
-            return null;
+            return;
         }
 
         const emailData = {
@@ -45,14 +46,14 @@ export const sendAdminNotification = functions.auth.user().onCreate(async (user:
         };
 
         await admin.firestore().collection("mail").add(emailData);
-        return null;
+        return;
     } catch (error) {
         console.error("Fehler beim Senden der Admin-Benachrichtigung:", error);
-        return null;
+        return;
     }
 });
 
-// Beispiel für vorhandene Cloud Function: getUserData (v2 HTTP-Trigger)
+// ********** HTTP-Trigger (v2): getUserData **********
 export const getUserData = functionsV2.https.onRequest(async (req, res) => {
     corsHandler(req, res, async () => {
         if (req.method === 'OPTIONS') {
@@ -68,7 +69,8 @@ export const getUserData = functionsV2.https.onRequest(async (req, res) => {
         try {
             const idToken = req.headers.authorization
                 ? req.headers.authorization.split('Bearer ')[1]
-                : null;
+                : undefined;
+
             if (!idToken) {
                 res.status(401).send('Nicht autorisiert: Kein Token vorhanden');
                 return;
@@ -97,7 +99,7 @@ export const getUserData = functionsV2.https.onRequest(async (req, res) => {
     });
 });
 
-// Cloud Function: addUser (v2 HTTP-Trigger)
+// ********** HTTP-Trigger (v2): addUser **********
 export const addUser = functionsV2.https.onRequest(async (req, res) => {
     corsHandler(req, res, async () => {
         if (req.method === 'OPTIONS') {
@@ -113,7 +115,8 @@ export const addUser = functionsV2.https.onRequest(async (req, res) => {
         try {
             const idToken = req.headers.authorization
                 ? req.headers.authorization.split('Bearer ')[1]
-                : null;
+                : undefined;
+
             if (!idToken) {
                 res.status(401).send('Nicht autorisiert: Kein Token vorhanden');
                 return;
@@ -122,7 +125,6 @@ export const addUser = functionsV2.https.onRequest(async (req, res) => {
             const decodedToken = await admin.auth().verifyIdToken(idToken);
 
             const { email, firstName, lastName } = req.body;
-
             const uid = decodedToken.uid;
 
             await admin.firestore().collection('users').doc(uid).set({
@@ -146,7 +148,7 @@ export const addUser = functionsV2.https.onRequest(async (req, res) => {
     });
 });
 
-// Cloud Function: deleteUser (v2 HTTP-Trigger)
+// ********** HTTP-Trigger (v2): deleteUser **********
 export const deleteUser = functionsV2.https.onRequest(async (req, res) => {
     corsHandler(req, res, async () => {
         if (req.method === 'OPTIONS') {
@@ -162,7 +164,8 @@ export const deleteUser = functionsV2.https.onRequest(async (req, res) => {
         try {
             const idToken = req.headers.authorization
                 ? req.headers.authorization.split('Bearer ')[1]
-                : null;
+                : undefined;
+
             if (!idToken) {
                 res.status(401).send('Nicht autorisiert: Kein Token vorhanden');
                 return;
@@ -208,3 +211,64 @@ export const deleteUser = functionsV2.https.onRequest(async (req, res) => {
         }
     });
 });
+
+// ********** Callable Function (v1): uploadToGoogleDrive **********
+
+export const uploadToGoogleDrive = functions.https.onCall(async (data, context) => {
+    // Optional: Authentifizierte Benutzer erzwingen
+    // if (!context.auth) {
+    //   throw new functions.https.HttpsError('unauthenticated', 'Benutzer ist nicht angemeldet.');
+    // }
+
+    const clientEmail = functions.config().google.drive_client_email;
+    const privateKey = functions.config().google.drive_private_key.replace(/\\n/g, '\n');
+
+    const auth = new google.auth.JWT({
+        email: clientEmail,
+        key: privateKey,
+        scopes: ['https://www.googleapis.com/auth/drive']
+    });
+
+
+    const drive = google.drive({ version: 'v3', auth });
+
+    const folderName = data.folderName;
+    const fileName = data.fileName;
+    const fileContentBase64 = data.fileContent; // PDF-Datei im Base64-Format
+
+    const folderId = await ensureFolderExists(drive, folderName);
+    const media = {
+        mimeType: 'application/pdf',
+        body: Buffer.from(fileContentBase64, 'base64')
+    };
+
+    const file = await drive.files.create({
+        requestBody: {
+            name: fileName,
+            parents: [folderId]
+        },
+        media: media
+    });
+
+    return { message: 'Upload erfolgreich', fileId: file.data.id };
+});
+
+async function ensureFolderExists(drive: any, folderName: string): Promise<string> {
+    const res = await drive.files.list({
+        q: `mimeType='application/vnd.google-apps.folder' and name='${folderName}'`,
+        fields: 'files(id, name)'
+    });
+
+    if (res.data.files && res.data.files.length > 0) {
+        return res.data.files[0].id;
+    } else {
+        const folder = await drive.files.create({
+            requestBody: {
+                name: folderName,
+                mimeType: 'application/vnd.google-apps.folder'
+            },
+            fields: 'id'
+        });
+        return folder.data.id;
+    }
+}

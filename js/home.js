@@ -1,4 +1,4 @@
-// js/home.js
+// Das ist die home.js:
 
 // Überprüfung, ob Firebase verfügbar ist
 console.log('Firebase in home.js:', firebase);
