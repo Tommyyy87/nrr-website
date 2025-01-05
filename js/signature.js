@@ -41,6 +41,17 @@ export function getSignatureData(canvasId) {
     }
 }
 
+// Füge Event-Handler für den Button hinzu
+document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.signature-popup-button');
+    buttons.forEach(button => {
+        button.addEventListener('click', function () {
+            const elementId = this.id.replace('popup-button-', '');
+            openSignaturePopup(elementId);
+        });
+    });
+});
+
 export function openSignaturePopup(elementId) {
     closeSignaturePopup();
 
@@ -68,7 +79,9 @@ export function saveSignature(elementId) {
         if (resultContainer) {
             resultContainer.innerHTML = `
                 <img src="${signatureData}" alt="Unterschrift" class="saved-signature">
-                <button type="button" class="button clear-signature-button" onclick="window.signatureUtils.clearSignatureResult('${elementId}')">Unterschrift löschen</button>
+                <button type="button" class="button clear-signature-button" onclick="window.signatureUtils.clearSignatureResult('${elementId}')">
+                    Unterschrift löschen
+                </button>
             `;
         }
         closeSignaturePopup();

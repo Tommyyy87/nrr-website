@@ -769,6 +769,183 @@
                                 </div>
                             </div>
 
+                            <!-- Eigenschaften für das Dropdown-Menü -->
+                            <div v-if="selectedElement.type === 'dropdown'" class="property-group">
+                                <div class="radio-options-container">
+                                    <!-- Beschriftung -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.label"
+                                            placeholder="Beschriftung eingeben"
+                                            @input="updateSpecificProperty('label', $event.target.value)" />
+                                    </div>
+
+                                    <h3>Dropdown Optionen</h3>
+
+                                    <!-- Optionen Verwaltung -->
+                                    <div v-for="(option, index) in selectedElement.specificProperties.options"
+                                        :key="index" class="radio-option-row">
+                                        <span class="option-number">Option {{ index + 1 }}</span>
+
+                                        <label class="radio-option-label">Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.optionLabels[index]"
+                                            placeholder="Beschriftung eingeben"
+                                            @input="updateDropdownOption(index, $event.target.value)" />
+
+                                        <button @click="removeOption(index)" class="delete-option-button"
+                                            title="Option löschen">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <button @click="addOption" class="add-option-button">
+                                        <i class="fas fa-plus"></i> Neue Option hinzufügen
+                                    </button>
+
+                                    <!-- Standardauswahl -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Standardauswahl:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.defaultValue"
+                                            @change="updateSpecificProperty('defaultValue', $event.target.value)">
+                                            <option value="">Keine Vorauswahl</option>
+                                            <option
+                                                v-for="(value, index) in selectedElement.specificProperties.optionValues"
+                                                :key="index" :value="value">
+                                                {{ selectedElement.specificProperties.optionLabels[index] }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Farben -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Textfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.textColor"
+                                            @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                    </div>
+
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Hintergrundfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.backgroundColor"
+                                            @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ID 10 - Checkbox -->
+                            <!-- Spezifische Eigenschaften für Checkbox Gruppe -->
+                            <div v-if="selectedElement.type === 'checkbox-group'" class="property-group">
+                                <div class="radio-options-container">
+                                    <!-- Gruppen-Beschriftung -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Gruppen-Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.groupLabel"
+                                            @input="updateSpecificProperty('groupLabel', $event.target.value)"
+                                            placeholder="Beschriftung über den Optionen" />
+                                    </div>
+
+                                    <h3>Checkbox Optionen</h3>
+
+                                    <!-- Optionen Verwaltung -->
+                                    <div v-for="(option, index) in selectedElement.specificProperties.options"
+                                        :key="index" class="radio-option-row">
+                                        <span class="option-number">Option {{ index + 1 }}</span>
+
+                                        <label class="radio-option-label">Beschriftung:</label>
+                                        <input type="text" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.optionLabels[index]"
+                                            placeholder="Beschriftung eingeben"
+                                            @input="updateCheckboxOption(index, $event.target.value)" />
+
+                                        <button @click="removeOption(index)" class="delete-option-button"
+                                            title="Option löschen">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <button @click="addOption" class="add-option-button">
+                                        <i class="fas fa-plus"></i> Neue Option hinzufügen
+                                    </button>
+
+                                    <!-- Layout Einstellungen -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Ausrichtung:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.layout"
+                                            @change="updateSpecificProperty('layout', $event.target.value)">
+                                            <option value="vertical">Untereinander</option>
+                                            <option value="horizontal">Nebeneinander</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Abstände -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Abstände:</label>
+                                        <select class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.spacing"
+                                            @change="updateSpecificProperty('spacing', $event.target.value)">
+                                            <option value="small">Klein</option>
+                                            <option value="medium">Mittel</option>
+                                            <option value="large">Groß</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Minimale/Maximale Auswahl -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Minimale Auswahl:</label>
+                                        <input type="number" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.minSelected"
+                                            @input="updateSpecificProperty('minSelected', parseInt($event.target.value))"
+                                            min="0" :max="selectedElement.specificProperties.options.length" />
+                                    </div>
+
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Maximale Auswahl:</label>
+                                        <input type="number" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.maxSelected"
+                                            @input="updateSpecificProperty('maxSelected', parseInt($event.target.value))"
+                                            min="0" :max="selectedElement.specificProperties.options.length" />
+                                        <small>0 = keine Begrenzung</small>
+                                    </div>
+
+                                    <!-- Farben -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Textfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.textColor"
+                                            @input="updateSpecificProperty('textColor', $event.target.value)" />
+                                    </div>
+
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Hintergrundfarbe:</label>
+                                        <input type="color" class="radio-option-input"
+                                            v-model="selectedElement.specificProperties.backgroundColor"
+                                            @input="updateSpecificProperty('backgroundColor', $event.target.value)" />
+                                    </div>
+
+                                    <!-- Standardauswahl Multiple -->
+                                    <div class="radio-option-row">
+                                        <label class="radio-option-label">Standardauswahl:</label>
+                                        <div class="checkbox-list">
+                                            <div v-for="option in selectedElement.specificProperties.options"
+                                                :key="option" class="checkbox-list-item">
+                                                <label>
+                                                    <input type="checkbox" :value="option"
+                                                        v-model="selectedElement.specificProperties.defaultSelected"
+                                                        @change="updateSpecificProperty('defaultSelected', selectedElement.specificProperties.defaultSelected)" />
+                                                    {{ option }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
                     </div>

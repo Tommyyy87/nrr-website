@@ -152,6 +152,63 @@ import {
                 }
             },
 
+            // Methoden für das Dropdown
+            addOption() {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    const newIndex = this.selectedElement.specificProperties.options.length + 1;
+                    const defaultLabel = `Option ${newIndex}`;
+                    const defaultValue = `option_${newIndex}`;
+
+                    this.selectedElement.specificProperties.options.push(defaultLabel);
+                    this.selectedElement.specificProperties.optionLabels.push(defaultLabel);
+                    this.selectedElement.specificProperties.optionValues.push(defaultValue);
+
+                    this.updateSpecificProperty('options', this.selectedElement.specificProperties.options);
+                    this.saveToHistory();
+                }
+            },
+
+            removeOption(index) {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    this.selectedElement.specificProperties.options.splice(index, 1);
+                    this.selectedElement.specificProperties.optionLabels.splice(index, 1);
+                    this.selectedElement.specificProperties.optionValues.splice(index, 1);
+
+                    // Standardauswahl zurücksetzen, wenn die gelöschte Option ausgewählt war
+                    if (this.selectedElement.specificProperties.defaultValue ===
+                        this.selectedElement.specificProperties.optionValues[index]) {
+                        this.selectedElement.specificProperties.defaultValue = '';
+                    }
+
+                    this.updateSpecificProperty('options', this.selectedElement.specificProperties.options);
+                    this.saveToHistory();
+                }
+            },
+
+            updateDropdownOption(index, newLabel) {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    this.selectedElement.specificProperties.options[index] = newLabel;
+                    this.selectedElement.specificProperties.optionLabels[index] = newLabel;
+                    this.updateSpecificProperty('options', this.selectedElement.specificProperties.options);
+                    this.saveToHistory();
+                }
+            },
+
+            updateDropdownValue(index, newValue) {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    this.selectedElement.specificProperties.optionValues[index] = newValue;
+
+                    // Standardauswahl aktualisieren, wenn die geänderte Option ausgewählt war
+                    if (this.selectedElement.specificProperties.defaultValue ===
+                        this.selectedElement.specificProperties.optionValues[index]) {
+                        this.selectedElement.specificProperties.defaultValue = newValue;
+                    }
+
+                    this.updateSpecificProperty('optionValues', this.selectedElement.specificProperties.optionValues);
+                    this.saveToHistory();
+                }
+            },
+
             removeOption(index) {
                 if (this.selectedElement && this.selectedElement.specificProperties) {
                     this.selectedElement.specificProperties.options.splice(index, 1);
@@ -227,6 +284,16 @@ import {
                 this.formElements.push(newElement);
                 this.saveToHistory();
                 this.isFormSaved = false;
+            },
+
+            // Checkbox
+            updateCheckboxOption(index, newLabel) {
+                if (this.selectedElement && this.selectedElement.specificProperties) {
+                    this.selectedElement.specificProperties.options[index] = newLabel;
+                    this.selectedElement.specificProperties.optionLabels[index] = newLabel;
+                    this.updateSpecificProperty('options', this.selectedElement.specificProperties.options);
+                    this.saveToHistory();
+                }
             },
 
             startDrag(element, event) {

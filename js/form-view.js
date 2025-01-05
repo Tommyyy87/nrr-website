@@ -10,6 +10,8 @@ import {
     showNotification,
     handleSubmitButton
 } from './submit-elements.js';
+import * as signatureUtils from './signature.js';
+window.signatureUtils = signatureUtils;
 
 document.addEventListener("DOMContentLoaded", function () {
     const app = new Vue({
@@ -258,6 +260,122 @@ document.addEventListener("DOMContentLoaded", function () {
                 element.userInput = value;
             },
 
+            validateDropdown(element) {
+                if (!element || element.type !== 'dropdown') return true;
+
+                const select = document.getElementById(`dropdown-${element.id}`);
+                if (!select) return true;
+
+                if (element.generalProperties.isRequired) {
+                    // Prüfen ob ein Wert ausgewählt wurde
+                    if (!select.value) return false;
+
+                    // Bei Mehrfachauswahl
+                    if (element.specificProperties.multiple) {
+                        const selectedOptions = Array.from(select.selectedOptions);
+                        if (selectedOptions.length < element.specificProperties.minLength) return false;
+                        if (element.specificProperties.maxSelections > 0 &&
+                            selectedOptions.length > element.specificProperties.maxSelections) return false;
+                    }
+                }
+
+                // Benutzerdefinierte Validierung ausführen, falls vorhanden
+                if (element.specificProperties.customValidation) {
+                    try {
+                        const validationFn = new Function('value', element.specificProperties.customValidation);
+                        return validationFn(select.value);
+                    } catch (error) {
+                        console.error('Fehler in der benutzerdefinierten Validierung:', error);
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+
+            validateRequiredFields(formElements) {
+                const errors = [];
+                formElements.forEach(element => {
+                    if (element.generalProperties.isRequired && element.generalProperties.visible) {
+                        if (element.type === 'textarea') {
+                            if (!this.validateTextarea(element)) {
+                                errors.push(`Das Feld "${element.generalProperties.label}" muss ausgefüllt werden.`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
+                        } else if (element.type === 'number-input') {
+                            if (!this.validateNumberInput(element)) {
+                                errors.push(`Das Feld "${element.generalProperties.label}" ist ungültig oder muss ausgefüllt werden.`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
+                        } else if (element.type === 'checkbox-group') {
+                            if (!this.validateCheckboxGroup(element)) {
+                                const minSelected = element.specificProperties.minSelected || 1;
+                                const maxSelected = element.specificProperties.maxSelected;
+                                let errorMessage = `Bitte wählen Sie `;
+
+                                if (maxSelected) {
+                                    errorMessage += `zwischen ${minSelected} und ${maxSelected} Optionen`;
+                                } else if (minSelected > 1) {
+                                    errorMessage += `mindestens ${minSelected} Optionen`;
+                                } else {
+                                    errorMessage += `mindestens eine Option`;
+                                }
+
+                                errorMessage += ` in "${element.generalProperties.label}" aus.`;
+                                errors.push(errorMessage);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
+                        } else if (element.type === 'dropdown') {
+                            if (!this.validateDropdown(element)) {
+                                errors.push(`Bitte treffen Sie eine Auswahl in "${element.generalProperties.label}".`);
+                                element.hasError = true;
+                            } else {
+                                element.hasError = false;
+                            }
+                        } else {
+                            // ... Rest der bestehenden Validierungslogik ...
+                        }
+                    }
+                });
+                return errors;
+            },
+
+            // Checkbox
+
+            // Fügen Sie diese Methode zu den methods in der Vue-Anwendung hinzu
+            validateCheckboxGroup(element) {
+                if (!element || element.type !== 'checkbox-group') return true;
+
+                // Finde alle Checkboxen für diese Gruppe
+                const checkboxes = document.querySelectorAll(`input[name="checkbox_${element.id}[]"]`);
+                const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+                // Wenn es ein Pflichtfeld ist, muss mindestens eine Option ausgewählt sein
+                if (element.generalProperties.isRequired && selectedCount === 0) {
+                    return false;
+                }
+
+                // Überprüfe minimale Auswahl
+                const minSelected = element.specificProperties.minSelected || 0;
+                if (minSelected > 0 && selectedCount < minSelected) {
+                    return false;
+                }
+
+                // Überprüfe maximale Auswahl
+                const maxSelected = element.specificProperties.maxSelected;
+                if (maxSelected && selectedCount > maxSelected) {
+                    return false;
+                }
+
+                return true;
+            },
+
             validateTextarea(element) {
                 if (!element || element.type !== 'textarea') return true;
 
@@ -447,5 +565,6 @@ document.addEventListener("DOMContentLoaded", function () {
         created() {
             window.app = this;
         }
+
     });
 });

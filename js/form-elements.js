@@ -228,23 +228,88 @@ const formElements = [
     //         defaultState: false,
     //     },
     // },
-    // {
-    //     id: 10,
-    //     label: 'Mehrfachauswahl',
-    //     type: 'multi-select',
-    //     icon: 'fas fa-tasks',
-    //     description: 'Erlaubt dem Nutzer, mehrere Optionen aus einer Liste auszuwählen.',
-    //     generalProperties: {
-    //         id: 'mehrfachauswahl_1',
-    //         label: 'Mehrfachauswahl',
-    //         duplicate: true,
-    //         delete: true,
-    //     },
-    //     specificProperties: {
-    //         options: ['Option 1', 'Option 2', 'Option 3'],
-    //         defaultSelection: ['Option 1'],
-    //     },
-    // },
+    {
+        id: 10,
+        label: 'Checkbox Gruppe',
+        type: 'checkbox-group',
+        icon: 'fas fa-check-square',
+        description: 'Fügt eine Gruppe von Checkboxen hinzu, aus denen der Benutzer mehrere Optionen auswählen kann.',
+        generalProperties: {
+            id: 'checkbox_1',
+            label: 'Checkbox Gruppe',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false
+        },
+        specificProperties: {
+            groupLabel: 'Bitte wählen Sie die zutreffenden Optionen:',
+            options: ['Option 1', 'Option 2', 'Option 3'],
+            defaultSelected: [],
+            layout: 'vertical',
+            optionLabels: ['Option 1', 'Option 2', 'Option 3'],
+            optionValues: ['1', '2', '3'],
+            textColor: '#000000',
+            backgroundColor: '#ffffff',
+            spacing: 'medium',
+            checkboxStyle: 'modern',
+            customCSS: '',
+            minSelected: 0,
+            maxSelected: null,
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const layoutClass = specific.layout === 'horizontal' ? 'flex-wrap' : 'flex-col';
+            const spacingClass = `gap-${specific.spacing === 'small' ? '2' : specific.spacing === 'medium' ? '4' : '6'}`;
+    
+            const labelHtml = specific.groupLabel ?
+                `<label class="form-label checkbox-group-label" style="color: ${specific.textColor}">
+                    ${specific.groupLabel}
+                    ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
+                </label>` : '';
+    
+            const options = specific.options.map((option, index) => {
+                const label = specific.optionLabels[index] || option;
+                const value = specific.optionValues[index] || option;
+                const isChecked = (specific.defaultSelected || []).includes(option);
+    
+                return `
+                    <label class="checkbox-option">
+                        <div class="checkbox-wrapper">
+                            <input 
+                                type="checkbox"
+                                name="checkbox_${element.id}[]"
+                                value="${value}"
+                                ${isChecked ? 'checked' : ''}
+                                data-min-selected="${specific.minSelected}"
+                                data-max-selected="${specific.maxSelected || ''}"
+                            />
+                            <span class="custom-checkbox"></span>
+                            <span class="checkbox-label" style="color: ${specific.textColor}">
+                                ${label}
+                            </span>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+    
+            return `
+                <div class="checkbox-group-container">
+                    ${labelHtml}
+                    <div class="checkbox-group ${layoutClass} ${spacingClass}" 
+                         style="background-color: ${specific.backgroundColor}">
+                        ${options}
+                    </div>
+                    ${specific.minSelected > 0 ? 
+                        `<small class="hint-text">Bitte wählen Sie mindestens ${specific.minSelected} Option${specific.minSelected > 1 ? 'en' : ''} aus.</small>` : 
+                        ''}
+                    ${specific.maxSelected ? 
+                        `<small class="hint-text">Sie können maximal ${specific.maxSelected} Option${specific.maxSelected > 1 ? 'en' : ''} auswählen.</small>` : 
+                        ''}
+                </div>
+            `;
+        }
+    },
     // {
     //     id: 11,
     //     label: 'Code-Scanner',
@@ -556,7 +621,7 @@ const formElements = [
 
             return `
                     <div class="textarea-container">
-                        <label for="${textareaId}" class="form-label">
+                       <label for="${textareaId}" class="form-label" style="font-weight: bold;">
                             ${element.generalProperties.label}
                             ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
                         </label>
@@ -620,38 +685,52 @@ const formElements = [
             duplicate: true,
             delete: true,
             visible: true,
-            isRequired: false,
+            isRequired: false
         },
         specificProperties: {
             penColor: '#000000',
-            fieldSize: 'medium', // Optionen: klein, mittel, groß
+            fieldSize: 'medium',
+            backgroundColor: '#ffffff',
+            penWidth: 2,
+            minWidth: 200,
+            maxWidth: 800,
+            minHeight: 100,
+            maxHeight: 400
         },
         render(element) {
             const inputId = `signature-pad-${element.id}`;
             const popupButtonId = `popup-button-${element.id}`;
-            const fieldSizeClass = element.specificProperties.fieldSize || 'medium'; // Standardgröße mittel
+            const fieldSizeClass = element.specificProperties.fieldSize || 'medium';
 
             return `
                 <div class="signature-container ${fieldSizeClass}">
                     <label for="${inputId}" class="form-label">
                         ${element.generalProperties.label || 'Unterschrift'}
+                        ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
                     </label>
-                    <button id="${popupButtonId}" type="button" class="button signature-popup-button">
+                    <button 
+                        id="${popupButtonId}" 
+                        type="button" 
+                        class="button signature-popup-button"
+                        onclick="window.signatureUtils.openSignaturePopup('${element.id}')">
                         Unterschreiben
                     </button>
                     <div id="signature-result-${element.id}" class="signature-result-container">
-                        ${element.signatureData
-                    ? `<img src="${element.signatureData}" alt="Unterschrift" class="saved-signature">
-                                   <button type="button" class="button clear-signature-button" 
-                                   onclick="window.signatureUtils.clearSignatureResult('${element.id}')">
-                                       Unterschrift löschen
-                                   </button>`
+                        ${element.signatureData ?
+                    `<img src="${element.signatureData}" 
+                                 alt="Unterschrift" 
+                                 class="saved-signature">
+                             <button type="button" 
+                                     class="button clear-signature-button"
+                                     onclick="window.signatureUtils.clearSignatureResult('${element.id}')">
+                                 Unterschrift löschen
+                             </button>`
                     : ''
                 }
                     </div>
                 </div>
             `;
-        },
+        }
     },
 
 
@@ -963,6 +1042,85 @@ const formElements = [
                     specific.spacing === 'medium' ? '1rem' : '1.5rem'}">
                         ${options}
                     </div>
+                </div>
+            `;
+        }
+    },
+
+    {
+        id: 32,
+        label: 'Dropdown Menü',
+        type: 'dropdown',
+        icon: 'fas fa-caret-square-down',
+        description: 'Fügt ein Auswahlmenü hinzu, aus dem der Benutzer eine Option auswählen kann.',
+        generalProperties: {
+            id: 'dropdown_1',
+            duplicate: true,
+            delete: true,
+            visible: true,
+            isRequired: false
+        },
+        specificProperties: {
+            label: '',
+            options: [],
+            optionLabels: [],
+            optionValues: [],
+            defaultValue: '',
+            textColor: '#000000',
+            backgroundColor: '#ffffff',
+            fontSize: 'medium'
+        },
+        // Factory-Funktion für neue Instanzen
+        createInstance() {
+            return {
+                ...this,
+                id: Date.now(),
+                specificProperties: {
+                    ...this.specificProperties,
+                    options: ['Option 1', 'Option 2', 'Option 3'],
+                    optionLabels: ['Option 1', 'Option 2', 'Option 3'],
+                    optionValues: ['1', '2', '3'],
+                }
+            };
+        },
+        render(element, userData = {}) {
+            const specific = element.specificProperties || {};
+            const selectId = `dropdown-${element.id}`;
+
+            const baseStyles = `
+                color: ${specific.textColor};
+                background-color: ${specific.backgroundColor};
+                border: 1px solid #cccccc;
+                border-radius: 4px;
+                padding: 8px 12px;
+                font-size: ${specific.fontSize === 'small' ? '0.875rem' :
+                    specific.fontSize === 'large' ? '1.25rem' : '1rem'};
+                width: 100%;
+                cursor: pointer;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            `;
+
+            return `
+                <div class="dropdown-container">
+                    <label for="${selectId}" class="form-label" style="font-weight: bold;">
+                        ${specific.label || 'Dropdown Menü'}
+                        ${element.generalProperties.isRequired ? '<span class="required">*</span>' : ''}
+                    </label>
+                    <select 
+                        id="${selectId}"
+                        class="form-dropdown"
+                        ${element.generalProperties.isRequired ? 'required' : ''}
+                        style="${baseStyles}"
+                    >
+                        ${specific.options.map((option, index) => `
+                            <option 
+                                value="${specific.optionValues[index]}"
+                                ${specific.defaultValue === specific.optionValues[index] ? 'selected' : ''}
+                            >
+                                ${specific.optionLabels[index]}
+                            </option>
+                        `).join('')}
+                    </select>
                 </div>
             `;
         }
